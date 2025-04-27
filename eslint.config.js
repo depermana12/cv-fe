@@ -5,16 +5,22 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import prettier from "eslint-config-prettier";
 import tseslint from "typescript-eslint";
 import reactHooks from "eslint-plugin-react-hooks";
+import pluginQuery from "@tanstack/eslint-plugin-query";
 import reactRefresh from "eslint-plugin-react-refresh";
 import importPlugin from "eslint-plugin-import";
+import pluginRouter from "@tanstack/eslint-plugin-router";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  { ignores: ["dist", "node_modules"] },
   {
     extends: [
       js.configs.recommended,
       ...tseslint.configs.recommended,
       ...tseslint.configs.stylistic,
+      ...jsxA11y.flatConfigs.recommended,
+      react.configs.flat["jsx-runtime"],
+      ...pluginRouter.configs["recommended"],
+      ...pluginQuery.configs["recommended"],
     ],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
@@ -39,18 +45,20 @@ export default tseslint.config(
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
       import: importPlugin,
-      prettier,
+      "@tanstack/query": pluginQuery,
+      "@tanstack/router": pluginRouter,
     },
     rules: {
       //base rules
       "no-console": "warn",
       "no-unused-vars": "off",
+      // React rules
+      "react/jsx-uses-react": "off",
+      "react/react-in-jsx-scope": "off",
+      "react/prop-types": "off",
       ...react.configs.recommended.rules,
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
-
-      // accesibility rules
-      ...jsxA11y.flatConfigs.recommended,
 
       // import rules
       "import/order": [
@@ -86,6 +94,17 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
+      // TanStack Query
+      "@tanstack/query/exhaustive-deps": "error",
+      "@tanstack/query/prefer-query-object-syntax": "warn",
+
+      // TanStack Router
+      "@tanstack/router/no-missing-route-components": "error",
     },
+  },
+  // Prettier config should be last
+  {
+    files: ["**/*.{ts,tsx}"],
+    extends: ["eslint-config-prettier"],
   },
 );
