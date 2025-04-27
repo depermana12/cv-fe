@@ -10,4 +10,13 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    proxy: {
+      "/api/v1": {
+        target: "https://api.kodedroid.com",
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
 });
