@@ -41,9 +41,11 @@ const SignUpForm = () => {
                 onChange={(e) => field.handleChange(e.target.value)}
                 className="border p-2 w-full"
               />
-              {field.state.meta.errors ? (
+              {field.state.meta.errors.length ? (
                 <p className="text-red-500">
-                  {field.state.meta.errors.join(", ")}
+                  {field.state.meta.errors
+                    .map((err) => err?.message)
+                    .join(", ")}
                 </p>
               ) : null}
             </>
@@ -66,9 +68,11 @@ const SignUpForm = () => {
                 onChange={(e) => field.handleChange(e.target.value)}
                 className="border p-2 w-full"
               />
-              {field.state.meta.errors ? (
+              {field.state.meta.errors.length ? (
                 <p className="text-red-500">
-                  {field.state.meta.errors.join(", ")}
+                  {field.state.meta.errors
+                    .map((err) => err?.message)
+                    .join(", ")}
                 </p>
               ) : null}
             </>
@@ -91,9 +95,11 @@ const SignUpForm = () => {
                 onChange={(e) => field.handleChange(e.target.value)}
                 className="border p-2 w-full"
               />
-              {field.state.meta.errors ? (
+              {field.state.meta.errors.length ? (
                 <p className="text-red-500">
-                  {field.state.meta.errors.join(", ")}
+                  {field.state.meta.errors
+                    .map((err) => err?.message)
+                    .join(", ")}
                 </p>
               ) : null}
             </>

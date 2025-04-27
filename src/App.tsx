@@ -1,33 +1,31 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { Link, Outlet } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="h-dvh w-dvw flex flex-col bg-gray-50">
+      <nav className="p-4 shadow bg-white flex justify-between items-center">
+        <div className="text-lg font-bold">
+          <Link to="/">Kodedroid CV</Link>
+        </div>
+        <div className="space-x-4">
+          <Link to="/auth/signin" className="text-blue-600 hover:underline">
+            Sign In
+          </Link>
+          <Link to="/auth/signup" className="text-blue-600 hover:underline">
+            Sign Up
+          </Link>
+        </div>
+      </nav>
+
+      <div className="flex-1 flex items-center justify-center p-4">
+        <Outlet />
       </div>
-      <h1 className="text-3xl font-bold underline">Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+      <TanStackRouterDevtools />
+      <ReactQueryDevtools />
+    </div>
   );
 }
 
