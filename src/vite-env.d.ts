@@ -4,7 +4,7 @@ declare module "@components/*";
 declare module "@features/*";
 declare module "@routes/*";
 declare module "@assets/*";
-declare module "@lib/axios" {
+declare module "@lib/axiosClient" {
   import { AxiosInstance } from "axios";
   export const axiosInstance: AxiosInstance;
 }
