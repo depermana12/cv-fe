@@ -1,9 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { signIn } from "../api/authApi";
 import { SignIn } from "../types/auth.schema";
+import { useAuthStore } from "../store/authStore";
 
 export const useSignIn = () => {
+  const { signIn } = useAuthStore();
   return useMutation({
-    mutationFn: (inputSignIn: SignIn) => signIn(inputSignIn),
+    mutationFn: async (inputSignIn: SignIn) => signIn(inputSignIn),
   });
 };
