@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { signInSchema, type SignIn } from "../types/auth.schema";
 import { useSignIn } from "../hooks/useSignIn";
+import { Button, Fieldset, Stack, TextInput } from "@mantine/core";
 
 const SignInForm = () => {
   const { mutate } = useSignIn();
@@ -25,66 +26,76 @@ const SignInForm = () => {
       }}
       className="space-y-4"
     >
-      <div>
-        <form.Field
-          name="email"
-          children={(field) => (
-            <>
-              <label htmlFor={field.name}>Email</label>
-              <input
-                type="email"
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="border p-2 w-full"
-              />
-              {field.state.meta.errors.length ? (
-                <p className="text-red-500">
-                  {field.state.meta.errors
-                    .map((err) => err?.message)
-                    .join(", ")}
-                </p>
-              ) : null}
-            </>
-          )}
-        />
-      </div>
+      <Fieldset legend="Sign In">
+        <Stack gap="md">
+          <div>
+            <form.Field
+              name="email"
+              children={(field) => (
+                <>
+                  <TextInput
+                    label={field.name}
+                    placeholder="Email"
+                    type="email"
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    error={
+                      field.state.meta.errors.length ? (
+                        <p className="text-red-500">
+                          {field.state.meta.errors
+                            .map((err) => err?.message)
+                            .join(", ")}
+                        </p>
+                      ) : null
+                    }
+                  />
+                </>
+              )}
+            />
+          </div>
 
-      <div>
-        <form.Field
-          name="password"
-          children={(field) => (
-            <>
-              <label htmlFor={field.name}>Password</label>
-              <input
-                type="password"
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="border p-2 w-full"
-              />
-              {field.state.meta.errors.length ? (
-                <p className="text-red-500">
-                  {field.state.meta.errors
-                    .map((err) => err?.message)
-                    .join(", ")}
-                </p>
-              ) : null}
-            </>
-          )}
-        />
-      </div>
-      <button
-        type="submit"
-        disabled={form.state.isSubmitting}
-        className="bg-blue-500 text-black p-2 rounded hover:bg-blue-600"
-      >
-        {form.state.isSubmitting ? "Signing Up..." : "Sign Up"}
-      </button>
+          <div>
+            <form.Field
+              name="password"
+              children={(field) => (
+                <>
+                  <TextInput
+                    label={field.name}
+                    placeholder="Password"
+                    type="password"
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    error={
+                      field.state.meta.errors.length ? (
+                        <p className="text-red-500">
+                          {field.state.meta.errors
+                            .map((err) => err?.message)
+                            .join(", ")}
+                        </p>
+                      ) : null
+                    }
+                  />
+                </>
+              )}
+            />
+          </div>
+          <Button
+            fullWidth
+            type="submit"
+            size="md"
+            mt="md"
+            disabled={form.state.isSubmitting}
+          >
+            {form.state.isSubmitting ? "Signing Up..." : "Sign Up"}
+          </Button>
+        </Stack>
+      </Fieldset>
     </form>
   );
 };
