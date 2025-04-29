@@ -7,6 +7,7 @@ import { routeTree } from "./routeTree.gen";
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "./index.css";
+import { useAuthStore } from "./features/auth/store/authStore";
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
@@ -15,13 +16,29 @@ declare module "@tanstack/react-router" {
   }
 }
 
-const router = createRouter({ routeTree });
+const router = createRouter({ routeTree, context: { auth: undefined! } });
+
+const InnerApp = () => {
+  const { user, isAuthenticated } = useAuthStore();
+
+  return (
+    <RouterProvider
+      router={router}
+      context={{
+        auth: {
+          user,
+          isAuthenticated,
+        },
+      }}
+    />
+  );
+};
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <MantineProvider>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <InnerApp />
       </QueryClientProvider>
     </MantineProvider>
   </StrictMode>,
