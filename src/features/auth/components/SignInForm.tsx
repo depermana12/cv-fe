@@ -43,13 +43,11 @@ const SignInForm = () => {
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     error={
-                      field.state.meta.errors.length ? (
-                        <p className="text-red-500">
-                          {field.state.meta.errors
+                      field.state.meta.errors.length
+                        ? field.state.meta.errors
                             .map((err) => err?.message)
-                            .join(", ")}
-                        </p>
-                      ) : null
+                            .join(", ")
+                        : null
                     }
                   />
                 </>
@@ -72,13 +70,11 @@ const SignInForm = () => {
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     error={
-                      field.state.meta.errors.length ? (
-                        <p className="text-red-500">
-                          {field.state.meta.errors
+                      field.state.meta.errors.length
+                        ? field.state.meta.errors
                             .map((err) => err?.message)
-                            .join(", ")}
-                        </p>
-                      ) : null
+                            .join(", ")
+                        : null
                     }
                   />
                 </>
@@ -92,7 +88,7 @@ const SignInForm = () => {
             mt="md"
             disabled={form.state.isSubmitting}
           >
-            {form.state.isSubmitting ? "Signing Up..." : "Sign Up"}
+            {form.state.isSubmitting ? "Signing In..." : "Sign In"}
           </Button>
         </Stack>
       </Fieldset>
