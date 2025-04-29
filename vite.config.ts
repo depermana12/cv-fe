@@ -14,7 +14,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/v1": {
-        target: "https://api.kodedroid.com",
+        target: "http://localhost:5000",
         changeOrigin: true,
         secure: true,
       },
