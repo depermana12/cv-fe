@@ -7,12 +7,13 @@ const SignInForm = () => {
   const { mutate } = useSignIn();
 
   const defaultSignInForm: SignIn = { email: "", password: "" };
-  const form = useForm({
+  const { Field, handleSubmit, state } = useForm({
     defaultValues: defaultSignInForm,
     onSubmit: async ({ value }) => {
       console.log("user login", value);
       mutate(value);
     },
+    //TODO: invalid error per field
     validators: {
       onChange: signInSchema,
     },
@@ -22,29 +23,30 @@ const SignInForm = () => {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        form.handleSubmit();
+        handleSubmit();
       }}
       className="space-y-4"
     >
       <Fieldset legend="Sign In">
         <Stack gap="md">
           <div>
-            <form.Field
+            <Field
               name="email"
-              children={(field) => (
+              children={({ state, name, handleChange, handleBlur }) => (
                 <>
                   <TextInput
-                    label={field.name}
+                    label={name}
                     placeholder="Email"
+                    defaultValue={state.value}
                     type="email"
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    id={name}
+                    name={name}
+                    value={state.value}
+                    onBlur={handleBlur}
+                    onChange={(e) => handleChange(e.target.value)}
                     error={
-                      field.state.meta.errors.length
-                        ? field.state.meta.errors
+                      state.meta.errors.length
+                        ? state.meta.errors
                             .map((err) => err?.message)
                             .join(", ")
                         : null
@@ -56,22 +58,23 @@ const SignInForm = () => {
           </div>
 
           <div>
-            <form.Field
+            <Field
               name="password"
-              children={(field) => (
+              children={({ state, name, handleChange, handleBlur }) => (
                 <>
                   <TextInput
-                    label={field.name}
+                    label={name}
                     placeholder="Password"
+                    defaultValue={state.value}
                     type="password"
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    id={name}
+                    name={name}
+                    value={state.value}
+                    onBlur={handleBlur}
+                    onChange={(e) => handleChange(e.target.value)}
                     error={
-                      field.state.meta.errors.length
-                        ? field.state.meta.errors
+                      state.meta.errors.length
+                        ? state.meta.errors
                             .map((err) => err?.message)
                             .join(", ")
                         : null
@@ -86,9 +89,9 @@ const SignInForm = () => {
             type="submit"
             size="md"
             mt="md"
-            disabled={form.state.isSubmitting}
+            disabled={state.isSubmitting}
           >
-            {form.state.isSubmitting ? "Signing In..." : "Sign In"}
+            {state.isSubmitting ? "Signing In..." : "Sign In"}
           </Button>
         </Stack>
       </Fieldset>
