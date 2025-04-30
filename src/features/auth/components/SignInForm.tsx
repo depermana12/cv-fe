@@ -1,7 +1,13 @@
 import { useForm } from "@tanstack/react-form";
 import { signInSchema, type SignIn } from "../types/auth.schema";
 import { useSignIn } from "../hooks/useSignIn";
-import { Button, Fieldset, Stack, TextInput } from "@mantine/core";
+import {
+  Button,
+  Fieldset,
+  PasswordInput,
+  Stack,
+  TextInput,
+} from "@mantine/core";
 
 const SignInForm = () => {
   const { mutate } = useSignIn();
@@ -37,7 +43,6 @@ const SignInForm = () => {
                   <TextInput
                     label={name}
                     placeholder="Email"
-                    defaultValue={state.value}
                     type="email"
                     id={name}
                     name={name}
@@ -62,10 +67,9 @@ const SignInForm = () => {
               name="password"
               children={({ state, name, handleChange, handleBlur }) => (
                 <>
-                  <TextInput
+                  <PasswordInput
                     label={name}
                     placeholder="Password"
-                    defaultValue={state.value}
                     type="password"
                     id={name}
                     name={name}
