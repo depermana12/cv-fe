@@ -6,7 +6,6 @@ export const useCreatePersonal = () => {
   return useMutation({
     mutationFn: async (personalInput: PersonalForm) =>
       await profileService.post(personalInput),
-
     onSuccess: () => {
       console.log("Personal info saved");
     },
