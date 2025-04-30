@@ -11,7 +11,8 @@ export const useAuthStore = create<AuthState>()(
       signIn: async (inputSignIn: SignIn) => {
         try {
           const res = await signInService<User>(inputSignIn);
-          const user = res.data;
+          const user = res.data.data;
+          console.log(user);
           set({ user, isAuthenticated: true });
           return user;
         } catch (error) {
@@ -22,7 +23,7 @@ export const useAuthStore = create<AuthState>()(
       signUp: async (inputSignUp: SignUp) => {
         try {
           const res = await signUpService<User>(inputSignUp);
-          const user = res.data;
+          const user = res.data.data;
           set({ user, isAuthenticated: true });
           return user;
         } catch (error) {

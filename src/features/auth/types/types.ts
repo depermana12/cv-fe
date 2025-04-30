@@ -19,3 +19,9 @@ export type AuthState = {
   signIn: (inputSignIn: SignIn) => void;
   signOut: () => void;
 };
+
+export type AuthApiResponse<T> = {
+  success: boolean;
+  message: string;
+  data: T;
+};
