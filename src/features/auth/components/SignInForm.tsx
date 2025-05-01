@@ -35,59 +35,52 @@ const SignInForm = () => {
     >
       <Fieldset legend="Sign In">
         <Stack gap="md">
-          <div>
-            <Field
-              name="email"
-              children={({ state, name, handleChange, handleBlur }) => (
-                <>
-                  <TextInput
-                    label={name}
-                    placeholder="Email"
-                    type="email"
-                    id={name}
-                    name={name}
-                    value={state.value}
-                    onBlur={handleBlur}
-                    onChange={(e) => handleChange(e.target.value)}
-                    error={
-                      state.meta.errors.length
-                        ? state.meta.errors
-                            .map((err) => err?.message)
-                            .join(", ")
-                        : null
-                    }
-                  />
-                </>
-              )}
-            />
-          </div>
+          <Field
+            name="email"
+            children={({ state, name, handleChange, handleBlur }) => (
+              <>
+                <TextInput
+                  label={name}
+                  placeholder="Email"
+                  type="email"
+                  id={name}
+                  name={name}
+                  value={state.value}
+                  onBlur={handleBlur}
+                  onChange={(e) => handleChange(e.target.value)}
+                  error={
+                    state.meta.errors.length
+                      ? state.meta.errors.map((err) => err?.message).join(", ")
+                      : null
+                  }
+                />
+              </>
+            )}
+          />
 
-          <div>
-            <Field
-              name="password"
-              children={({ state, name, handleChange, handleBlur }) => (
-                <>
-                  <PasswordInput
-                    label={name}
-                    placeholder="Password"
-                    type="password"
-                    id={name}
-                    name={name}
-                    value={state.value}
-                    onBlur={handleBlur}
-                    onChange={(e) => handleChange(e.target.value)}
-                    error={
-                      state.meta.errors.length
-                        ? state.meta.errors
-                            .map((err) => err?.message)
-                            .join(", ")
-                        : null
-                    }
-                  />
-                </>
-              )}
-            />
-          </div>
+          <Field
+            name="password"
+            children={({ state, name, handleChange, handleBlur }) => (
+              <>
+                <PasswordInput
+                  label={name}
+                  placeholder="Password"
+                  type="password"
+                  id={name}
+                  name={name}
+                  value={state.value}
+                  onBlur={handleBlur}
+                  onChange={(e) => handleChange(e.target.value)}
+                  error={
+                    state.meta.errors.length
+                      ? state.meta.errors.map((err) => err?.message).join(", ")
+                      : null
+                  }
+                />
+              </>
+            )}
+          />
+
           <Button
             fullWidth
             type="submit"
