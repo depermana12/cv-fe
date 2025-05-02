@@ -9,7 +9,7 @@ import { AxiosResponse } from "axios";
  * @template I Input data type for creation/updates
  */
 export class CvApi<T, I> {
-  private endpoint: string;
+  protected endpoint: string;
   constructor(endpoint: string) {
     this.endpoint = endpoint;
   }
