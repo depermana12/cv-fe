@@ -16,7 +16,10 @@ declare module "@tanstack/react-router" {
   }
 }
 
-const router = createRouter({ routeTree, context: { auth: undefined! } });
+const router = createRouter({
+  routeTree,
+  context: { auth: undefined! },
+});
 
 const InnerApp = () => {
   const { user, isAuthenticated } = useAuthStore();
