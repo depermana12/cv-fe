@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import {
   ActionIcon,
   Alert,
@@ -16,11 +17,18 @@ import {
   IconPhoneCall,
   IconWorld,
 } from "@tabler/icons-react";
+import { useAuthStore } from "../../auth/store/authStore";
 
-const Profile = () => {
-  const { data, isPending, isError, error } = useGetProfile();
+export const Profile = () => {
+  const { user } = useAuthStore();
+  const id = user?.id;
 
-  if (isPending) {
+  if (!id) throw new Error("User must be logged in to use Profile component");
+
+  const { data, isPending, isError, error } = useGetProfile(Number(id));
+  const navigate = useNavigate();
+
+  if (isPending && !data) {
     return (
       <Box p="md" ta="center">
         <Skeleton height={120} circle mb="md" />
@@ -33,10 +41,18 @@ const Profile = () => {
   if (isError) {
     return (
       <Alert color="red" title="error loading profile" mt="md">
-        {error.message}
+        {error?.message || "An unknown error occurred"}
       </Alert>
     );
   }
+
+  const handleEdit = () => {
+    navigate({
+      to: "/dashboard/cv/$id/edit",
+      params: { id: String(data.id) },
+    });
+  };
+
   return (
     <Box p="md" flex="flex" ta="center">
       <Box className="relative mx-auto w-fit">
@@ -49,6 +65,7 @@ const Profile = () => {
         />
         <Tooltip label="Edit profile">
           <ActionIcon
+            onClick={handleEdit}
             variant="filled"
             color="blue"
             radius="xl"
@@ -91,4 +108,3 @@ const Profile = () => {
     </Box>
   );
 };
-export default Profile;
