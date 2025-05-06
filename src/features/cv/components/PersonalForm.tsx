@@ -4,18 +4,30 @@ import type { PersonalForm } from "../types/types";
 import { useCreatePersonal } from "../hooks/useCreatePersonal";
 import { useAuthStore } from "../../auth/store/authStore";
 import {
+  Box,
   Button,
   FileInput,
   LoadingOverlay,
   Stack,
   Textarea,
   TextInput,
+  Image,
+  Group,
 } from "@mantine/core";
 import { IconCameraUp } from "@tabler/icons-react";
 import { z } from "zod";
 import useFieldError from "../hooks/useFieldError";
+import { useState } from "react";
+import {
+  getImage,
+  requestSignedUrl,
+  uploadFile,
+} from "../services/uploadService";
 
 const personalFieldSchema = personalCreateSchema.shape;
+
+const MAX_FILE_SIZE = 1024 * 1024 * 1;
+const ALLOWED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 
 const zFieldValidator =
   <T,>(schema: z.ZodType<T>) =>
@@ -27,6 +39,10 @@ const zFieldValidator =
 const PersonalForm = () => {
   const { mutate, isPending, isError } = useCreatePersonal();
   const { user } = useAuthStore();
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   if (!user) throw new Error("User must be logged in to use PersonalForm");
 
@@ -39,6 +55,81 @@ const PersonalForm = () => {
     phone: "",
     email: "",
     url: "",
+  };
+
+  const validateFile = (file: File) => {
+    if (!file) {
+      return { isValid: false, error: "File is required" };
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      return { isValid: false, error: "File size must be less than 1MB" };
+    }
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      return {
+        isValid: false,
+        error: `File type ${file.type} not supported. Only ${ALLOWED_FILE_TYPES.join(", ")} are allowed.`,
+      };
+    }
+    return { isValid: true, error: null };
+  };
+
+  const handleFileChange = (newFile: File | null) => {
+    if (!newFile) {
+      setFile(null);
+      setFileError(null);
+      setUploadedImageUrl("");
+      return;
+    }
+
+    setFile(newFile);
+    setUploadedImageUrl("");
+
+    const validation = validateFile(newFile);
+    if (!validation.isValid) {
+      setFileError(validation.error);
+      return;
+    }
+
+    setFileError(null);
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      setFileError("plese select a file to upload");
+      return;
+    }
+
+    const validation = validateFile(file);
+    if (!validation.isValid) {
+      setFileError(validation.error);
+      return;
+    }
+
+    try {
+      setUploading(true);
+      // 1. request a presigned URL from backend
+      const signedUrl = await requestSignedUrl(file.type);
+      const { url, key } = signedUrl.data.data;
+      console.log("signed url:", url, key);
+
+      // 2. upload file directly to S3 using the presigned URL
+      await uploadFile(url, file);
+
+      // 3. get the URL to view the uploaded image
+      const getImageUrl = await getImage(key);
+      const { url: imageUrl } = getImageUrl.data.data;
+      console.log("image url:", imageUrl);
+
+      // 4. set the uploaded image URL to the state
+      setUploadedImageUrl(imageUrl);
+
+      setFileError(null);
+    } catch (err) {
+      // TODO: handle error properly
+      console.error("Upload error:", err);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const { Field, handleSubmit, state } = useForm({
@@ -58,24 +149,63 @@ const PersonalForm = () => {
         handleSubmit();
       }}
     >
-      <LoadingOverlay visible={state.isSubmitting || isPending} />
+      <LoadingOverlay visible={state.isSubmitting || isPending || uploading} />
       <Stack gap="md">
+        {uploadedImageUrl && (
+          <Box mb="md">
+            <Image
+              src={uploadedImageUrl}
+              alt="Profile preview"
+              width={200}
+              height={200}
+              radius="md"
+              fit="cover"
+            />
+          </Box>
+        )}
         <Field
           name="image"
-          children={({ state, name }) => {
+          children={({ state, name, handleChange }) => {
             const errorField = useFieldError(state.meta);
             return (
-              <FileInput
-                name={name}
-                label="Profile Image"
-                placeholder="Upload your image"
-                description="Max 1MB, PNG/JPG formats only"
-                leftSection={<IconCameraUp size={18} />}
-                rightSectionPointerEvents="none"
-                clearable
-                accept="image/*"
-                error={errorField}
-              />
+              <>
+                <FileInput
+                  name={name}
+                  label="Profile Image"
+                  placeholder="Upload your image"
+                  description="Max 1MB, PNG/JPG formats only"
+                  leftSection={<IconCameraUp size={18} />}
+                  accept="image/jpeg,image/png,image/jpg"
+                  value={file}
+                  onChange={handleFileChange}
+                  clearable
+                  error={errorField || fileError}
+                />
+                <Group mt="xs" justify="flex-end">
+                  <Button
+                    size="sm"
+                    onClick={async () => {
+                      await handleUpload();
+                      // after upload completes, check for the updated URL and update the form field
+                      // the uploadedImageUrl state will be updated in handleUpload
+                      if (uploadedImageUrl) {
+                        handleChange(uploadedImageUrl);
+                      }
+                    }}
+                    loading={uploading}
+                    disabled={!file || !!fileError}
+                  >
+                    Upload Image
+                  </Button>
+                </Group>
+                {/* hidden input to store the actual image URL */}
+                <input
+                  type="hidden"
+                  name="image"
+                  value={state.value || ""}
+                  onChange={(e) => handleChange(e.target.value)}
+                />
+              </>
             );
           }}
         ></Field>
