@@ -3,9 +3,13 @@ import {
   personalCreateSchema,
   personalSelectSchema,
 } from "../schema/personalSchema";
+import { educationInsertSchema } from "../schema/educationSchema";
 
 export type PersonalForm = z.infer<typeof personalCreateSchema>;
 export type PersonalDTO = z.infer<typeof personalSelectSchema>;
+
+export type EducationForm = z.infer<typeof educationInsertSchema>;
+export type EducationDTO = z.infer<typeof educationInsertSchema>;
 
 export type ApiResponse<T> = {
   success: boolean;
