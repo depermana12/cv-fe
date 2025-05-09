@@ -23,6 +23,5 @@ export const educationSelectSchema = z.object({
 });
 
 export const educationInsertSchema = educationSelectSchema.omit({
-  personalId: true,
   id: true,
 });
