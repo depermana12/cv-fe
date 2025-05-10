@@ -2,14 +2,13 @@ import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { Button, LoadingOverlay, Stack, TextInput, Group } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { useAuthStore } from "../../auth/store/authStore";
 
 import { educationSelectSchema } from "../schema/educationSchema";
 import type { EducationForm } from "../types/types";
 import useFieldError from "../hooks/useFieldError";
 import { useCreateEducation } from "../hooks/useCreateEducation";
 import { useState } from "react";
-import { useGetProfile } from "../hooks/useGetProfile";
+import { usePersonalId } from "../hooks/usePersonalId";
 
 const educationFieldSchema = educationSelectSchema.shape;
 
@@ -24,17 +23,7 @@ const EducationForm = () => {
   const { mutate, isPending } = useCreateEducation();
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
-  const { user } = useAuthStore();
-
-  if (!user) throw new Error("User must be logged in to use EducationForm");
-
-  const { data } = useGetProfile(user.id);
-
-  // TODO: add logic to first create profile, and prevent creating other forms
-  if (!data)
-    throw new Error("User must have a profile befrore creating education");
-
-  const personalId = data.id;
+  const personalId = usePersonalId();
 
   const defaultEducationValues: EducationForm = {
     personalId: personalId,
