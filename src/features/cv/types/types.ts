@@ -19,6 +19,7 @@ import {
   softSkillCreateSchema,
   softSkillSchema,
 } from "../schema/softSkillSchema";
+import { socialCreateSchema, socialSchema } from "../schema/socialMediaSchema";
 
 export type PersonalForm = z.infer<typeof personalCreateSchema>;
 export type PersonalDTO = z.infer<typeof personalSelectSchema>;
@@ -40,6 +41,9 @@ export type SkillDto = z.infer<typeof skillSchema>;
 
 export type SoftSkillForm = z.infer<typeof softSkillCreateSchema>;
 export type SoftSkillDto = z.infer<typeof softSkillSchema>;
+
+export type SocialMedia = z.infer<typeof socialCreateSchema>;
+export type SocialMediaDTO = z.infer<typeof socialSchema>;
 
 export type ApiResponse<T> = {
   success: boolean;
