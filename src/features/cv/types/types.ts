@@ -15,6 +15,10 @@ import {
   projectSchema,
 } from "../schema/projectSchema";
 import { skillCreateSchema, skillSchema } from "../schema/skillSchema";
+import {
+  softSkillCreateSchema,
+  softSkillSchema,
+} from "../schema/softSkillSchema";
 
 export type PersonalForm = z.infer<typeof personalCreateSchema>;
 export type PersonalDTO = z.infer<typeof personalSelectSchema>;
@@ -33,6 +37,9 @@ export type ProjectDescDto = z.infer<typeof projectDescSchema>;
 
 export type SkillForm = z.infer<typeof skillCreateSchema>;
 export type SkillDto = z.infer<typeof skillSchema>;
+
+export type SoftSkillForm = z.infer<typeof softSkillCreateSchema>;
+export type SoftSkillDto = z.infer<typeof softSkillSchema>;
 
 export type ApiResponse<T> = {
   success: boolean;
