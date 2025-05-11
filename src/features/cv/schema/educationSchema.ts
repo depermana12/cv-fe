@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const idSchema = z.number().int().positive();
 
-export const educationSelectSchema = z.object({
+export const educationSchema = z.object({
   id: idSchema,
   personalId: idSchema,
   institution: z
@@ -22,6 +22,6 @@ export const educationSelectSchema = z.object({
   url: z.string().url({ message: "Invalid URL format" }),
 });
 
-export const educationInsertSchema = educationSelectSchema.omit({
+export const educationCreateSchema = educationSchema.omit({
   id: true,
 });

@@ -3,14 +3,14 @@ import { z } from "zod";
 import { Button, LoadingOverlay, Stack, TextInput, Group } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 
-import { educationSelectSchema } from "../schema/educationSchema";
+import { educationSchema } from "../schema/educationSchema";
 import type { EducationForm } from "../types/types";
 import useFieldError from "../hooks/useFieldError";
 import { useCreateEducation } from "../hooks/useCreateEducation";
 import { useState } from "react";
 import { usePersonalId } from "../hooks/usePersonalId";
 
-const educationFieldSchema = educationSelectSchema.shape;
+const educationFieldSchema = educationSchema.shape;
 
 const zFieldValidator =
   <T,>(schema: z.ZodType<T>) =>
@@ -40,7 +40,7 @@ const EducationForm = () => {
     defaultValues: defaultEducationValues,
     onSubmit: ({ value }) => mutate(value),
     validators: {
-      onSubmit: educationSelectSchema.omit({ id: true }),
+      onSubmit: educationSchema.omit({ id: true }),
     },
   });
 

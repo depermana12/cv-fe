@@ -4,15 +4,15 @@ import {
   personalSelectSchema,
 } from "../schema/personalSchema";
 import {
-  educationInsertSchema,
-  educationSelectSchema,
+  educationCreateSchema,
+  educationSchema,
 } from "../schema/educationSchema";
 
 export type PersonalForm = z.infer<typeof personalCreateSchema>;
 export type PersonalDTO = z.infer<typeof personalSelectSchema>;
 
-export type EducationForm = z.infer<typeof educationInsertSchema>;
-export type EducationDTO = z.infer<typeof educationSelectSchema>;
+export type EducationForm = z.infer<typeof educationCreateSchema>;
+export type EducationDTO = z.infer<typeof educationSchema>;
 
 export type ApiResponse<T> = {
   success: boolean;
