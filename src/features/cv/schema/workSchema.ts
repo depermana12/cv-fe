@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const workSelectSchema = z.object({
+export const workSchema = z.object({
   id: z.number().int().positive(),
   personalId: z.number().int().positive(),
   company: z.string().max(100, { message: "Must be 100 characters or fewer" }),
@@ -11,6 +11,6 @@ export const workSelectSchema = z.object({
   isCurrent: z.boolean(),
 });
 
-export const workCreateSchema = workSelectSchema.omit({
+export const workCreateSchema = workSchema.omit({
   id: true,
 });
