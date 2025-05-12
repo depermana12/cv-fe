@@ -16,6 +16,7 @@
     "@mantine/core": "^7.17.5",
     "@mantine/dates": "^7.17.5",
     "@mantine/hooks": "^7.17.5",
+    "@mantine/notifications": "^8.0.0",
     "@tabler/icons-react": "^3.31.0",
     "@tailwindcss/vite": "^4.1.4",
     "@tanstack/react-form": "^1.9.0",
