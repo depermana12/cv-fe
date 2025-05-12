@@ -38,7 +38,7 @@ export type ProjectDescForm = z.infer<typeof projectDescCreateSchema>;
 export type ProjectDescDTO = z.infer<typeof projectDescSchema>;
 
 export type SkillForm = z.infer<typeof skillCreateSchema>;
-export type SkillDto = z.infer<typeof skillSchema>;
+export type SkillDTO = z.infer<typeof skillSchema>;
 
 export type SoftSkillForm = z.infer<typeof softSkillCreateSchema>;
 export type SoftSkillDTO = z.infer<typeof softSkillSchema>;
