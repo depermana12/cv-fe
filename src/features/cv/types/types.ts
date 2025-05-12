@@ -32,16 +32,16 @@ export type WorkForm = z.infer<typeof workCreateSchema>;
 export type WorkDTO = z.infer<typeof workSchema>;
 
 export type ProjectForm = z.infer<typeof projectCreateSchema>;
-export type ProjectDto = z.infer<typeof projectSchema>;
+export type ProjectDTO = z.infer<typeof projectSchema>;
 
 export type ProjectDescForm = z.infer<typeof projectDescCreateSchema>;
-export type ProjectDescDto = z.infer<typeof projectDescSchema>;
+export type ProjectDescDTO = z.infer<typeof projectDescSchema>;
 
 export type SkillForm = z.infer<typeof skillCreateSchema>;
 export type SkillDto = z.infer<typeof skillSchema>;
 
 export type SoftSkillForm = z.infer<typeof softSkillCreateSchema>;
-export type SoftSkillDto = z.infer<typeof softSkillSchema>;
+export type SoftSkillDTO = z.infer<typeof softSkillSchema>;
 
 export type SocialMedia = z.infer<typeof socialCreateSchema>;
 export type SocialMediaDTO = z.infer<typeof socialSchema>;
