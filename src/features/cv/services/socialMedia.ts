@@ -1,6 +1,6 @@
-import { SocialMediaDTO } from "../types/types";
+import { SocialMediaDTO, SocialMediaForm } from "../types/types";
 import { CvApi } from "./Api";
 
-export const socialMedia = new CvApi<SocialMediaDTO, SocialMediaDTO>(
+export const socialMediaService = new CvApi<SocialMediaDTO, SocialMediaForm>(
   "cv/socials",
 );

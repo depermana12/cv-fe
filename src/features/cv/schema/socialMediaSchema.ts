@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const socialSchema = z.object({
+export const socialMediaSchema = z.object({
   id: z.number().int().positive(),
   personalId: z.number().int(),
   social: z.string().max(50, { message: "Must be 50 characters or fewer" }),
@@ -8,6 +8,6 @@ export const socialSchema = z.object({
   url: z.string().url({ message: "Invalid url" }).max(255),
 });
 
-export const socialCreateSchema = socialSchema.omit({
+export const socialMediaCreateSchema = socialMediaSchema.omit({
   id: true,
 });

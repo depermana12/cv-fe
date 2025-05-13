@@ -19,7 +19,10 @@ import {
   softSkillCreateSchema,
   softSkillSchema,
 } from "../schema/softSkillSchema";
-import { socialCreateSchema, socialSchema } from "../schema/socialMediaSchema";
+import {
+  socialMediaCreateSchema,
+  socialMediaSchema,
+} from "../schema/socialMediaSchema";
 import { locationCreateSchema, locationSchema } from "../schema/locationSchema";
 
 export type PersonalForm = z.infer<typeof personalCreateSchema>;
@@ -43,8 +46,8 @@ export type SkillDTO = z.infer<typeof skillSchema>;
 export type SoftSkillForm = z.infer<typeof softSkillCreateSchema>;
 export type SoftSkillDTO = z.infer<typeof softSkillSchema>;
 
-export type SocialMedia = z.infer<typeof socialCreateSchema>;
-export type SocialMediaDTO = z.infer<typeof socialSchema>;
+export type SocialMediaForm = z.infer<typeof socialMediaCreateSchema>;
+export type SocialMediaDTO = z.infer<typeof socialMediaSchema>;
 
 export type LocationForm = z.infer<typeof locationCreateSchema>;
 export type LocationDTO = z.infer<typeof locationSchema>;
