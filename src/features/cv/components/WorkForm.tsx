@@ -7,6 +7,7 @@ import { workSchema } from "../schema/workSchema";
 import { Checkbox, LoadingOverlay, Stack, TextInput } from "@mantine/core";
 import useFieldError from "../hooks/useFieldError";
 import { DateInput } from "@mantine/dates";
+import { zFieldValidator } from "../utils/zFieldValidator";
 
 const WorkForm = () => {
   const { mutate, isPending } = useCreateWork();
@@ -44,9 +45,7 @@ const WorkForm = () => {
       <Stack gap="md">
         <Field
           name="company"
-          validators={{
-            onBlur: (value) => workSchema.shape.company.safeParse(value),
-          }}
+          validators={{ onBlur: zFieldValidator(workSchema.shape.company) }}
         >
           {({ state, handleChange, handleBlur }) => {
             const errorField = useFieldError(state.meta);
@@ -64,9 +63,7 @@ const WorkForm = () => {
         </Field>
         <Field
           name="position"
-          validators={{
-            onBlur: (value) => workSchema.shape.position.safeParse(value),
-          }}
+          validators={{ onBlur: zFieldValidator(workSchema.shape.position) }}
         >
           {({ state, handleChange, handleBlur }) => {
             const errorField = useFieldError(state.meta);
@@ -84,9 +81,7 @@ const WorkForm = () => {
         </Field>
         <Field
           name="startDate"
-          validators={{
-            onBlur: (value) => workSchema.shape.startDate.safeParse(value),
-          }}
+          validators={{ onBlur: zFieldValidator(workSchema.shape.startDate) }}
         >
           {({ state, handleBlur }) => {
             const errorField = useFieldError(state.meta);
@@ -106,9 +101,7 @@ const WorkForm = () => {
         </Field>
         <Field
           name="endDate"
-          validators={{
-            onBlur: (value) => workSchema.shape.endDate.safeParse(value),
-          }}
+          validators={{ onBlur: zFieldValidator(workSchema.shape.endDate) }}
         >
           {({ state, handleBlur }) => {
             const errorField = useFieldError(state.meta);
@@ -128,9 +121,7 @@ const WorkForm = () => {
         </Field>
         <Field
           name="url"
-          validators={{
-            onBlur: (value) => workSchema.shape.url.safeParse(value),
-          }}
+          validators={{ onBlur: zFieldValidator(workSchema.shape.url) }}
         >
           {({ state, handleChange, handleBlur }) => {
             const errorField = useFieldError(state.meta);
@@ -148,9 +139,7 @@ const WorkForm = () => {
         </Field>
         <Field
           name="isCurrent"
-          validators={{
-            onBlur: (value) => workSchema.shape.isCurrent.safeParse(value),
-          }}
+          validators={{ onBlur: zFieldValidator(workSchema.shape.isCurrent) }}
         >
           {({ state, handleBlur }) => {
             const errorField = useFieldError(state.meta);
