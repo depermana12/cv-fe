@@ -10,7 +10,7 @@ import {
   Text,
   Tooltip,
 } from "@mantine/core";
-import { useGetProfile } from "../hooks/useGetProfile";
+import { useProfile } from "../hooks/useProfile";
 import {
   IconAt,
   IconPencil,
@@ -25,7 +25,7 @@ export const Profile = () => {
 
   if (!id) throw new Error("User must be logged in to use Profile component");
 
-  const { data, isPending, isError, error } = useGetProfile(Number(id));
+  const { data, isPending, isError, error } = useProfile(Number(id));
   const navigate = useNavigate();
 
   if (isPending && !data) {

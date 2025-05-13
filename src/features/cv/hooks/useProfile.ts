@@ -1,5 +1,5 @@
 import { profileQuery } from "../queries/profileQuery";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export const useGetProfile = (userId: number) =>
+export const useProfile = (userId: number) =>
   useSuspenseQuery(profileQuery(userId));

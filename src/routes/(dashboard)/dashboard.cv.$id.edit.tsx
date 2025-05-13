@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { EditForm } from "../../features/cv/components/EditForm";
 import { queryClient } from "../../lib/queryClient";
 import { profileQuery } from "../../features/cv/queries/profileQuery";
-import { useGetProfile } from "../../features/cv/hooks/useGetProfile";
+import { useProfile } from "../../features/cv/hooks/useProfile";
 
 export const Route = createFileRoute("/(dashboard)/dashboard/cv/$id/edit")({
   loader: ({ params: { id } }) =>
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/(dashboard)/dashboard/cv/$id/edit")({
 
 function Edit() {
   const { id } = Route.useParams();
-  const { data } = useGetProfile(Number(id));
+  const { data } = useProfile(Number(id));
 
   return <EditForm initialValues={data} />;
 }
