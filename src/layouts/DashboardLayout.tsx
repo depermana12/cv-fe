@@ -1,6 +1,7 @@
 import { AppShell, Burger, Group, Skeleton } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconFile } from "@tabler/icons-react";
+import { Sidebar } from "../components/ui/Sidebar";
 
 export const DashboardLayout = ({
   children,
@@ -38,12 +39,7 @@ export const DashboardLayout = ({
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
-        Navbar
-        {Array(15)
-          .fill(0)
-          .map((_, index) => (
-            <Skeleton key={index} h={28} mt="sm" animate={false} />
-          ))}
+        <Sidebar />
       </AppShell.Navbar>
       <AppShell.Main>{children}</AppShell.Main>
     </AppShell>
