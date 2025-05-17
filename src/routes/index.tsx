@@ -1,18 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import LandingLayout from "../layouts/LandingLayout";
+import HomePage from "../pages/HomePage";
 
 export const Route = createFileRoute("/")({
-  component: RouteComponent,
+  component: RouteHome,
 });
 
-function RouteComponent() {
+function RouteHome() {
   return (
-    <div className="space-x-4">
-      <Link to="/dashboard" className="text-blue-600 hover:underline">
-        Dashboard
-      </Link>
-      <Link to="/dashboard/cv/view" className="text-blue-600 hover:underline">
-        View test
-      </Link>
-    </div>
+    <LandingLayout>
+      <HomePage />
+    </LandingLayout>
   );
 }
