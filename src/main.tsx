@@ -16,8 +16,8 @@ import { emotionTransform, MantineEmotionProvider } from "@mantine/emotion";
 import { Notifications } from "@mantine/notifications";
 
 import { useAuthStore } from "./features/auth/store/authStore";
+import { myTheme } from "./themes/blao";
 
-// Register the router instance for type safety
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
@@ -29,31 +29,31 @@ const router = createRouter({
   context: { auth: undefined! },
 });
 
-const InnerApp = () => {
+const AppProviders = () => {
   const { user, isAuthenticated } = useAuthStore();
 
   return (
-    <RouterProvider
-      router={router}
-      context={{
-        auth: {
-          user,
-          isAuthenticated,
-        },
-      }}
-    />
+    <MantineProvider theme={myTheme} stylesTransform={emotionTransform}>
+      <MantineEmotionProvider>
+        <Notifications />
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider
+            router={router}
+            context={{
+              auth: {
+                user,
+                isAuthenticated,
+              },
+            }}
+          />
+        </QueryClientProvider>
+      </MantineEmotionProvider>
+    </MantineProvider>
   );
 };
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <MantineProvider stylesTransform={emotionTransform}>
-      <MantineEmotionProvider>
-        <Notifications />
-        <QueryClientProvider client={queryClient}>
-          <InnerApp />
-        </QueryClientProvider>
-      </MantineEmotionProvider>
-    </MantineProvider>
+    <AppProviders />
   </StrictMode>,
 );
