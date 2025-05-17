@@ -1,6 +1,7 @@
 import { createRootRouteWithContext } from "@tanstack/react-router";
-import App from "../App";
+// import App from "../App";
 import { AuthState } from "../features/auth/types/types";
+import RootLayout from "../layouts/RootLayout";
 
 type MinimumAuthContext = Pick<AuthState, "user" | "isAuthenticated">;
 interface MyRouterContext {
@@ -8,5 +9,5 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  component: App,
+  component: RootLayout,
 });
