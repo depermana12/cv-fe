@@ -16,10 +16,12 @@ export const myTheme = createTheme({
     ],
   },
   primaryColor: "blue",
-  primaryShade: 5,
+  primaryShade: { light: 5, dark: 7 },
   defaultRadius: "md",
   focusRing: "auto",
   fontFamily: "Open Sans, sans-serif",
   fontFamilyMonospace: "Monaco, Courier, monospace",
   headings: { fontFamily: "Open Sans, sans-serif" },
+
+  defaultGradient: { from: "blue", to: "cyan", deg: 45 },
 });
