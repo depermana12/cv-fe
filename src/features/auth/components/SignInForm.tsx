@@ -2,26 +2,30 @@ import { useForm } from "@tanstack/react-form";
 import { signInSchema, type SignIn } from "../types/auth.schema";
 import { useSignIn } from "../hooks/useSignIn";
 import {
+  Anchor,
+  Box,
   Button,
-  Fieldset,
+  Checkbox,
+  Group,
+  LoadingOverlay,
   PasswordInput,
   Stack,
   TextInput,
 } from "@mantine/core";
+import { Link } from "@tanstack/react-router";
+import { zFieldValidator } from "../../cv/utils/zFieldValidator";
+import useFieldError from "../../cv/hooks/useFieldError";
 
 const SignInForm = () => {
-  const { mutate } = useSignIn();
+  const { mutate, isPending } = useSignIn();
 
   const defaultSignInForm: SignIn = { email: "", password: "" };
+
   const { Field, handleSubmit, state } = useForm({
     defaultValues: defaultSignInForm,
-    onSubmit: async ({ value }) => {
-      console.log("user login", value);
-      mutate(value);
-    },
-    //TODO: invalid error per field
+    onSubmit: async ({ value }) => mutate(value),
     validators: {
-      onChange: signInSchema,
+      onSubmit: signInSchema,
     },
   });
 
@@ -31,67 +35,86 @@ const SignInForm = () => {
         e.preventDefault();
         handleSubmit();
       }}
-      className="space-y-4"
     >
-      <Fieldset legend="Sign In">
+      <Box pos="relative">
+        <LoadingOverlay
+          zIndex={1000}
+          visible={state.isSubmitting || isPending}
+          overlayProps={{ radius: "sm", blur: 2 }}
+        />
         <Stack gap="md">
           <Field
             name="email"
-            children={({ state, name, handleChange, handleBlur }) => (
-              <>
+            validators={{
+              onBlur: zFieldValidator(signInSchema.shape.email),
+            }}
+            children={({ state, name, handleChange, handleBlur }) => {
+              const errorField = useFieldError(state.meta);
+              return (
                 <TextInput
-                  label={name}
-                  placeholder="Email"
-                  type="email"
+                  label="Email"
+                  placeholder="you@kodedroid.com"
+                  autoComplete="email"
+                  inputMode="email"
+                  required
                   id={name}
                   name={name}
                   value={state.value}
                   onBlur={handleBlur}
                   onChange={(e) => handleChange(e.target.value)}
-                  error={
-                    state.meta.errors.length
-                      ? state.meta.errors.map((err) => err?.message).join(", ")
-                      : null
-                  }
+                  error={errorField}
                 />
-              </>
-            )}
+              );
+            }}
           />
-
           <Field
             name="password"
-            children={({ state, name, handleChange, handleBlur }) => (
-              <>
+            children={({ state, name, handleChange, handleBlur }) => {
+              const errorField = useFieldError(state.meta);
+              return (
                 <PasswordInput
-                  label={name}
-                  placeholder="Password"
-                  type="password"
+                  label="Password"
+                  placeholder="Your password"
+                  required
                   id={name}
                   name={name}
                   value={state.value}
                   onBlur={handleBlur}
                   onChange={(e) => handleChange(e.target.value)}
-                  error={
-                    state.meta.errors.length
-                      ? state.meta.errors.map((err) => err?.message).join(", ")
-                      : null
-                  }
+                  error={errorField}
                 />
-              </>
-            )}
+              );
+            }}
           />
-
+          <Group justify="space-between">
+            <Checkbox
+              radius="xs"
+              label="Remember me"
+              name="remember"
+              id="remember"
+            />
+            <Anchor
+              component={Link}
+              to="/auth/forget-password"
+              underline="hover"
+              size="sm"
+            >
+              Forgot password?
+            </Anchor>
+          </Group>
           <Button
             fullWidth
             type="submit"
             size="md"
             mt="md"
+            loading={isPending}
+            loaderProps={{ type: "dots", color: "indigo" }}
             disabled={state.isSubmitting}
           >
-            {state.isSubmitting ? "Signing In..." : "Sign In"}
+            Sign In
           </Button>
         </Stack>
-      </Fieldset>
+      </Box>
     </form>
   );
 };
