@@ -15,8 +15,8 @@ export type User = {
 export type AuthState = {
   user: User | null;
   isAuthenticated: boolean;
-  signUp: (inputSignUp: SignUp) => void;
-  signIn: (inputSignIn: SignIn) => void;
+  signUp: (inputSignUp: SignUp) => Promise<User>;
+  signIn: (inputSignIn: SignIn) => Promise<User>;
   signOut: () => void;
 };
 
