@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { profileService } from "../services/personalService";
+import { profileService } from "../modules/personal/services/personalService";
 
 export const profileQuery = (userId: number, service = profileService) =>
   queryOptions({

@@ -14,8 +14,8 @@ import { useDisclosure, useLocalStorage, useMediaQuery } from "@mantine/hooks";
 import { Outlet, Link } from "@tanstack/react-router";
 import { IconFile } from "@tabler/icons-react";
 
-import { Sidebar } from "../components/ui/Sidebar";
-import DashboardHeaderNav from "../components/ui/DashboardHeaderNav";
+import { Sidebar } from "../features/dashboard/components/Sidebar";
+import DashboardHeaderNav from "../features/dashboard/components/DashboardHeaderNav";
 
 export type SidebarState = "collapsed" | "expanded";
 
