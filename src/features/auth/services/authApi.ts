@@ -11,21 +11,25 @@ import { AxiosResponse } from "axios";
 export class AuthApi {
   private base = "/auth";
 
-  signUp<T>(inputData: SignUp): Promise<AxiosResponse<AuthApiResponse<T>>> {
+  async signUp<T>(
+    inputData: SignUp,
+  ): Promise<AxiosResponse<AuthApiResponse<T>>> {
     return axiosClient.post<AuthApiResponse<T>>(
       `${this.base}/signup`,
       inputData,
     );
   }
 
-  signIn<T>(inputData: SignIn): Promise<AxiosResponse<AuthApiResponse<T>>> {
+  async signIn<T>(
+    inputData: SignIn,
+  ): Promise<AxiosResponse<AuthApiResponse<T>>> {
     return axiosClient.post<AuthApiResponse<T>>(
       `${this.base}/signin`,
       inputData,
     );
   }
 
-  forgetPassword<T>(
+  async forgetPassword<T>(
     inputData: ForgetPassword,
   ): Promise<AxiosResponse<AuthApiResponse<T>>> {
     return axiosClient.post<AuthApiResponse<T>>(
@@ -33,7 +37,7 @@ export class AuthApi {
       inputData,
     );
   }
-  resetPassword<T>(
+  async resetPassword<T>(
     token: string,
     newPassword: ResetPassword,
   ): Promise<AxiosResponse<AuthApiResponse<T>>> {
@@ -42,24 +46,26 @@ export class AuthApi {
       newPassword,
     );
   }
-  verifyEmail<T>(token: string): Promise<AxiosResponse<AuthApiResponse<T>>> {
+  async verifyEmail<T>(
+    token: string,
+  ): Promise<AxiosResponse<AuthApiResponse<T>>> {
     return axiosClient.post<AuthApiResponse<T>>(
       `${this.base}/verify-email/${token}`,
     );
   }
-  emailVerificationStatus<T>(
+  async emailVerificationStatus<T>(
     userId: number,
   ): Promise<AxiosResponse<AuthApiResponse<T>>> {
     return axiosClient.get<AuthApiResponse<T>>(
       `${this.base}/email-verification-status/${userId}`,
     );
   }
-  sendEmailVerification<T>(): Promise<AxiosResponse<AuthApiResponse<T>>> {
+  async sendEmailVerification<T>(): Promise<AxiosResponse<AuthApiResponse<T>>> {
     return axiosClient.post<AuthApiResponse<T>>(
       `${this.base}/send-email-verification`,
     );
   }
-  refreshToken<T>(): Promise<AxiosResponse<AuthApiResponse<T>>> {
+  async refreshToken<T>(): Promise<AxiosResponse<AuthApiResponse<T>>> {
     return axiosClient.post<AuthApiResponse<T>>(`${this.base}/refresh-token`);
   }
 }

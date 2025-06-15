@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { AuthState, SignIn, SignUp, User } from "../types/types";
-import { signInService, signUpService } from "../services/authApi";
+import { AuthApi } from "../services/authApi";
+
+const authApi = new AuthApi();
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -10,7 +12,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       signIn: async (inputSignIn: SignIn) => {
         try {
-          const res = await signInService<User>(inputSignIn);
+          const res = await authApi.signIn<User>(inputSignIn);
           const user = res.data.data;
           console.log(user);
           set({ user, isAuthenticated: true });
@@ -22,7 +24,7 @@ export const useAuthStore = create<AuthState>()(
       },
       signUp: async (inputSignUp: SignUp) => {
         try {
-          const res = await signUpService<User>(inputSignUp);
+          const res = await authApi.signUp<User>(inputSignUp);
           const user = res.data.data;
           set({ user, isAuthenticated: true });
           return user;
