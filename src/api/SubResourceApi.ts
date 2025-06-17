@@ -1,12 +1,11 @@
-import { axiosClient } from "../../../lib/axiosClient";
-import type { ApiResponse } from "../types/types";
+import { ApiResponse } from "../features/types/types";
+import { axiosClient } from "../lib/axiosClient";
 import { AxiosResponse } from "axios";
 
 export class SubResourceApi<T, I> {
   protected resource: string;
   protected subResource: string;
-
-  constructor(resource = "cvs", subResource: string) {
+  constructor(subResource: string, resource = "/cvs") {
     this.resource = resource;
     this.subResource = subResource;
   }

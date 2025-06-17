@@ -1,5 +1,6 @@
-import { axiosClient } from "../../../lib/axiosClient";
-import type { ApiResponse } from "../types/types";
+import { ApiResponse } from "../features/types/types";
+import { axiosClient } from "../lib/axiosClient";
+
 import { AxiosResponse } from "axios";
 
 export class ResourceApi<T, I> {
