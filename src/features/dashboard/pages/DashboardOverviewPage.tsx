@@ -7,11 +7,14 @@ import {
   SimpleGrid,
   Skeleton,
   Box,
+  Grid,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Suspense } from "react";
-import { OverviewStatsCards } from "../components/OverviewStatsCards";
+import { OverviewStatsCards } from "../overview/components/OverviewStatsCards";
+import { OverviewRecentCvs } from "../overview/components/OverviewRecentCvs";
+import { OverviewQuickItems } from "../overview/components/OverviewQuickItems";
 
 export const DashboardOverviewPage = () => {
   return (
@@ -41,6 +44,16 @@ export const DashboardOverviewPage = () => {
       >
         <OverviewStatsCards />
       </Suspense>
+      <Grid>
+        <Grid.Col span={{ base: 12, lg: 8 }}>
+          <Stack gap="lg">
+            <Suspense fallback={<Skeleton height={300} radius="md" />}>
+              <OverviewRecentCvs />
+            </Suspense>
+            <OverviewQuickItems />
+          </Stack>
+        </Grid.Col>
+      </Grid>
     </Stack>
   );
 };
