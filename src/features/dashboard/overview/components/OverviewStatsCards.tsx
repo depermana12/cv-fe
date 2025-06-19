@@ -5,7 +5,7 @@ import {
   IconBriefcase,
   IconTarget,
 } from "@tabler/icons-react";
-import { useUserStats } from "../../user/hooks/useUserStats";
+import { useUserStats } from "../../../user/hooks/useUserStats";
 
 export const OverviewStatsCards = () => {
   const { data: stats } = useUserStats();
