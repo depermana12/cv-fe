@@ -19,4 +19,7 @@ const DashboardOverview = () => {
 
 export const Route = createFileRoute("/dashboard/overview/")({
   component: DashboardOverview,
+  staticData: {
+    breadcrumb: "overview",
+  },
 });

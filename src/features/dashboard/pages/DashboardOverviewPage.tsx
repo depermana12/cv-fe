@@ -15,23 +15,17 @@ import { Suspense } from "react";
 import { OverviewStatsCards } from "../overview/components/OverviewStatsCards";
 import { OverviewRecentCvs } from "../overview/components/OverviewRecentCvs";
 import { OverviewQuickItems } from "../overview/components/OverviewQuickItems";
+import { OverviewRecentActivity } from "../overview/components/OverviewRecentActivity";
 
 export const DashboardOverviewPage = () => {
   return (
     <Stack gap="lg">
-      <Group justify="space-between">
-        <Box>
-          <Title order={2}>Dashboard Overview</Title>
-          <Text c="dimmed" size="sm">
-            Welcome back! Here's what's happening with your CVs.
-          </Text>
-        </Box>
-        <Link to="/dashboard/cv/create">
-          <Button leftSection={<IconPlus size={16} />} size="md">
-            Create New CV
-          </Button>
-        </Link>
-      </Group>
+      <Box>
+        <Title order={2}>Dashboard Overview</Title>
+        <Text c="dimmed" size="sm">
+          Welcome back! Here's what's happening with your CVs.
+        </Text>
+      </Box>
 
       <Suspense
         fallback={
@@ -52,6 +46,9 @@ export const DashboardOverviewPage = () => {
             </Suspense>
             <OverviewQuickItems />
           </Stack>
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, lg: 4 }}>
+          <OverviewRecentActivity />
         </Grid.Col>
       </Grid>
     </Stack>

@@ -1,10 +1,4 @@
-import { SimpleGrid, Card, Group, ActionIcon, Text } from "@mantine/core";
-import {
-  IconFileCv,
-  IconEye,
-  IconBriefcase,
-  IconTarget,
-} from "@tabler/icons-react";
+import { SimpleGrid, Card, Text, Stack } from "@mantine/core";
 import { useUserStats } from "../../../user/hooks/useUserStats";
 
 export const OverviewStatsCards = () => {
@@ -38,26 +32,18 @@ export const OverviewStatsCards = () => {
     {
       title: "Total CVs",
       value: stats?.cvCreated || 0,
-      icon: IconFileCv,
-      color: "blue",
     },
     {
       title: "Account Age",
       value: normalizeAccountAge(),
-      icon: IconEye,
-      color: "green",
     },
     {
       title: "Job Applications",
       value: stats?.totalJobApplications || 0,
-      icon: IconBriefcase,
-      color: "orange",
     },
     {
       title: "Profile Completion",
       value: `${calculateProfileCompletion()}%`,
-      icon: IconTarget,
-      color: "purple",
     },
   ];
 
@@ -65,24 +51,14 @@ export const OverviewStatsCards = () => {
     <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
       {statItems.map((stat) => (
         <Card key={stat.title} padding="lg" radius="md" withBorder>
-          <Group justify="space-between">
-            <div>
-              <Text size="xs" c="dimmed" tt="uppercase" fw={700}>
-                {stat.title}
-              </Text>
-              <Text size="xl" fw={700}>
-                {stat.value}
-              </Text>
-            </div>
-            <ActionIcon
-              variant="light"
-              color={stat.color}
-              size="lg"
-              radius="md"
-            >
-              <stat.icon size={22} />
-            </ActionIcon>
-          </Group>
+          <Stack justify="center">
+            <Text size="xs" c="dimmed" tt="uppercase" fw={700}>
+              {stat.title}
+            </Text>
+            <Text size="xl" fw={700}>
+              {stat.value}
+            </Text>
+          </Stack>
         </Card>
       ))}
     </SimpleGrid>
