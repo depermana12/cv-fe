@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { signInSchema, type SignIn } from "../types/auth.schema";
+import { signInSchema } from "../types/auth.schema";
 import { useSignIn } from "../hooks/useSignIn";
 import {
   Anchor,
@@ -19,14 +19,10 @@ import useFieldError from "../../cv/hooks/useFieldError";
 const SignInForm = () => {
   const { mutate, isPending } = useSignIn();
 
-  const defaultSignInForm: SignIn = { email: "", password: "" };
-
+  const defaultSignInForm = { email: "", password: "", rememberMe: false };
   const { Field, handleSubmit, state } = useForm({
     defaultValues: defaultSignInForm,
     onSubmit: async ({ value }) => mutate(value),
-    validators: {
-      onSubmit: signInSchema,
-    },
   });
 
   return (
@@ -85,13 +81,20 @@ const SignInForm = () => {
                 />
               );
             }}
-          />
+          />{" "}
           <Group justify="space-between">
-            <Checkbox
-              radius="xs"
-              label="Remember me"
-              name="remember"
-              id="remember"
+            <Field
+              name="rememberMe"
+              children={({ state, handleChange }) => (
+                <Checkbox
+                  radius="xs"
+                  label="Remember me"
+                  checked={state.value}
+                  onChange={(event) =>
+                    handleChange(event.currentTarget.checked)
+                  }
+                />
+              )}
             />
             <Anchor
               component={Link}

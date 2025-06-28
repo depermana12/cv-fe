@@ -20,7 +20,7 @@ export const useSignUp = () => {
         message: `Thanks for joining! ${user.username} account has been created`,
         color: "green",
       });
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/dashboard/overview" });
     },
     onError: (error) => {
       notifications.show({

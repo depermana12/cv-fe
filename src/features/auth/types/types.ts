@@ -15,9 +15,11 @@ export type User = {
 export type AuthState = {
   user: User | null;
   isAuthenticated: boolean;
+  rememberMe: boolean;
   signUp: (inputSignUp: SignUp) => Promise<User>;
-  signIn: (inputSignIn: SignIn) => Promise<User>;
+  signIn: (inputSignIn: SignIn & { rememberMe?: boolean }) => Promise<User>;
   signOut: () => void;
+  checkAuthValidity: () => boolean;
 };
 
 export type AuthApiResponse<T> = {

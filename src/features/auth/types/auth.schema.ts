@@ -7,6 +7,10 @@ export const signInSchema = z.object({
   password: z.string().min(8, "password must have minimum 8 characters"),
 });
 
+export const signInWithRememberMeSchema = signInSchema.extend({
+  rememberMe: z.boolean().default(false),
+});
+
 export const signUpSchema = signInSchema.extend({
   username: z.string().min(3, "username must be at least 3 characters"),
 });

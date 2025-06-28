@@ -20,7 +20,7 @@ export const useSignIn = () => {
         message: `Welcome back, ${user.username}!`,
         color: "green",
       });
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/dashboard/overview" });
     },
     onError: (error) => {
       notifications.show({
