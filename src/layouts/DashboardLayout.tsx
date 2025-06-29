@@ -11,11 +11,13 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure, useLocalStorage, useMediaQuery } from "@mantine/hooks";
-import { Outlet, Link } from "@tanstack/react-router";
+import { Outlet, Link, useMatches } from "@tanstack/react-router";
 import { IconFile } from "@tabler/icons-react";
 
 import { Sidebar } from "../features/dashboard/components/Sidebar";
 import DashboardHeaderNav from "../features/dashboard/components/DashboardHeaderNav";
+import { useBreadcrumbItems } from "../hooks/useBreadcrumbItems";
+import { HeaderSection } from "../features/dashboard/components/HeaderSection";
 
 export type SidebarState = "collapsed" | "expanded";
 
@@ -35,6 +37,13 @@ export const DashboardLayout = () => {
     defaultValue: "expanded",
     getInitialValueInEffect: true,
   });
+
+  const matches = useMatches();
+  const isCvBuilder = matches.some((m) =>
+    m.pathname?.startsWith("/dashboard/cv"),
+  );
+
+  const breadcrumbItems = useBreadcrumbItems();
 
   useEffect(() => {
     if (!isMobile) {
@@ -117,13 +126,18 @@ export const DashboardLayout = () => {
         <Sidebar />
       </AppShell.Navbar>
       <AppShell.Main>
-        <Container
-          size={isTablet ? "100%" : "xl"}
-          px={isTablet ? "sm" : "md"}
-          py="sm"
-        >
+        <HeaderSection breadcrumbItems={breadcrumbItems} />
+        {isCvBuilder ? (
           <Outlet />
-        </Container>
+        ) : (
+          <Container
+            size={isTablet ? "100%" : "xl"}
+            px={isTablet ? "sm" : "md"}
+            py="sm"
+          >
+            <Outlet />
+          </Container>
+        )}
       </AppShell.Main>
     </AppShell>
   );
