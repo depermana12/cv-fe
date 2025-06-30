@@ -2,12 +2,14 @@ import {
   IconFileDescription,
   IconBriefcase,
   IconChartHistogram,
+  IconBrain,
+  IconTemplate,
+  IconShield,
 } from "@tabler/icons-react";
 import {
   Badge,
   Card,
   Container,
-  Group,
   SimpleGrid,
   Text,
   Title,
@@ -15,26 +17,45 @@ import {
   rem,
   useMantineColorScheme,
   Stack,
+  ThemeIcon,
 } from "@mantine/core";
 
-const mockdata = [
+const features = [
   {
-    title: "Professional Templates",
+    title: "AI-Powered Writing",
     description:
-      "Choose from dozens of ATS-friendly templates designed to get your CV noticed by recruiters and hiring managers.",
-    icon: IconFileDescription,
+      "Write your first CV with confidence. Get intelligent suggestions to showcase your strengths, even with limited experience.",
+    icon: IconBrain,
   },
   {
-    title: "Job Application Tracker",
+    title: "ATS-Friendly Templates",
     description:
-      "Keep track of all your job applications in one place with status updates, follow-up reminders, and company details.",
+      "Use professional templates built to pass resume scanners and get your CV seen by real recruiters.",
+    icon: IconTemplate,
+  },
+  {
+    title: "Application Tracker",
+    description:
+      "Keep track of jobs you’ve applied to, interviews scheduled, and follow-ups—all in one place.",
     icon: IconBriefcase,
   },
   {
-    title: "Performance Analytics",
+    title: "Performance Insights",
     description:
-      "Get insights on which CV versions perform best and optimize your applications for better response rates.",
+      "See how your CV is performing and get tips to improve your chances of landing interviews.",
     icon: IconChartHistogram,
+  },
+  {
+    title: "Privacy First",
+    description:
+      "Your personal data stays safe. Control who sees your CV and manage access with ease.",
+    icon: IconShield,
+  },
+  {
+    title: "Export Anywhere",
+    description:
+      "Download your CV in PDF or Word format. Ready to send to recruiters or upload to job portals.",
+    icon: IconFileDescription,
   },
 ];
 
@@ -43,77 +64,78 @@ export const FeaturesCards = () => {
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === "dark";
 
-  const features = mockdata.map((feature) => (
-    <Card
-      key={feature.title}
-      shadow="md"
-      radius="md"
-      p="xl"
-      style={{
-        border: `1px solid ${
-          isDark ? theme.colors.dark[4] : theme.colors.gray[2]
-        }`,
-        backgroundColor: isDark ? theme.colors.dark[6] : theme.white,
-      }}
-    >
-      <Stack gap="sm">
-        <feature.icon
-          size={50}
-          stroke={1.5}
-          color={isDark ? theme.colors.blue[4] : theme.colors.blue[6]}
-        />
-        <Text fz="lg" fw={600}>
-          {feature.title}
-        </Text>
-        <Text fz="sm" c="dimmed">
-          {feature.description}
-        </Text>
-      </Stack>
-    </Card>
-  ));
+  const iconColor = isDark ? theme.colors.gray[2] : theme.colors.dark[6];
 
   return (
-    <Container size="lg" py="xl">
-      <Group justify="center">
-        <Badge variant="filled" size="lg" color="blue">
-          CV Success Toolkit
-        </Badge>
-      </Group>
+    <Container size="lg" py={rem(80)}>
+      <Stack gap="xl" align="center">
+        <Stack gap="sm" align="center">
+          <Badge size="lg">Made for Fresh Graduates</Badge>
+          <Title
+            order={2}
+            ta="center"
+            fz={{ base: 28, sm: 36 }}
+            fw={700}
+            c={isDark ? theme.white : theme.colors.dark[7]}
+          >
+            Tools to Kickstart Your Career
+          </Title>
+          <Text
+            c="dimmed"
+            ta="center"
+            mt="md"
+            maw={600}
+            mx="auto"
+            size="lg"
+            lh={1.6}
+          >
+            Whether you're applying for your first job or internship, our smart
+            CV builder and tools are designed to help you stand out.
+          </Text>
+        </Stack>
 
-      <Title
-        order={2}
-        ta="center"
-        mt="sm"
-        fz={{ base: 24, sm: 34 }}
-        fw={600}
-        c={isDark ? theme.white : theme.black}
-      >
-        Everything You Need for Your Job Search
-      </Title>
+        <SimpleGrid
+          cols={{ base: 1, sm: 2, lg: 3 }}
+          spacing="xl"
+          mt={rem(40)}
+          w="100%"
+        >
+          {features.map((feature) => (
+            <Card
+              key={feature.title}
+              shadow="sm"
+              radius="lg"
+              p="xl"
+              withBorder
+              sx={{
+                backgroundColor: isDark ? theme.colors.dark[6] : theme.white,
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-6px)",
+                  boxShadow: isDark
+                    ? "0 12px 24px rgba(0, 0, 0, 0.4)"
+                    : "0 12px 24px rgba(0, 0, 0, 0.08)",
+                },
+              }}
+            >
+              <Stack gap="lg">
+                <ThemeIcon size={60} radius="xl" variant="default" color="gray">
+                  <feature.icon size={30} stroke={1.5} color={iconColor} />
+                </ThemeIcon>
 
-      <Text
-        c="dimmed"
-        ta="center"
-        mt="md"
-        maw={600}
-        mx="auto"
-        style={{
-          position: "relative",
-          paddingBottom: rem(16),
-        }}
-      >
-        Our platform combines powerful CV tools with job tracking to give you an
-        edge in today's competitive market.
-      </Text>
-
-      <SimpleGrid
-        cols={{ base: 1, sm: 2, md: 3 }}
-        spacing="xl"
-        mt={50}
-        verticalSpacing="xl"
-      >
-        {features}
-      </SimpleGrid>
+                <Stack gap="sm">
+                  <Title order={3} fz="xl" fw={600}>
+                    {feature.title}
+                  </Title>
+                  <Text fz="md" c="dimmed" lh={1.6}>
+                    {feature.description}
+                  </Text>
+                </Stack>
+              </Stack>
+            </Card>
+          ))}
+        </SimpleGrid>
+      </Stack>
     </Container>
   );
 };
