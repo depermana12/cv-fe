@@ -1,4 +1,4 @@
-import { IconCheck } from "@tabler/icons-react";
+import { IconCheck, IconArrowRight } from "@tabler/icons-react";
 import {
   Button,
   Container,
@@ -12,7 +12,9 @@ import {
   rem,
   useMantineColorScheme,
   useMantineTheme,
+  Paper,
 } from "@mantine/core";
+import { Link } from "@tanstack/react-router";
 import image from "./image.svg";
 
 export const HeroBullets = () => {
@@ -20,84 +22,110 @@ export const HeroBullets = () => {
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === "dark";
 
+  const gradientProps = {
+    variant: "gradient",
+    gradient: { from: "violet", to: "blue", deg: 129 },
+  };
+
   return (
-    <Container size="lg" py={{ base: rem(40), md: rem(80) }}>
+    <Container size="lg" py={{ base: rem(60), md: rem(100) }}>
       <Group justify="space-between" align="flex-start" wrap="wrap" gap={50}>
-        <Stack gap="md" style={{ maxWidth: rem(480) }}>
+        <Stack gap="xl" maw={600}>
           <Title
+            fz={{ base: rem(32), sm: rem(40) }}
+            lh={1.3}
+            fw={700}
             c={isDark ? theme.white : theme.colors.dark[7]}
-            fz={{ base: rem(28), xs: rem(38), md: rem(44) }}
-            lh={1.2}
-            fw={600}
           >
-            Build Your <br />
+            Start Your Career with a{" "}
             <Text
-              span
-              px="sm"
-              py={4}
-              fw={600}
-              bg={isDark ? theme.colors.blue[7] : theme.colors.blue[2]}
-              style={{ borderRadius: rem(4) }}
-              inherit
+              component="span"
+              fz={{ base: rem(32), sm: rem(40) }}
+              lh={1.3}
+              fw={700}
+              {...gradientProps}
             >
-              Professional
-            </Text>{" "}
-            CV Effortlessly
+              Professional CV
+            </Text>
           </Title>
 
-          <Text c="dimmed" mt="md" fz="md">
-            Create, customize, and manage multiple CV versions tailored for
-            different job applications. Track your submissions and get hired
-            faster with our powerful tools.
+          <Text
+            fz="lg"
+            lh={1.6}
+            c={isDark ? theme.colors.gray[3] : theme.colors.gray[7]}
+          >
+            No experience? No problem. Our smart CV builder helps you highlight
+            your strengths, projects, and education to make a great first
+            impression.
           </Text>
 
           <List
-            size="sm"
-            spacing="sm"
-            mt="md"
+            spacing="md"
+            size="md"
             icon={
-              <ThemeIcon
-                size={20}
-                radius="xl"
-                variant="light"
-                color={isDark ? "blue.4" : "blue"}
-              >
-                <IconCheck size={12} stroke={1.5} />
+              <ThemeIcon variant="light" size={30} radius="xl">
+                <IconCheck size={18} stroke={2.5} />
               </ThemeIcon>
             }
           >
             <List.Item>
-              <b>AI-Powered Suggestions</b> - Get tailored content
-              recommendations based on your target roles
+              <Text fw={600} component="span" {...gradientProps}>
+                Smart Suggestions:
+              </Text>{" "}
+              Get guidance on how to describe your projects, internships, and
+              coursework.
             </List.Item>
             <List.Item>
-              <b>Multi-Version Management</b> - Maintain different CV versions
-              for various job applications
+              <Text fw={600} component="span" {...gradientProps}>
+                ATS-Friendly Templates:
+              </Text>{" "}
+              Choose from clean layouts that work with applicant tracking
+              systems.
             </List.Item>
             <List.Item>
-              <b>Application Tracker</b> - Monitor where you've applied and
-              follow up effectively
+              <Text fw={600} component="span" {...gradientProps}>
+                Application Tracker:
+              </Text>{" "}
+              Keep track of every job you apply to with deadlines and follow-up
+              notes.
             </List.Item>
           </List>
 
-          <Group mt="lg">
-            <Button radius="md" size="md">
-              Create Your CV
-            </Button>
-            <Button variant="default" radius="md" size="md">
-              Track Applications
+          <Group mt="xl" gap="md">
+            <Button
+              component={Link}
+              to="/auth/signup"
+              size="lg"
+              radius="xl"
+              rightSection={<IconArrowRight size={18} />}
+            >
+              Get Started for Free
             </Button>
           </Group>
         </Stack>
 
-        <Image
-          src={image}
-          w={{ base: "100%", md: 376 }}
-          h={{ base: "auto", md: 356 }}
+        <Paper
+          radius="md"
+          p="md"
+          maw={400}
           visibleFrom="md"
-          alt="Professional CV illustration"
-          style={{ objectFit: "contain" }}
-        />
+          style={{
+            backgroundColor: isDark
+              ? theme.colors.dark[6]
+              : theme.colors.gray[0],
+            border: `1px solid ${isDark ? theme.colors.dark[4] : theme.colors.gray[2]}`,
+          }}
+        >
+          <Image
+            src={image}
+            h={360}
+            alt="Creating CV illustration"
+            style={{
+              objectFit: "contain",
+              filter: isDark ? "brightness(0.9)" : "brightness(1)",
+            }}
+          />
+        </Paper>
       </Group>
     </Container>
   );
