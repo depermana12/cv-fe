@@ -7,10 +7,6 @@ export const userSchema = z.object({
     .min(3, { message: "Username must be at least 3 characters" })
     .max(50),
   email: z.string().email({ message: "Invalid email address" }).max(100),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .max(255),
   isEmailVerified: z.boolean().optional(),
   profileImage: z
     .string()
@@ -45,7 +41,6 @@ export const userInsertSchema = userSchema.omit({
 
 export const userUpdateSchema = userSchema
   .pick({
-    profileImage: true,
     birthDate: true,
     firstName: true,
     lastName: true,
