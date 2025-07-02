@@ -29,17 +29,22 @@ import { useSendEmailVerification } from "../../user/hooks/useSendEmailVerificat
 import useFieldError from "../../cv/hooks/useFieldError";
 import { zFieldValidator } from "../../cv/utils/zFieldValidator";
 import { userUpdateSchema } from "../../user/schema/user";
+import { useUploadPP } from "../../user/hooks/useUploadPP";
 
 const ProfileContent = () => {
   const { data: user } = useUser();
   const [isEditing, setIsEditing] = useState(false);
-  const { mutate, isPending } = useUpdateProfile();
+  const { mutate: updateProfile, isPending } = useUpdateProfile();
   const { mutate: sendVerificationEmail, isPending: isSendingEmail } =
     useSendEmailVerification();
   const [
     avatarModalOpened,
     { open: openAvatarModal, close: closeAvatarModal },
   ] = useDisclosure(false);
+
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewurl] = useState<string | null>(null);
+  const { mutate: uploadPP, isPending: isUpdating } = useUploadPP();
 
   const { Field, handleSubmit, state } = useForm({
     defaultValues: {
@@ -49,7 +54,7 @@ const ProfileContent = () => {
       gender: user?.gender || null,
     },
     onSubmit: async ({ value }) => {
-      mutate(value, {
+      updateProfile(value, {
         onSuccess: () => {
           setIsEditing(false);
         },
@@ -81,7 +86,7 @@ const ProfileContent = () => {
 
               <Box pos="relative">
                 <Avatar
-                  src={user.profileImage}
+                  src={previewUrl || user.profileImage}
                   size={200}
                   radius={200}
                   color="blue"
@@ -318,7 +323,11 @@ const ProfileContent = () => {
 
       <Modal
         opened={avatarModalOpened}
-        onClose={closeAvatarModal}
+        onClose={() => {
+          closeAvatarModal();
+          setFile(null);
+          setPreviewurl(null);
+        }}
         title="Update Profile Picture"
         centered
       >
@@ -330,9 +339,37 @@ const ProfileContent = () => {
             clearable
             accept="image/*"
             leftSection={<IconUpload size={16} />}
+            value={file}
+            onChange={(file) => {
+              setFile(file);
+              setPreviewurl(file ? URL.createObjectURL(file) : null);
+            }}
           />
           <Group justify="flex-start">
-            <Button variant="outline">Upload</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (!file) return;
+                uploadPP(file, {
+                  onSuccess: async (key) => {
+                    updateProfile(
+                      { profileImage: key },
+                      {
+                        onSuccess: () => {
+                          setPreviewurl(null);
+                          setFile(null);
+                          closeAvatarModal();
+                        },
+                      },
+                    );
+                  },
+                });
+              }}
+              disabled={!file || isUpdating}
+              loading={isUpdating}
+            >
+              Upload
+            </Button>
           </Group>
         </Stack>
       </Modal>
