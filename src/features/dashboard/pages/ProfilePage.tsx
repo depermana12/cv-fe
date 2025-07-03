@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import {
   Stack,
   Group,
@@ -18,6 +18,7 @@ import {
   LoadingOverlay,
   Anchor,
   Box,
+  useMantineColorScheme,
 } from "@mantine/core";
 import { IconCamera, IconUpload } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -41,9 +42,11 @@ const ProfileContent = () => {
     avatarModalOpened,
     { open: openAvatarModal, close: closeAvatarModal },
   ] = useDisclosure(false);
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
 
   const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewurl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { mutate: uploadPP, isPending: isUpdating } = useUploadPP();
 
   const { Field, handleSubmit, state } = useForm({
@@ -54,6 +57,7 @@ const ProfileContent = () => {
       gender: user?.gender || null,
     },
     onSubmit: async ({ value }) => {
+      if (!state.isDirty) return;
       updateProfile(value, {
         onSuccess: () => {
           setIsEditing(false);
@@ -62,10 +66,42 @@ const ProfileContent = () => {
     },
   });
 
-  const avatarInitials =
-    user.firstName && user.lastName
-      ? `${user.firstName[0]}${user.lastName[0]}`
-      : user.username?.[0]?.toUpperCase() || "U";
+  const avatarInitials = useMemo(() => {
+    if (user.firstName && user.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`;
+    }
+    return user.username ? user.username[0].toUpperCase() : "n/a";
+  }, [user.firstName, user.lastName, user.username]);
+
+  const cdn = import.meta.env.VITE_CDN;
+  const constructImageUrl = (key: string | null | undefined) => {
+    return key ? `${cdn}/${key?.replace(/^uploads\//, "")}` : null;
+  };
+  const profileImageUrl = constructImageUrl(user.profileImage);
+
+  const resetModal = () => {
+    setFile(null);
+    setPreviewUrl(null);
+    closeAvatarModal();
+  };
+
+  const handleUploadPP = () => {
+    if (!file) return;
+    uploadPP(file, {
+      onSuccess: (key) => {
+        updateProfile(
+          { profileImage: key },
+          {
+            onSuccess: resetModal,
+          },
+        );
+      },
+    });
+  };
+
+  const handleDeletePP = () => {
+    updateProfile({ profileImage: null });
+  };
 
   return (
     <Stack gap="lg">
@@ -86,10 +122,16 @@ const ProfileContent = () => {
 
               <Box pos="relative">
                 <Avatar
-                  src={previewUrl || user.profileImage}
+                  src={previewUrl || profileImageUrl}
                   size={200}
                   radius={200}
                   color="blue"
+                  sx={(theme) => ({
+                    background: isDark
+                      ? theme.colors.dark[5]
+                      : theme.colors.gray[2],
+                    border: "2px solid transparent",
+                  })}
                 >
                   {avatarInitials}
                 </Avatar>
@@ -240,6 +282,7 @@ const ProfileContent = () => {
                         variant="outline"
                         type="submit"
                         loading={state.isSubmitting || isPending}
+                        disabled={!state.isDirty}
                       >
                         Save Changes
                       </Button>
@@ -323,11 +366,7 @@ const ProfileContent = () => {
 
       <Modal
         opened={avatarModalOpened}
-        onClose={() => {
-          closeAvatarModal();
-          setFile(null);
-          setPreviewurl(null);
-        }}
+        onClose={resetModal}
         title="Update Profile Picture"
         centered
       >
@@ -342,34 +381,23 @@ const ProfileContent = () => {
             value={file}
             onChange={(file) => {
               setFile(file);
-              setPreviewurl(file ? URL.createObjectURL(file) : null);
+              setPreviewUrl(file ? URL.createObjectURL(file) : null);
             }}
           />
           <Group justify="flex-start">
             <Button
               variant="outline"
-              onClick={() => {
-                if (!file) return;
-                uploadPP(file, {
-                  onSuccess: async (key) => {
-                    updateProfile(
-                      { profileImage: key },
-                      {
-                        onSuccess: () => {
-                          setPreviewurl(null);
-                          setFile(null);
-                          closeAvatarModal();
-                        },
-                      },
-                    );
-                  },
-                });
-              }}
+              onClick={handleUploadPP}
               disabled={!file || isUpdating}
               loading={isUpdating}
             >
               Upload
             </Button>
+            {user.profileImage ? (
+              <Button color="red" onClick={handleDeletePP}>
+                Remove
+              </Button>
+            ) : null}
           </Group>
         </Stack>
       </Modal>
