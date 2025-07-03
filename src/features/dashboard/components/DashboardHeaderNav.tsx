@@ -9,6 +9,7 @@ import {
   Modal,
   Text,
   Tooltip,
+  useMantineColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconLogout2, IconUserCircle, IconSettings } from "@tabler/icons-react";
@@ -24,6 +25,9 @@ const DashboardHeaderNav = () => {
   const { data: user } = useUser();
   const { signOut } = useAuthStore();
 
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
+
   const handleSignOut = () => {
     signOut();
     closeModal();
@@ -38,6 +42,11 @@ const DashboardHeaderNav = () => {
     }
     return user.username ? user.username[0].toUpperCase() : "n/a";
   }, [user.firstName, user.lastName, user.username]);
+
+  const baseCdn = import.meta.env.VITE_CDN;
+  const profileImgUrl = user.profileImage
+    ? `${baseCdn}/${user.profileImage.split("/")[1]}`
+    : null;
 
   return (
     <Group justify="flex-end" gap="sm">
@@ -74,9 +83,20 @@ const DashboardHeaderNav = () => {
             >
               {user.profileImage ? (
                 <Avatar
-                  src={user.profileImage}
+                  src={profileImgUrl}
                   alt={user.username || "User avatar"}
                   radius="xl"
+                  sx={(theme) => ({
+                    background: isDark
+                      ? theme.colors.dark[5]
+                      : theme.colors.gray[2],
+                    border: "2px solid transparent",
+                    "&:hover": {
+                      borderColor: isDark
+                        ? theme.colors.gray[6]
+                        : theme.colors.dark[2],
+                    },
+                  })}
                 />
               ) : (
                 <Avatar radius="xl" color="blue" name={avatarInitials} />
