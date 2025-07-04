@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { cvApi } from "../services/CvApi";
+import type { CvQueryOptions } from "../types/types";
 
 export const cvsQuery = () =>
   queryOptions({
@@ -7,6 +8,21 @@ export const cvsQuery = () =>
     queryFn: async () => {
       const res = await cvApi.getAll();
       return res.data.data;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+export const cvsPaginatedQuery = (options?: CvQueryOptions) =>
+  queryOptions({
+    queryKey: ["cvs-paginated", options],
+    queryFn: async () => {
+      const res = await cvApi.getAllWithPagination(options);
+      return {
+        data: res.data.data,
+        total: res.data.pagination.total,
+        limit: res.data.pagination.limit,
+        offset: res.data.pagination.offset,
+      };
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
