@@ -32,7 +32,7 @@ export const useCreateCv = () => {
         withCloseButton: true,
         autoClose: 3000,
         title: "Failed to create CV",
-        message: "There was an error creating your CV.",
+        message: err?.message || "There was an error creating your CV.",
         color: "red",
       });
       console.error("Failed to create CV", err);
