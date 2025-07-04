@@ -1,3 +1,6 @@
+import { z } from "zod";
+import { cvQueryOptionsSchema } from "../schema/cv.schema";
+
 export type Cv = {
   id: number;
   userId: number;
@@ -23,6 +26,8 @@ export type CvCreate = {
 };
 
 export type CvUpdate = Partial<CvCreate>;
+
+export type CvQueryOptions = z.infer<typeof cvQueryOptionsSchema>;
 
 export type CvPaginatedResponse = {
   data: Cv[];
