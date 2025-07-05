@@ -41,3 +41,10 @@ export type CvStore = {
   setActiveCvId: (id: number) => void;
   clearActiveCvId: () => void;
 };
+
+export type CvFormProps = {
+  opened: boolean;
+  onClose: () => void;
+  initialData?: Partial<CvCreate>;
+  mode?: "create" | "edit";
+};
