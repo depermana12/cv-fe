@@ -6,13 +6,19 @@ import { notifications } from "@mantine/notifications";
 
 export const useUpdateCv = () => {
   return useMutation({
-    mutationFn: async (variables: { id: number; data: CvUpdate }) => {
-      const res = await cvApi.patch(variables.id, variables.data);
+    mutationFn: async (payload: { cvId: number; data: CvUpdate }) => {
+      const { cvId, data } = payload;
+
+      const res = await cvApi.patch(cvId, data);
       return res.data.data;
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: (_updatedCv, payload) => {
+      const { cvId } = payload;
+
       queryClient.invalidateQueries({ queryKey: ["cvs"] });
-      queryClient.invalidateQueries({ queryKey: ["cvs", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["cvs-paginated"] });
+      queryClient.invalidateQueries({ queryKey: ["cvs", cvId] });
+
       notifications.show({
         position: "top-center",
         withCloseButton: true,
