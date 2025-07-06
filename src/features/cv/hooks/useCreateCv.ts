@@ -15,6 +15,7 @@ export const useCreateCv = () => {
     },
     onSuccess: (newCv) => {
       queryClient.invalidateQueries({ queryKey: ["cvs"] });
+      queryClient.invalidateQueries({ queryKey: ["cvs-paginated"] });
       setActiveCvId(newCv.id);
 
       notifications.show({

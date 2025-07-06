@@ -11,7 +11,8 @@ export const useDeleteCv = () => {
     },
     onSuccess: (_data, cvId) => {
       queryClient.invalidateQueries({ queryKey: ["cvs"] });
-      queryClient.removeQueries({ queryKey: ["cvs", cvId] });
+      queryClient.invalidateQueries({ queryKey: ["cvs-paginated"] });
+      queryClient.removeQueries({ queryKey: ["cv", cvId] });
       notifications.show({
         position: "top-center",
         withCloseButton: true,
