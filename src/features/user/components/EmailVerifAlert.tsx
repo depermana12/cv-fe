@@ -1,20 +1,15 @@
 import { Alert, Button, Group } from "@mantine/core";
 import { IconMail, IconMailCheck } from "@tabler/icons-react";
-import { AuthApi } from "../../auth/services/authApi";
-import { useEmailVerification } from "../hooks/useEmailverification";
-
-const authApi = new AuthApi();
+import { useEmailVerification } from "../hooks/useEmailVerification";
+import { useSendEmailVerification } from "../hooks/useSendEmailVerification";
 
 export const EmailVerificationAlert = () => {
   const { data: emailStatus } = useEmailVerification();
+  const { mutate: sendVerificationEmail, isPending: isSending } =
+    useSendEmailVerification();
 
-  const handleResendVerification = async () => {
-    try {
-      await authApi.sendEmailVerification();
-      // TODO: email service
-    } catch (error) {
-      // TODO: email service
-    }
+  const handleResendVerification = () => {
+    sendVerificationEmail();
   };
 
   if (emailStatus.verified) {
@@ -29,8 +24,13 @@ export const EmailVerificationAlert = () => {
     <Alert icon={<IconMail size={16} />} color="yellow" mb="md">
       <Group justify="space-between">
         <div>Please verify your email address to access all features.</div>
-        <Button size="xs" variant="outline" onClick={handleResendVerification}>
-          Resend Email
+        <Button
+          size="xs"
+          variant="outline"
+          onClick={handleResendVerification}
+          loading={isSending}
+        >
+          {isSending ? "Sending..." : "Resend Email"}
         </Button>
       </Group>
     </Alert>
