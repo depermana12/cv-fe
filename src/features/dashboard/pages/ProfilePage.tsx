@@ -1,4 +1,4 @@
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import {
   Stack,
   Group,
@@ -21,7 +21,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconCamera, IconUpload } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useInterval, useTimeout } from "@mantine/hooks";
 import { useForm } from "@tanstack/react-form";
 import { DatePickerInput } from "@mantine/dates";
 import { useUser } from "../../user/hooks/useUser";
@@ -38,6 +38,10 @@ const ProfileContent = () => {
   const { mutate: updateProfile, isPending } = useUpdateProfile();
   const { mutate: sendVerificationEmail, isPending: isSendingEmail } =
     useSendEmailVerification();
+  const [emailSent, setEmailSent] = useState(false);
+  const [retrySeconds, setRetrySeconds] = useState(0);
+  const interval = useInterval(() => setRetrySeconds((s) => s - 1), 1000);
+  const timeout = useTimeout(() => setEmailSent(false), 30000);
   const [
     avatarModalOpened,
     { open: openAvatarModal, close: closeAvatarModal },
@@ -48,6 +52,24 @@ const ProfileContent = () => {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { mutate: uploadPP, isPending: isUpdating } = useUploadPP();
+
+  const handleSendVerification = async () => {
+    if (isSendingEmail || retrySeconds > 0) return;
+    sendVerificationEmail(undefined, {
+      onSuccess: () => {
+        setEmailSent(true);
+        setRetrySeconds(30);
+        interval.start();
+        timeout.start();
+      },
+    });
+  };
+
+  useEffect(() => {
+    if (retrySeconds === 0) {
+      interval.stop();
+    }
+  }, [retrySeconds, interval]);
 
   const { Field, handleSubmit, state } = useForm({
     defaultValues: {
@@ -329,17 +351,22 @@ const ProfileContent = () => {
                   {!user.isEmailVerified && (
                     <Anchor
                       size="xs"
-                      c="blue"
-                      onClick={() => sendVerificationEmail()}
+                      c={emailSent ? "blue" : "orange"}
+                      onClick={handleSendVerification}
                       style={{
-                        cursor: isSendingEmail ? "not-allowed" : "pointer",
-                        opacity: isSendingEmail ? 0.6 : 1,
+                        cursor:
+                          isSendingEmail || retrySeconds > 0
+                            ? "not-allowed"
+                            : "pointer",
+                        opacity: isSendingEmail || retrySeconds > 0 ? 0.6 : 1,
                       }}
                       fw={500}
                     >
                       {isSendingEmail
                         ? "Sending..."
-                        : "Send verification email"}
+                        : emailSent && retrySeconds > 0
+                          ? `Sent! retry in ${retrySeconds}s`
+                          : "Send verification email"}
                     </Anchor>
                   )}
                 </Stack>
