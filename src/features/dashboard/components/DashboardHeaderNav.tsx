@@ -118,18 +118,18 @@ const DashboardHeaderNav = () => {
           <Menu.Item
             leftSection={<IconUserCircle size={14} />}
             aria-label="Profile"
+            component={Link}
+            to="/dashboard/profile"
           >
-            <Anchor component={Link} to="/dashboard/profile" underline="never">
-              Profile
-            </Anchor>
+            Profile
           </Menu.Item>
           <Menu.Item
             leftSection={<IconSettings size={14} />}
             aria-label="Account Settings"
+            component={Link}
+            to="/dashboard/account"
           >
-            <Anchor component={Link} to="/dashboard/account" underline="never">
-              Account Settings
-            </Anchor>
+            Account Settings
           </Menu.Item>
           <Menu.Divider />
           <Menu.Item
