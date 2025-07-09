@@ -19,6 +19,7 @@ import {
   Anchor,
   Box,
   useMantineColorScheme,
+  Tabs,
 } from "@mantine/core";
 import { IconCamera, IconUpload } from "@tabler/icons-react";
 import { useDisclosure, useInterval, useTimeout } from "@mantine/hooks";
@@ -31,6 +32,7 @@ import useFieldError from "../../cv/hooks/useFieldError";
 import { zFieldValidator } from "../../cv/utils/zFieldValidator";
 import { userUpdateSchema } from "../../user/schema/user";
 import { useUploadPP } from "../../user/hooks/useUploadPP";
+import { AccountSettings } from "../profile/components/AccountSettings";
 
 const ProfileContent = () => {
   const { data: user } = useUser();
@@ -126,309 +128,329 @@ const ProfileContent = () => {
   };
 
   return (
-    <Stack gap="lg">
-      <Group justify="space-between">
-        <Stack gap={0}>
-          <Title order={2}>Profile</Title>
-          <Text c="dimmed">
-            Manage your personal information and account settings
-          </Text>
-        </Stack>
-      </Group>
-
-      <Grid>
-        <Grid.Col span={{ base: 12, md: 4 }}>
-          <Card padding="lg" radius="md">
-            <Stack align="center" gap="md">
-              <Title order={4}>Profile Picture</Title>
-
-              <Box pos="relative">
-                <Avatar
-                  src={previewUrl || profileImageUrl}
-                  size={200}
-                  radius={200}
-                  color="blue"
-                  sx={(theme) => ({
-                    background: isDark
-                      ? theme.colors.dark[5]
-                      : theme.colors.gray[2],
-                    border: "2px solid transparent",
-                  })}
-                >
-                  {avatarInitials}
-                </Avatar>
-                <Button
-                  size="xs"
-                  variant="default"
-                  leftSection={<IconCamera size={14} />}
-                  onClick={openAvatarModal}
-                  pos="absolute"
-                  bottom={0}
-                  right={0}
-                >
-                  Edit
-                </Button>
-              </Box>
+    <Tabs defaultValue="profile">
+      <Tabs.List mb="lg">
+        <Tabs.Tab value="profile">Profile</Tabs.Tab>
+        <Tabs.Tab value="authentication">Authentication</Tabs.Tab>
+      </Tabs.List>
+      <Tabs.Panel value="profile">
+        <Stack gap="lg">
+          <Group justify="space-between">
+            <Stack gap={0}>
+              <Title order={2}>Profile</Title>
+              <Text c="dimmed">
+                Manage your personal information and account settings
+              </Text>
             </Stack>
-          </Card>
-        </Grid.Col>
-
-        <Grid.Col span={{ base: 12, md: 8 }}>
-          <Card padding="lg" radius="md" withBorder>
-            <Group justify="space-between" mb="md">
-              <Title order={4}>Basic Information</Title>
-            </Group>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSubmit();
-              }}
-            >
-              <LoadingOverlay visible={state.isSubmitting || isPending} />
-              <Stack gap="md">
-                <Group justify="center" gap="md" grow>
-                  <Field
-                    name="firstName"
-                    validators={{
-                      onBlur: zFieldValidator(userUpdateSchema.shape.firstName),
-                    }}
-                  >
-                    {({ state, name, handleChange, handleBlur }) => (
-                      <TextInput
-                        name={name}
-                        label="First Name"
-                        placeholder="Enter your first name"
-                        value={state.value || ""}
-                        error={
-                          isEditing ? useFieldError(state.meta) : undefined
-                        }
-                        onChange={(e) => handleChange(e.target.value)}
-                        onBlur={handleBlur}
-                        disabled={!isEditing}
-                      />
-                    )}
-                  </Field>
-                  <Field
-                    name="lastName"
-                    validators={{
-                      onBlur: zFieldValidator(userUpdateSchema.shape.lastName),
-                    }}
-                  >
-                    {({ state, name, handleChange, handleBlur }) => (
-                      <TextInput
-                        name={name}
-                        label="Last Name"
-                        placeholder="Enter your last name"
-                        value={state.value || ""}
-                        error={
-                          isEditing ? useFieldError(state.meta) : undefined
-                        }
-                        onChange={(e) => handleChange(e.target.value)}
-                        onBlur={handleBlur}
-                        disabled={!isEditing}
-                      />
-                    )}
-                  </Field>
-                </Group>
-
-                <Group justify="center" gap="md" grow>
-                  <Field
-                    name="birthDate"
-                    validators={{
-                      onBlur: zFieldValidator(userUpdateSchema.shape.birthDate),
-                    }}
-                  >
-                    {({ state, name, handleChange, handleBlur }) => (
-                      <DatePickerInput
-                        name={name}
-                        label="Birth Date"
-                        placeholder="Select your birth date"
-                        value={state.value}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={
-                          isEditing ? useFieldError(state.meta) : undefined
-                        }
-                        maxDate={new Date()}
-                        disabled={!isEditing}
-                      />
-                    )}
-                  </Field>
-                  <Field
-                    name="gender"
-                    validators={{
-                      onBlur: zFieldValidator(userUpdateSchema.shape.gender),
-                    }}
-                  >
-                    {({ state, name, handleChange, handleBlur }) => (
-                      <Select
-                        name={name}
-                        label="Gender"
-                        placeholder="Select your gender"
-                        value={state.value}
-                        data={[
-                          { value: "male", label: "Male" },
-                          { value: "female", label: "Female" },
-                        ]}
-                        onChange={(value) =>
-                          handleChange(value as "male" | "female" | null)
-                        }
-                        onBlur={handleBlur}
-                        error={
-                          isEditing ? useFieldError(state.meta) : undefined
-                        }
-                        clearable
-                        disabled={!isEditing}
-                      />
-                    )}
-                  </Field>
-                </Group>
-
-                <Group justify="space-between" mt="md">
-                  {!isEditing ? (
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditing(true)}
-                    >
-                      Edit Profile
-                    </Button>
-                  ) : (
-                    <Group>
-                      <Button
-                        variant="default"
-                        onClick={() => setIsEditing(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="outline"
-                        type="submit"
-                        loading={state.isSubmitting || isPending}
-                        disabled={!state.isDirty}
-                      >
-                        Save Changes
-                      </Button>
-                    </Group>
-                  )}
-                </Group>
-              </Stack>
-            </form>
-          </Card>
-
-          <Card padding="lg" radius="md" withBorder mt="lg">
-            <Group gap="sm" mb="md">
-              <Title order={4}>Account Information</Title>
-            </Group>
-
-            <Stack gap="md">
-              <Group justify="space-between">
-                <Stack gap={0}>
-                  <Text size="sm" fw={500}>
-                    Username
-                  </Text>
-                  <Text size="sm" c="dimmed">
-                    @{user.username}
-                  </Text>
-                </Stack>
-              </Group>
-              <Group justify="space-between">
-                <Stack gap={4}>
-                  <Group gap="xs">
-                    <Text size="sm" fw={500}>
-                      Email
-                    </Text>
-                    <Badge
-                      size="xs"
-                      variant="light"
-                      color={user.isEmailVerified ? "green" : "orange"}
-                    >
-                      {user.isEmailVerified ? "Verified" : "Unverified"}
-                    </Badge>
-                  </Group>
-                  <Text size="sm" c="dimmed">
-                    {user.email}
-                  </Text>
-                  {!user.isEmailVerified && (
-                    <Anchor
-                      size="xs"
-                      c={emailSent ? "blue" : "orange"}
-                      onClick={handleSendVerification}
-                      style={{
-                        cursor:
-                          isSendingEmail || retrySeconds > 0
-                            ? "not-allowed"
-                            : "pointer",
-                        opacity: isSendingEmail || retrySeconds > 0 ? 0.6 : 1,
-                      }}
-                      fw={500}
-                    >
-                      {isSendingEmail
-                        ? "Sending..."
-                        : emailSent && retrySeconds > 0
-                          ? `Sent! retry in ${retrySeconds}s`
-                          : "Send verification email"}
-                    </Anchor>
-                  )}
-                </Stack>
-              </Group>
-              <Divider />
-              <Group justify="space-between">
-                <Stack gap={0}>
-                  <Text size="sm" fw={500}>
-                    Member since
-                  </Text>
-                  <Text size="sm" c="dimmed">
-                    {new Date(user.createdAt).toLocaleDateString("en-ID", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </Text>
-                </Stack>
-              </Group>
-            </Stack>
-          </Card>
-        </Grid.Col>
-      </Grid>
-
-      <Modal
-        opened={avatarModalOpened}
-        onClose={resetModal}
-        title="Update Profile Picture"
-        centered
-      >
-        <Stack gap="md">
-          <FileInput
-            label="Profile Picture"
-            description="Upload a square photo with a minimum size of 300×300px"
-            placeholder="Select image file"
-            clearable
-            accept="image/*"
-            leftSection={<IconUpload size={16} />}
-            value={file}
-            onChange={(file) => {
-              setFile(file);
-              setPreviewUrl(file ? URL.createObjectURL(file) : null);
-            }}
-          />
-          <Group justify="flex-start">
-            <Button
-              variant="outline"
-              onClick={handleUploadPP}
-              disabled={!file || isUpdating}
-              loading={isUpdating}
-            >
-              Upload
-            </Button>
-            {user.profileImage ? (
-              <Button color="red" onClick={handleDeletePP}>
-                Remove
-              </Button>
-            ) : null}
           </Group>
+
+          <Grid>
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <Card padding="lg" radius="md">
+                <Stack align="center" gap="md">
+                  <Title order={4}>Profile Picture</Title>
+
+                  <Box pos="relative">
+                    <Avatar
+                      src={previewUrl || profileImageUrl}
+                      size={200}
+                      radius={200}
+                      color="blue"
+                      sx={(theme) => ({
+                        background: isDark
+                          ? theme.colors.dark[5]
+                          : theme.colors.gray[2],
+                        border: "2px solid transparent",
+                      })}
+                    >
+                      {avatarInitials}
+                    </Avatar>
+                    <Button
+                      size="xs"
+                      variant="default"
+                      leftSection={<IconCamera size={14} />}
+                      onClick={openAvatarModal}
+                      pos="absolute"
+                      bottom={0}
+                      right={0}
+                    >
+                      Edit
+                    </Button>
+                  </Box>
+                </Stack>
+              </Card>
+            </Grid.Col>
+
+            <Grid.Col span={{ base: 12, md: 8 }}>
+              <Card padding="lg" radius="md" withBorder>
+                <Group justify="space-between" mb="md">
+                  <Title order={4}>Basic Information</Title>
+                </Group>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmit();
+                  }}
+                >
+                  <LoadingOverlay visible={state.isSubmitting || isPending} />
+                  <Stack gap="md">
+                    <Group justify="center" gap="md" grow>
+                      <Field
+                        name="firstName"
+                        validators={{
+                          onBlur: zFieldValidator(
+                            userUpdateSchema.shape.firstName,
+                          ),
+                        }}
+                      >
+                        {({ state, name, handleChange, handleBlur }) => (
+                          <TextInput
+                            name={name}
+                            label="First Name"
+                            placeholder="Enter your first name"
+                            value={state.value || ""}
+                            error={
+                              isEditing ? useFieldError(state.meta) : undefined
+                            }
+                            onChange={(e) => handleChange(e.target.value)}
+                            onBlur={handleBlur}
+                            disabled={!isEditing}
+                          />
+                        )}
+                      </Field>
+                      <Field
+                        name="lastName"
+                        validators={{
+                          onBlur: zFieldValidator(
+                            userUpdateSchema.shape.lastName,
+                          ),
+                        }}
+                      >
+                        {({ state, name, handleChange, handleBlur }) => (
+                          <TextInput
+                            name={name}
+                            label="Last Name"
+                            placeholder="Enter your last name"
+                            value={state.value || ""}
+                            error={
+                              isEditing ? useFieldError(state.meta) : undefined
+                            }
+                            onChange={(e) => handleChange(e.target.value)}
+                            onBlur={handleBlur}
+                            disabled={!isEditing}
+                          />
+                        )}
+                      </Field>
+                    </Group>
+
+                    <Group justify="center" gap="md" grow>
+                      <Field
+                        name="birthDate"
+                        validators={{
+                          onBlur: zFieldValidator(
+                            userUpdateSchema.shape.birthDate,
+                          ),
+                        }}
+                      >
+                        {({ state, name, handleChange, handleBlur }) => (
+                          <DatePickerInput
+                            name={name}
+                            label="Birth Date"
+                            placeholder="Select your birth date"
+                            value={state.value}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={
+                              isEditing ? useFieldError(state.meta) : undefined
+                            }
+                            maxDate={new Date()}
+                            disabled={!isEditing}
+                          />
+                        )}
+                      </Field>
+                      <Field
+                        name="gender"
+                        validators={{
+                          onBlur: zFieldValidator(
+                            userUpdateSchema.shape.gender,
+                          ),
+                        }}
+                      >
+                        {({ state, name, handleChange, handleBlur }) => (
+                          <Select
+                            name={name}
+                            label="Gender"
+                            placeholder="Select your gender"
+                            value={state.value}
+                            data={[
+                              { value: "male", label: "Male" },
+                              { value: "female", label: "Female" },
+                            ]}
+                            onChange={(value) =>
+                              handleChange(value as "male" | "female" | null)
+                            }
+                            onBlur={handleBlur}
+                            error={
+                              isEditing ? useFieldError(state.meta) : undefined
+                            }
+                            clearable
+                            disabled={!isEditing}
+                          />
+                        )}
+                      </Field>
+                    </Group>
+
+                    <Group justify="space-between" mt="md">
+                      {!isEditing ? (
+                        <Button
+                          variant="outline"
+                          onClick={() => setIsEditing(true)}
+                        >
+                          Edit Profile
+                        </Button>
+                      ) : (
+                        <Group>
+                          <Button
+                            variant="default"
+                            onClick={() => setIsEditing(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="outline"
+                            type="submit"
+                            loading={state.isSubmitting || isPending}
+                            disabled={!state.isDirty}
+                          >
+                            Save Changes
+                          </Button>
+                        </Group>
+                      )}
+                    </Group>
+                  </Stack>
+                </form>
+              </Card>
+
+              <Card padding="lg" radius="md" withBorder mt="lg">
+                <Group gap="sm" mb="md">
+                  <Title order={4}>Account Information</Title>
+                </Group>
+
+                <Stack gap="md">
+                  <Group justify="space-between">
+                    <Stack gap={0}>
+                      <Text size="sm" fw={500}>
+                        Username
+                      </Text>
+                      <Text size="sm" c="dimmed">
+                        @{user.username}
+                      </Text>
+                    </Stack>
+                  </Group>
+                  <Group justify="space-between">
+                    <Stack gap={4}>
+                      <Group gap="xs">
+                        <Text size="sm" fw={500}>
+                          Email
+                        </Text>
+                        <Badge
+                          size="xs"
+                          variant="light"
+                          color={user.isEmailVerified ? "green" : "orange"}
+                        >
+                          {user.isEmailVerified ? "Verified" : "Unverified"}
+                        </Badge>
+                      </Group>
+                      <Text size="sm" c="dimmed">
+                        {user.email}
+                      </Text>
+                      {!user.isEmailVerified && (
+                        <Anchor
+                          size="xs"
+                          c={emailSent ? "blue" : "orange"}
+                          onClick={handleSendVerification}
+                          style={{
+                            cursor:
+                              isSendingEmail || retrySeconds > 0
+                                ? "not-allowed"
+                                : "pointer",
+                            opacity:
+                              isSendingEmail || retrySeconds > 0 ? 0.6 : 1,
+                          }}
+                          fw={500}
+                        >
+                          {isSendingEmail
+                            ? "Sending..."
+                            : emailSent && retrySeconds > 0
+                              ? `Sent! retry in ${retrySeconds}s`
+                              : "Send verification email"}
+                        </Anchor>
+                      )}
+                    </Stack>
+                  </Group>
+                  <Divider />
+                  <Group justify="space-between">
+                    <Stack gap={0}>
+                      <Text size="sm" fw={500}>
+                        Member since
+                      </Text>
+                      <Text size="sm" c="dimmed">
+                        {new Date(user.createdAt).toLocaleDateString("en-ID", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </Text>
+                    </Stack>
+                  </Group>
+                </Stack>
+              </Card>
+            </Grid.Col>
+          </Grid>
+
+          <Modal
+            opened={avatarModalOpened}
+            onClose={resetModal}
+            title="Update Profile Picture"
+            centered
+          >
+            <Stack gap="md">
+              <FileInput
+                label="Profile Picture"
+                description="Upload a square photo with a minimum size of 300×300px"
+                placeholder="Select image file"
+                clearable
+                accept="image/*"
+                leftSection={<IconUpload size={16} />}
+                value={file}
+                onChange={(file) => {
+                  setFile(file);
+                  setPreviewUrl(file ? URL.createObjectURL(file) : null);
+                }}
+              />
+              <Group justify="flex-start">
+                <Button
+                  variant="outline"
+                  onClick={handleUploadPP}
+                  disabled={!file || isUpdating}
+                  loading={isUpdating}
+                >
+                  Upload
+                </Button>
+                {user.profileImage ? (
+                  <Button color="red" onClick={handleDeletePP}>
+                    Remove
+                  </Button>
+                ) : null}
+              </Group>
+            </Stack>
+          </Modal>
         </Stack>
-      </Modal>
-    </Stack>
+      </Tabs.Panel>
+      <Tabs.Panel value="authentication">
+        <AccountSettings />
+      </Tabs.Panel>
+    </Tabs>
   );
 };
 
