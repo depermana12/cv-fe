@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import {
-  Anchor,
   Avatar,
   Box,
   Button,
@@ -12,7 +11,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconLogout2, IconUserCircle, IconSettings } from "@tabler/icons-react";
+import { IconLogout2, IconUserCircle } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 
 import { useAuthStore } from "../../auth/store/authStore";
@@ -122,14 +121,6 @@ const DashboardHeaderNav = () => {
             to="/dashboard/profile"
           >
             Profile
-          </Menu.Item>
-          <Menu.Item
-            leftSection={<IconSettings size={14} />}
-            aria-label="Account Settings"
-            component={Link}
-            to="/dashboard/account"
-          >
-            Account Settings
           </Menu.Item>
           <Menu.Divider />
           <Menu.Item
