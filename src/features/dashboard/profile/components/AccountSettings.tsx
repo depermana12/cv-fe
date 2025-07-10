@@ -100,6 +100,7 @@ const AccountContent = () => {
                   icon={<IconAlertTriangle size={16} />}
                   color="orange"
                   variant="light"
+                  title="Verify email"
                 >
                   Verify your email address to ensure account security. Click
                   "send verification" button to verify your email.
@@ -113,7 +114,9 @@ const AccountContent = () => {
                     <Text size="sm" fw={500}>
                       Two-Factor Authentication
                     </Text>
-                    <Badge variant="default">Disabled</Badge>
+                    <Badge variant="default" size="sm">
+                      Disabled
+                    </Badge>
                   </Group>
                   <Button variant="outline" size="xs">
                     Enable
@@ -127,6 +130,7 @@ const AccountContent = () => {
                 icon={<IconAlertTriangle size={16} />}
                 color="orange"
                 variant="light"
+                title="2fa"
               >
                 Enable two-factor authentication (2FA) to protect your account
                 from unauthorized access.

@@ -131,7 +131,7 @@ const ProfileContent = () => {
     <Tabs defaultValue="profile">
       <Tabs.List mb="lg">
         <Tabs.Tab value="profile">Profile</Tabs.Tab>
-        <Tabs.Tab value="authentication">Authentication</Tabs.Tab>
+        <Tabs.Tab value="settings">Settings</Tabs.Tab>
       </Tabs.List>
       <Tabs.Panel value="profile">
         <Stack gap="lg">
@@ -447,7 +447,7 @@ const ProfileContent = () => {
           </Modal>
         </Stack>
       </Tabs.Panel>
-      <Tabs.Panel value="authentication">
+      <Tabs.Panel value="settings">
         <AccountSettings />
       </Tabs.Panel>
     </Tabs>
