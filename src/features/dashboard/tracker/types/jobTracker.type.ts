@@ -29,3 +29,10 @@ export type JobApplicationsResponse = {
     offset: number;
   };
 };
+
+export type JobApplicationFormProps = {
+  opened: boolean;
+  onClose: () => void;
+  initialData?: Partial<JobTrackerCreate>;
+  mode?: "create" | "edit";
+};
