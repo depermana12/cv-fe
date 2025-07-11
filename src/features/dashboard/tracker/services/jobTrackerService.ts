@@ -1,3 +1,3 @@
-import { jobTrackerApi } from "./jobApplicationApi";
+import { jobTrackerApi } from "./jobTrackerApi";
 
 export const jobTrackerService = new jobTrackerApi();
