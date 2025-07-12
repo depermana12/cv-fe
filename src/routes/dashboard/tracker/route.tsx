@@ -1,9 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
+import { JobsTrackerPage } from "../../../features/dashboard/tracker/pages";
 
-export const Route = createFileRoute('/dashboard/tracker')({
+export const Route = createFileRoute("/dashboard/tracker")({
   component: RouteComponent,
-})
+  staticData: {
+    breadcrumb: "tracker",
+  },
+});
 
 function RouteComponent() {
-  return <div>Hello "/dashboard/tracker"!</div>
+  return <JobsTrackerPage />;
 }
