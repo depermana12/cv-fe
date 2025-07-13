@@ -8,7 +8,12 @@ import {
   Stack,
   Tooltip,
 } from "@mantine/core";
-import { IconEdit, IconTrash, IconExternalLink } from "@tabler/icons-react";
+import {
+  IconEdit,
+  IconTrash,
+  IconExternalLink,
+  IconPencil,
+} from "@tabler/icons-react";
 import { JobTracker } from "../types/jobTracker.type";
 import { Link } from "@tanstack/react-router";
 
@@ -132,7 +137,7 @@ export const createColumns = ({
     cell: ({ getValue }) => {
       const status = getValue() as string;
       return (
-        <Badge color={getStatusColor(status)} variant="light" size="sm">
+        <Badge color={getStatusColor(status)} variant="filled" size="sm">
           {getStatusLabel(status)}
         </Badge>
       );
@@ -156,7 +161,7 @@ export const createColumns = ({
     cell: ({ row }) => {
       const data = row.original;
       return (
-        <Group gap="xs">
+        <Group gap={0}>
           <Text size="sm">{data.jobPortal}</Text>
           {data.jobUrl ? (
             <Tooltip label="View job website" withArrow>
@@ -184,15 +189,14 @@ export const createColumns = ({
     cell: ({ row }) => {
       const application = row.original;
       return (
-        <Group gap="xs">
+        <Group gap={0}>
           <Tooltip label="Edit application" withArrow>
             <ActionIcon
               variant="subtle"
-              color="blue"
-              size="sm"
+              color="gray"
               onClick={() => onEdit(application)}
             >
-              <IconEdit size={18} />
+              <IconPencil size={16} />
             </ActionIcon>
           </Tooltip>
 
@@ -200,10 +204,9 @@ export const createColumns = ({
             <ActionIcon
               variant="subtle"
               color="red"
-              size="sm"
               onClick={() => onDelete(application)}
             >
-              <IconTrash size={18} />
+              <IconTrash size={16} />
             </ActionIcon>
           </Tooltip>
         </Group>

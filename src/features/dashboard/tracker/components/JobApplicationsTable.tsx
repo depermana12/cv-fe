@@ -31,7 +31,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { useState, useMemo } from "react";
-import { createColumns } from "./columns";
+import { createColumns } from "./JobApplicationColumn";
 import { JobApplicationsTableProps } from "../types/jobTracker.type";
 import { JobApplicationEmpty } from "./JobApplicationEmpty";
 import { useDebouncedValue } from "@mantine/hooks";
@@ -167,6 +167,7 @@ export const JobApplicationsTable = ({
                     {header.isPlaceholder ? null : (
                       <Group
                         gap="xs"
+                        justify="space-between"
                         style={{
                           cursor: header.column.getCanSort()
                             ? "pointer"
