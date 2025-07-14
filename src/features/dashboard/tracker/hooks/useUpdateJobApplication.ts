@@ -1,28 +1,47 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
-import { JobTracker, JobTrackerUpdate } from "../types/jobTracker.type";
-import { ApiResponse } from "../../../types/types";
+import { useMutation } from "@tanstack/react-query";
+import { JobTrackerUpdate } from "../types/jobTracker.type";
 import { jobTrackerService } from "../services/jobTrackerService";
-
-interface UpdateJobApplicationParams {
-  id: number;
-  data: JobTrackerUpdate;
-}
+import { queryClient } from "../../../../lib/queryClient";
+import { notifications } from "@mantine/notifications";
 
 export const useUpdateJobApplication = () => {
-  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: {
+      applicationId: number;
+      data: JobTrackerUpdate;
+    }) => {
+      const { applicationId, data } = payload;
 
-  return useMutation<
-    AxiosResponse<ApiResponse<JobTracker>>,
-    Error,
-    UpdateJobApplicationParams
-  >({
-    mutationFn: async ({ id, data }: UpdateJobApplicationParams) => {
-      return jobTrackerService.patch(id, data);
+      const res = await jobTrackerService.patch(applicationId, data);
+      return res.data.data;
     },
-    onSuccess: (_, { id }) => {
+    onSuccess: (_updatedJobApp, payload) => {
+      const { applicationId } = payload;
+
       queryClient.invalidateQueries({ queryKey: ["job-applications"] });
-      queryClient.invalidateQueries({ queryKey: ["job-application", id] });
+      queryClient.invalidateQueries({
+        queryKey: ["job-application", applicationId],
+      });
+
+      notifications.show({
+        position: "top-center",
+        withCloseButton: true,
+        autoClose: 3000,
+        title: "Job application updated",
+        message: `Your Job Application has been updated successfully.`,
+        color: "green",
+      });
+    },
+    onError: (err) => {
+      notifications.show({
+        position: "top-center",
+        withCloseButton: true,
+        autoClose: 3000,
+        title: "Failed to update Job application",
+        message: "There was an error updating your Job application.",
+        color: "red",
+      });
+      console.error("Failed to update Job application", err);
     },
   });
 };
