@@ -8,12 +8,7 @@ import {
   Stack,
   Tooltip,
 } from "@mantine/core";
-import {
-  IconEdit,
-  IconTrash,
-  IconExternalLink,
-  IconPencil,
-} from "@tabler/icons-react";
+import { IconTrash, IconExternalLink, IconPencil } from "@tabler/icons-react";
 import { JobTracker } from "../types/jobTracker.type";
 import { Link } from "@tanstack/react-router";
 
