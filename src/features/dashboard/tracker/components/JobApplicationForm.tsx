@@ -6,10 +6,12 @@ import {
   Button,
   Group,
   Card,
+  Box,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@tanstack/react-form";
 import { useCreateJobApplication } from "../hooks/useCreateJobApplication";
+import { useUpdateJobApplication } from "../hooks/useUpdateJobApplication";
 import {
   JobApplicationFormProps,
   JobTrackerCreate,
@@ -20,46 +22,77 @@ import useFieldError from "../../../cv/hooks/useFieldError";
 import { zFieldValidator } from "../../../cv/utils/zFieldValidator";
 import { notifications } from "@mantine/notifications";
 
-export const JobApplicationForm = ({
-  initialData,
-  onClose,
-  mode = "edit",
-}: JobApplicationFormProps) => {
-  const { mutate: addApplication, isPending } = useCreateJobApplication();
+export const JobApplicationForm = (props: JobApplicationFormProps) => {
+  const { onClose } = props;
+  const isEdit = props.mode === "edit";
+  const btnTitle = isEdit ? "Update Application" : "Add Application";
+
+  const { mutate: addApplication, isPending: isCreating } =
+    useCreateJobApplication();
+  const { mutate: updateApplication, isPending: isUpdating } =
+    useUpdateJobApplication();
   const { data: cvsResponse } = useCvs();
   const cvs = cvsResponse || [];
 
-  const defaultValues: JobTrackerCreate = {
-    cvId: initialData?.cvId || null,
-    jobPortal: initialData?.jobPortal || "",
-    jobUrl: initialData?.jobUrl || "",
-    companyName: initialData?.companyName || "",
-    jobTitle: initialData?.jobTitle || "",
-    jobType: initialData?.jobType || "Full-time",
-    position: initialData?.position || "Mid-level",
-    location: initialData?.location || "",
-    locationType: initialData?.locationType || "On-site",
-    status: initialData?.status || "applied",
-    notes: initialData?.notes || "",
-    appliedAt: new Date(),
-  };
+  const defaultValues = isEdit
+    ? {
+        ...props.initialData,
+        appliedAt: props.initialData.appliedAt
+          ? new Date(props.initialData.appliedAt)
+          : new Date(),
+      }
+    : {
+        cvId: props.initialData?.cvId ?? null,
+        jobPortal: props.initialData?.jobPortal ?? "",
+        jobUrl: props.initialData?.jobUrl ?? "",
+        companyName: props.initialData?.companyName ?? "",
+        jobTitle: props.initialData?.jobTitle ?? "",
+        jobType: props.initialData?.jobType ?? "Full-time",
+        position: props.initialData?.position ?? "Mid-level",
+        location: props.initialData?.location ?? "",
+        locationType: props.initialData?.locationType ?? "On-site",
+        status: props.initialData?.status ?? "applied",
+        notes: props.initialData?.notes ?? "",
+        appliedAt: props.initialData?.appliedAt
+          ? new Date(props.initialData.appliedAt)
+          : new Date(),
+      };
 
   const { Field, handleSubmit } = useForm({
     defaultValues,
     onSubmit: ({ value }) => {
-      addApplication(value, {
-        onSuccess: () => {
-          onClose();
-          notifications.show({
-            title: "Success!",
-            message: `Job application ${value.jobTitle} has been ${mode === "create" ? "created" : "updated"}`,
-            color: "green",
-            position: "top-right",
-            autoClose: 4000,
-            withCloseButton: true,
-          });
-        },
-      });
+      if (isEdit) {
+        updateApplication(
+          { applicationId: props.initialData.id, data: value },
+          {
+            onSuccess: () => {
+              onClose();
+              notifications.show({
+                title: "Success!",
+                message: `Job application ${value.jobTitle} has been updated`,
+                color: "green",
+                position: "top-right",
+                autoClose: 4000,
+                withCloseButton: true,
+              });
+            },
+          },
+        );
+      } else {
+        addApplication(value, {
+          onSuccess: () => {
+            onClose();
+            notifications.show({
+              title: "Success!",
+              message: `Job application ${value.jobTitle} has been created`,
+              color: "green",
+              position: "top-right",
+              autoClose: 4000,
+              withCloseButton: true,
+            });
+          },
+        });
+      }
     },
   });
 
@@ -302,14 +335,28 @@ export const JobApplicationForm = ({
         </Stack>
       </Card>
 
-      <Group justify="flex-end" mt="md">
-        <Button variant="default" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button type="submit" variant="outline" loading={isPending}>
-          {initialData ? "Update Application" : "Add Application"}
-        </Button>
-      </Group>
+      <Box
+        style={{
+          position: "sticky",
+          bottom: 0,
+          zIndex: 10,
+          backgroundColor: "white",
+          padding: "1rem",
+        }}
+      >
+        <Group justify="flex-end" mt="md">
+          <Button variant="default" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="outline"
+            loading={isCreating || isUpdating}
+          >
+            {btnTitle}
+          </Button>
+        </Group>
+      </Box>
     </form>
   );
 };
