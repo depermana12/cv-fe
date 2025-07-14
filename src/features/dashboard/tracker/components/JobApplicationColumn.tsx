@@ -7,9 +7,22 @@ import {
   Avatar,
   Stack,
   Tooltip,
+  Modal,
+  Popover,
+  Select,
+  Button,
 } from "@mantine/core";
-import { IconTrash, IconExternalLink, IconPencil } from "@tabler/icons-react";
+import { DatePickerInput } from "@mantine/dates";
+import {
+  IconTrash,
+  IconExternalLink,
+  IconPencil,
+  IconCalendar,
+} from "@tabler/icons-react";
 import { JobTracker } from "../types/jobTracker.type";
+import { useUpdateJobApplication } from "../hooks/useUpdateJobApplication";
+import { useState } from "react";
+import { useDisclosure } from "@mantine/hooks";
 import { Link } from "@tanstack/react-router";
 
 const getStatusColor = (status: string) => {
@@ -107,7 +120,7 @@ export const createColumns = ({
         </Stack>
       );
     },
-    enableSorting: true,
+    enableSorting: false,
   },
   {
     id: "location",
@@ -124,20 +137,159 @@ export const createColumns = ({
         </Stack>
       );
     },
-    enableSorting: true,
+    enableSorting: false,
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ getValue }) => {
-      const status = getValue() as string;
+    cell: ({ row, getValue }) => {
+      const status = getValue();
+      const application = row.original;
+
+      const [popoverOpened, setPopoverOpened] = useState(false);
+      const [modalOpened, { open: openModal, close: closeModal }] =
+        useDisclosure(false);
+
+      const [localStatus, setLocalStatus] = useState<
+        "applied" | "interview" | "offer" | "accepted" | "rejected" | "ghosted"
+      >(status as any);
+
+      const [statusChangedAt, setStatusChangedAt] = useState<Date | null>(null);
+      const { mutate, isPending } = useUpdateJobApplication();
+
+      const statusOptions = [
+        { value: "applied", label: "Applied" },
+        { value: "interview", label: "Interview" },
+        { value: "offer", label: "Offer" },
+        { value: "accepted", label: "Accepted" },
+        { value: "rejected", label: "Rejected" },
+        { value: "ghosted", label: "Ghosted" },
+      ];
+
+      const handleStatusSelect = (newStatus: string | null) => {
+        if (!newStatus) return;
+        setLocalStatus(newStatus as typeof localStatus);
+      };
+
+      const handleUpdateStatus = () => {
+        if (!statusChangedAt) return;
+        mutate(
+          {
+            applicationId: application.id,
+            data: {
+              status: localStatus,
+              statusChangedAt,
+            },
+          },
+          {
+            onSuccess: () => {
+              setPopoverOpened(false);
+              setStatusChangedAt(null);
+            },
+          },
+        );
+      };
+
       return (
-        <Badge color={getStatusColor(status)} variant="filled" size="sm">
-          {getStatusLabel(status)}
-        </Badge>
+        <>
+          <Group gap={4}>
+            <Tooltip label="Click to view status history">
+              <Badge
+                color={getStatusColor(localStatus)}
+                variant="filled"
+                size="sm"
+                style={{ cursor: "pointer" }}
+                onClick={openModal}
+              >
+                {getStatusLabel(localStatus)}
+              </Badge>
+            </Tooltip>
+            <Popover
+              width={260}
+              position="bottom"
+              withArrow
+              shadow="md"
+              opened={popoverOpened}
+              onChange={setPopoverOpened}
+              closeOnClickOutside={false}
+              closeOnEscape={true}
+            >
+              <Popover.Target>
+                <Tooltip label="Edit status" withArrow>
+                  <ActionIcon
+                    size="xs"
+                    variant="subtle"
+                    color="gray.6"
+                    onClick={() => setPopoverOpened(true)}
+                    aria-label="Update status"
+                  >
+                    <IconPencil size={16} />
+                  </ActionIcon>
+                </Tooltip>
+              </Popover.Target>
+              <Popover.Dropdown>
+                <Select
+                  label="What's the Update?"
+                  size="xs"
+                  data={statusOptions}
+                  value={localStatus}
+                  onChange={handleStatusSelect}
+                  disabled={isPending}
+                  allowDeselect={false}
+                  mb="xs"
+                />
+                <DatePickerInput
+                  label="When?"
+                  value={statusChangedAt}
+                  leftSection={<IconCalendar size={16} />}
+                  onChange={(date) => {
+                    setStatusChangedAt(date);
+                  }}
+                  placeholder="Pick date"
+                  minDate={new Date(application.appliedAt)}
+                  maxDate={new Date()}
+                  disabled={isPending || localStatus === status}
+                  size="xs"
+                />
+                <Group gap="md" mt="md" align="center">
+                  <Button
+                    variant="default"
+                    size="xs"
+                    onClick={() => {
+                      setPopoverOpened(false);
+                      setStatusChangedAt(null);
+                      setLocalStatus(status as typeof localStatus);
+                    }}
+                    disabled={isPending}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    onClick={handleUpdateStatus}
+                    disabled={!statusChangedAt || isPending}
+                  >
+                    Update
+                  </Button>
+                </Group>
+              </Popover.Dropdown>
+            </Popover>
+          </Group>
+          <Modal
+            opened={modalOpened}
+            onClose={closeModal}
+            title="Status History"
+            centered={false}
+            yOffset="5vh"
+            xOffset={0}
+          >
+            <Text size="sm">Status history feature coming soon.</Text>
+          </Modal>
+        </>
       );
     },
-    enableSorting: true,
+    enableSorting: false,
     filterFn: "equals",
   },
   {
@@ -145,7 +297,12 @@ export const createColumns = ({
     header: "Applied Date",
     cell: ({ getValue }) => {
       const date = getValue() as string;
-      return <Text size="sm">{new Date(date).toLocaleDateString()}</Text>;
+      const formatted = new Date(date).toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+      return <Text size="sm">{formatted}</Text>;
     },
     enableSorting: true,
   },
@@ -176,7 +333,7 @@ export const createColumns = ({
         </Group>
       );
     },
-    enableSorting: true,
+    enableSorting: false,
   },
   {
     id: "actions",
