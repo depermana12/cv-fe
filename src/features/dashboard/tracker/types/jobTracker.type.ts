@@ -47,12 +47,19 @@ export type JobApplicationsTableProps = {
   onCreateNew: () => void;
 };
 
-export type JobApplicationFormProps = {
-  opened: boolean;
-  onClose: () => void;
-  initialData?: Partial<JobTrackerCreate>;
-  mode?: "create" | "edit";
-};
+export type JobApplicationFormProps =
+  | {
+      opened: boolean;
+      onClose: () => void;
+      mode: "create";
+      initialData?: Partial<JobTrackerCreate>;
+    }
+  | {
+      opened: boolean;
+      onClose: () => void;
+      mode: "edit";
+      initialData: JobTracker;
+    };
 
 export type DeleteJobApplicationProps = {
   opened: boolean;
