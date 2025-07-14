@@ -79,15 +79,17 @@ export const JobsTrackerPage = () => {
           opened={createModalOpened}
           onClose={closeCreate}
         />
-        <JobApplicationModal
-          initialData={selectedApplication || undefined}
-          mode="edit"
-          opened={editModalOpened}
-          onClose={() => {
-            closeEdit();
-            setSelectedApplication(null);
-          }}
-        />
+        {selectedApplication && (
+          <JobApplicationModal
+            mode="edit"
+            initialData={selectedApplication}
+            opened={editModalOpened}
+            onClose={() => {
+              closeEdit();
+              setSelectedApplication(null);
+            }}
+          />
+        )}
         <DeleteJobApplicationModal
           opened={deleteModalOpened}
           onClose={closeDelete}
