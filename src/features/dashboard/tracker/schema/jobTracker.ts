@@ -57,6 +57,32 @@ export const jobTrackerSchema = z.object({
   updatedAt: z.coerce.date().optional(),
 });
 
+export const jobTrackerImportSchema = jobTrackerSchema.omit({
+  id: true,
+  userId: true,
+  cvId: true,
+});
+
+export const jobTrackerStatusSchema = z.object({
+  id: idSchema,
+  applicationId: idSchema,
+  status: z
+    .enum(
+      ["applied", "interview", "offer", "rejected", "accepted", "ghosted"],
+      { message: "Invalid status" },
+    )
+    .default("applied"),
+  changedAt: z.coerce.date(),
+});
+
+export const jobTrackerStatusCreateSchema = jobTrackerStatusSchema.omit({
+  id: true,
+  applicationId: true,
+});
+
+export const jobTrackerStatusUpdateSchema =
+  jobTrackerStatusCreateSchema.partial();
+
 export const jobTrackerCreateSchema = jobTrackerSchema.omit({
   id: true,
   userId: true,

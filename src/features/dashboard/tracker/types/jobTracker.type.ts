@@ -4,6 +4,7 @@ import {
   jobTrackerImportSchema,
   jobTrackerQueryOptionsSchema,
   jobTrackerSchema,
+  jobTrackerStatusSchema,
   jobTrackerUpdateSchema,
 } from "../schema/jobTracker";
 
@@ -14,6 +15,8 @@ export type JobTrackerUpdate = Partial<z.infer<typeof jobTrackerUpdateSchema>>;
 export type JobTrackerQueryOptions = z.infer<
   typeof jobTrackerQueryOptionsSchema
 >;
+
+export type JobTrackerStatus = z.infer<typeof jobTrackerStatusSchema>;
 
 export type JobApplicationResponse = {
   success: boolean;
@@ -35,6 +38,10 @@ export type JobApplicationsResponse = {
 export type JobApplicationsTableProps = {
   applications: JobTracker[];
   loading?: boolean;
+  page: number;
+  pageSize: number;
+  total: number;
+  onPageChange: (page: number) => void;
   onEdit: (application: JobTracker) => void;
   onDelete: (application: JobTracker) => void;
   onCreateNew: () => void;
