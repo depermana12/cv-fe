@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Stack,
   TextInput,
@@ -7,9 +8,12 @@ import {
   Group,
   Card,
   Box,
+  Grid,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
+import { notifications } from "@mantine/notifications";
 import { useForm } from "@tanstack/react-form";
+
 import { useCreateJobApplication } from "../hooks/useCreateJobApplication";
 import { useUpdateJobApplication } from "../hooks/useUpdateJobApplication";
 import {
@@ -20,12 +24,16 @@ import { jobTrackerCreateSchema } from "../schema/jobTracker";
 import { useCvs } from "../../../cv/hooks/useCvs";
 import useFieldError from "../../../cv/hooks/useFieldError";
 import { zFieldValidator } from "../../../cv/utils/zFieldValidator";
-import { notifications } from "@mantine/notifications";
 
 export const JobApplicationForm = (props: JobApplicationFormProps) => {
   const { onClose } = props;
   const isEdit = props.mode === "edit";
   const btnTitle = isEdit ? "Update Application" : "Add Application";
+
+  const [statusChangedAt, setStatusChangedAt] = useState<Date | undefined>(
+    undefined,
+  );
+  const [lastStatus] = useState(isEdit ? props.initialData.status : undefined);
 
   const { mutate: addApplication, isPending: isCreating } =
     useCreateJobApplication();
@@ -54,7 +62,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
         status: props.initialData?.status ?? "applied",
         notes: props.initialData?.notes ?? "",
         appliedAt: props.initialData?.appliedAt
-          ? new Date(props.initialData.appliedAt)
+          ? new Date(props.initialData?.appliedAt)
           : new Date(),
       };
 
@@ -62,8 +70,12 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
     defaultValues,
     onSubmit: ({ value }) => {
       if (isEdit) {
+        const updatePayload =
+          lastStatus !== value.status && statusChangedAt
+            ? { ...value, statusChangedAt }
+            : value;
         updateApplication(
-          { applicationId: props.initialData.id, data: value },
+          { applicationId: props.initialData.id, data: updatePayload },
           {
             onSuccess: () => {
               onClose();
@@ -110,7 +122,6 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
     >
       <Card padding="md" radius="md" withBorder>
         <Stack gap="md">
-          {/* Company Name */}
           <Field
             name="companyName"
             validators={{
@@ -128,8 +139,6 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
               />
             )}
           </Field>
-
-          {/* Job Title */}
           <Field
             name="jobTitle"
             validators={{
@@ -147,27 +156,6 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
               />
             )}
           </Field>
-
-          {/* Location */}
-          <Field
-            name="location"
-            validators={{
-              onBlur: zFieldValidator(jobTrackerCreateSchema.shape.location),
-            }}
-          >
-            {({ state, handleChange, handleBlur }) => (
-              <TextInput
-                label="Company Location"
-                value={state.value}
-                onChange={(e) => handleChange(e.target.value)}
-                onBlur={handleBlur}
-                error={useFieldError(state.meta)}
-                required
-              />
-            )}
-          </Field>
-
-          {/* Job Type & Position */}
           <Group grow>
             <Field name="jobType">
               {({ state, handleChange }) => (
@@ -218,9 +206,24 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
               )}
             </Field>
           </Group>
-
-          {/* Location Type & Status */}
           <Group grow>
+            <Field
+              name="location"
+              validators={{
+                onBlur: zFieldValidator(jobTrackerCreateSchema.shape.location),
+              }}
+            >
+              {({ state, handleChange, handleBlur }) => (
+                <TextInput
+                  label="Company Location"
+                  value={state.value}
+                  onChange={(e) => handleChange(e.target.value)}
+                  onBlur={handleBlur}
+                  error={useFieldError(state.meta)}
+                  required
+                />
+              )}
+            </Field>
             <Field name="locationType">
               {({ state, handleChange }) => (
                 <Select
@@ -238,15 +241,36 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                 />
               )}
             </Field>
-
+          </Group>
+          <Group grow>
+            <Field name="appliedAt">
+              {({ state, handleChange }) => (
+                <DatePickerInput
+                  label="Applied Date"
+                  valueFormat="D MMMM YYYY"
+                  locale="id"
+                  value={state.value}
+                  onChange={(v) => handleChange(v || new Date())}
+                  maxDate={new Date()}
+                  required
+                />
+              )}
+            </Field>
             <Field name="status">
               {({ state, handleChange }) => (
                 <Select
                   label="Application Status"
                   value={state.value}
-                  onChange={(v) =>
-                    handleChange((v as JobTrackerCreate["status"]) || "applied")
-                  }
+                  onChange={(v) => {
+                    handleChange(
+                      (v as JobTrackerCreate["status"]) || "applied",
+                    );
+                    if (isEdit && v && v !== lastStatus) {
+                      setStatusChangedAt(new Date());
+                    } else if (isEdit && v === lastStatus) {
+                      setStatusChangedAt(undefined);
+                    }
+                  }}
                   data={[
                     "applied",
                     "interview",
@@ -259,9 +283,17 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                 />
               )}
             </Field>
+            {isEdit && statusChangedAt && (
+              <DatePickerInput
+                label="Status Updated At"
+                value={statusChangedAt}
+                onChange={(value) => setStatusChangedAt(value ?? undefined)}
+                minDate={new Date(props.initialData.appliedAt)}
+                maxDate={new Date()}
+                required
+              />
+            )}
           </Group>
-
-          {/* Job Portal & Applied Date */}
           <Group grow>
             <Field
               name="jobPortal"
@@ -280,46 +312,33 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                 />
               )}
             </Field>
-            <Field name="appliedAt">
-              {({ state, handleChange }) => (
-                <DatePickerInput
-                  label="Applied Date"
-                  value={state.value}
-                  onChange={(v) => handleChange(v || new Date())}
-                  maxDate={new Date()}
-                  required
+            <Field name="jobUrl">
+              {({ state, handleChange, handleBlur }) => (
+                <TextInput
+                  label="Job URL"
+                  value={state.value || ""}
+                  onChange={(e) => handleChange(e.target.value)}
+                  onBlur={handleBlur}
+                  error={useFieldError(state.meta)}
                 />
               )}
             </Field>
           </Group>
-
-          {/* Job URL */}
-          <Field name="jobUrl">
-            {({ state, handleChange, handleBlur }) => (
-              <TextInput
-                label="Job URL"
-                value={state.value || ""}
-                onChange={(e) => handleChange(e.target.value)}
-                onBlur={handleBlur}
-                error={useFieldError(state.meta)}
-              />
-            )}
-          </Field>
-
-          {/* CV ID */}
-          <Field name="cvId">
-            {({ state, handleChange }) => (
-              <Select
-                label="CV Used"
-                value={state.value?.toString() || ""}
-                onChange={(v) => handleChange(v ? parseInt(v) : null)}
-                data={cvOptions}
-                clearable
-              />
-            )}
-          </Field>
-
-          {/* Notes */}
+          <Grid>
+            <Grid.Col span={6}>
+              <Field name="cvId">
+                {({ state, handleChange }) => (
+                  <Select
+                    label="CV Used"
+                    value={state.value?.toString() || ""}
+                    onChange={(v) => handleChange(v ? parseInt(v) : null)}
+                    data={cvOptions}
+                    clearable
+                  />
+                )}
+              </Field>
+            </Grid.Col>
+          </Grid>
           <Field name="notes">
             {({ state, handleChange, handleBlur }) => (
               <Textarea

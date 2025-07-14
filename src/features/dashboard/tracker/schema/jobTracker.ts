@@ -80,8 +80,9 @@ export const jobTrackerStatusCreateSchema = jobTrackerStatusSchema.omit({
   applicationId: true,
 });
 
-export const jobTrackerStatusUpdateSchema =
-  jobTrackerStatusCreateSchema.partial();
+export const jobTrackerStatusUpdateSchema = jobTrackerStatusCreateSchema
+  .partial()
+  .extend({ statusChangedAt: z.coerce.date().optional() });
 
 export const jobTrackerCreateSchema = jobTrackerSchema.omit({
   id: true,
