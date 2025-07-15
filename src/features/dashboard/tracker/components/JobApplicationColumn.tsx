@@ -10,6 +10,8 @@ import {
   Popover,
   Select,
   Button,
+  Menu,
+  Anchor,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import {
@@ -17,13 +19,13 @@ import {
   IconExternalLink,
   IconPencil,
   IconCalendar,
+  IconDots,
 } from "@tabler/icons-react";
 import { JobTracker } from "../types/jobTracker.type";
 import { useUpdateJobApplication } from "../hooks/useUpdateJobApplication";
 import { StatusHistoryTimeline } from "./StatusHistoryTimeline";
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
-import { Link } from "@tanstack/react-router";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -282,12 +284,12 @@ export const createColumns = ({
   },
   {
     accessorKey: "appliedAt",
-    header: "Applied Date",
+    header: "Applied",
     cell: ({ getValue }) => {
       const date = getValue() as string;
-      const formatted = new Date(date).toLocaleDateString("id-ID", {
-        day: "2-digit",
-        month: "long",
+      const formatted = new Date(date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
         year: "numeric",
       });
       return <Text size="sm">{formatted}</Text>;
@@ -296,60 +298,66 @@ export const createColumns = ({
   },
   {
     id: "jobPortal",
-    header: "Job portal",
+    header: "Source",
     accessorFn: (row) => `${row.jobPortal}${row.jobUrl}`,
     cell: ({ row }) => {
       const data = row.original;
-      return (
-        <Group gap={0}>
-          <Text size="sm">{data.jobPortal}</Text>
-          {data.jobUrl ? (
-            <Tooltip label="View job website" withArrow>
-              <ActionIcon
-                variant="transparent"
-                color="blue"
-                size="sm"
-                component={Link}
-                to={data.jobUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <IconExternalLink size={14} />
-              </ActionIcon>
-            </Tooltip>
-          ) : null}
-        </Group>
+      return data.jobUrl ? (
+        <Tooltip label="Open job posting" withArrow>
+          <Anchor
+            href={data.jobUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            underline="never"
+            c="inherit"
+          >
+            <Group gap={4}>
+              <Text size="sm" c="inherit">
+                {data.jobPortal}
+              </Text>
+              <IconExternalLink size={12} />
+            </Group>
+          </Anchor>
+        </Tooltip>
+      ) : (
+        <Text size="sm" c="inherit">
+          {data.jobPortal}
+        </Text>
       );
     },
     enableSorting: false,
   },
   {
     id: "actions",
-    header: "Actions",
+    header: "",
     cell: ({ row }) => {
       const application = row.original;
       return (
-        <Group gap={0}>
-          <Tooltip label="Edit application" withArrow>
-            <ActionIcon
-              variant="subtle"
-              color="gray"
+        <Menu shadow="md" width={160} position="bottom-end">
+          <Menu.Target>
+            <Tooltip label="Actions" withArrow>
+              <ActionIcon variant="subtle" color="gray" size="sm">
+                <IconDots size={16} />
+              </ActionIcon>
+            </Tooltip>
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Menu.Item
+              leftSection={<IconPencil size={14} />}
               onClick={() => onEdit(application)}
             >
-              <IconPencil size={16} />
-            </ActionIcon>
-          </Tooltip>
-
-          <Tooltip label="Delete application" withArrow>
-            <ActionIcon
-              variant="subtle"
+              Edit
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<IconTrash size={14} />}
               color="red"
               onClick={() => onDelete(application)}
             >
-              <IconTrash size={16} />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
+              Delete
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       );
     },
     enableSorting: false,
