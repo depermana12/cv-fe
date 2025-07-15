@@ -54,6 +54,7 @@ export const JobApplicationsTable = ({
   pageSize,
   total,
   onPageChange,
+  onPageSizeChange,
 }: JobApplicationsTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([
     {
@@ -233,19 +234,42 @@ export const JobApplicationsTable = ({
               ` (${applications.length} total)`}
           </Text>
 
-          <Text size="sm" c="dimmed">
-            Page {page} of {Math.ceil(total / pageSize)}
-          </Text>
+          <Group gap="md">
+            <Group gap="xs">
+              <Text size="sm" c="dimmed">
+                Rows per page:
+              </Text>
+              <Select
+                data={[
+                  { value: "10", label: "10" },
+                  { value: "20", label: "20" },
+                  { value: "30", label: "30" },
+                  { value: "40", label: "40" },
+                  { value: "50", label: "50" },
+                ]}
+                value={pageSize.toString()}
+                onChange={onPageSizeChange}
+                checkIconPosition="right"
+                size="sm"
+                w={70}
+                disabled={loading}
+              />
+            </Group>
 
-          <Pagination
-            value={page}
-            onChange={onPageChange}
-            total={Math.ceil(total / pageSize)}
-            size="md"
-            siblings={1}
-            boundaries={1}
-            disabled={loading}
-          />
+            <Text size="sm" c="dimmed">
+              Page {page} of {Math.ceil(total / pageSize)}
+            </Text>
+
+            <Pagination
+              value={page}
+              onChange={onPageChange}
+              total={Math.ceil(total / pageSize)}
+              size="md"
+              siblings={1}
+              boundaries={1}
+              disabled={loading}
+            />
+          </Group>
         </Group>
       )}
     </Paper>

@@ -23,7 +23,7 @@ export const JobsTrackerPage = () => {
     useState<JobTracker | null>(null);
 
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   const {
     data: res,
@@ -45,6 +45,13 @@ export const JobsTrackerPage = () => {
   const handleDelete = (application: JobTracker) => {
     setSelectedApplication(application);
     openDelete();
+  };
+
+  const handlePageSizeChange = (newSize: string | null) => {
+    if (newSize) {
+      setPageSize(Number(newSize));
+      setPage(1);
+    }
   };
 
   if (isLoading) {
@@ -81,6 +88,7 @@ export const JobsTrackerPage = () => {
           pageSize={pageSize}
           total={total}
           onPageChange={setPage}
+          onPageSizeChange={handlePageSizeChange}
         />
       </Stack>
       <JobApplicationModal

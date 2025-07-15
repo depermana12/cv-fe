@@ -52,6 +52,7 @@ export type JobApplicationsTableProps = {
   pageSize: number;
   total: number;
   onPageChange: (page: number) => void;
+  onPageSizeChange: (pageSize: string | null) => void;
   onEdit: (application: JobTracker) => void;
   onDelete: (application: JobTracker) => void;
   onCreateNew: () => void;
