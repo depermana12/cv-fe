@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { Container, Group, Title, Button, Stack, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -25,12 +25,17 @@ export const JobsTrackerPage = () => {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  const { data: res } = useJobApplications({
+  const {
+    data: res,
+    isLoading,
+    isFetching,
+  } = useJobApplications({
     limit: pageSize,
     offset: (page - 1) * pageSize,
   });
-  const applications = res.data;
-  const total = res.total;
+
+  const applications = res?.data || [];
+  const total = res?.total || 0;
 
   const handleEdit = (application: JobTracker) => {
     setSelectedApplication(application);
@@ -42,60 +47,61 @@ export const JobsTrackerPage = () => {
     openDelete();
   };
 
+  if (isLoading) {
+    return <JobTrackerSkeleton />;
+  }
+
   return (
     <Container size="xl" py="md">
-      <Suspense fallback={<JobTrackerSkeleton />}>
-        <Stack gap="lg">
-          <Group justify="space-between">
-            <Stack gap={1}>
-              <Title order={1} size="h2">
-                Jobs Tracker
-              </Title>
-              <Text c="dimmed" size="sm">
-                Track your job applications and manage your job search
-              </Text>
-            </Stack>
-            <Button
-              variant="outline"
-              leftSection={<IconPlus size={16} />}
-              onClick={openCreate}
-            >
-              Add Application
-            </Button>
-          </Group>
-          <JobApplicationsTable
-            applications={applications}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onCreateNew={openCreate}
-            page={page}
-            pageSize={pageSize}
-            total={total}
-            onPageChange={setPage}
-          />
-        </Stack>
-        <JobApplicationModal
-          mode="create"
-          opened={createModalOpened}
-          onClose={closeCreate}
+      <Stack gap="lg">
+        <Group justify="space-between">
+          <Stack gap={1}>
+            <Title order={1} size="h2">
+              Jobs Tracker
+            </Title>
+            <Text c="dimmed" size="sm">
+              Track your job applications and manage your job search
+            </Text>
+          </Stack>
+          <Button
+            variant="outline"
+            leftSection={<IconPlus size={16} />}
+            onClick={openCreate}
+          >
+            Add Application
+          </Button>
+        </Group>
+        <JobApplicationsTable
+          applications={applications}
+          loading={isFetching}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onCreateNew={openCreate}
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
         />
-        {selectedApplication && (
-          <JobApplicationModal
-            mode="edit"
-            initialData={selectedApplication}
-            opened={editModalOpened}
-            onClose={() => {
-              closeEdit();
-              setSelectedApplication(null);
-            }}
-          />
-        )}
-        <DeleteJobApplicationModal
-          opened={deleteModalOpened}
-          onClose={closeDelete}
-          application={selectedApplication}
-        />
-      </Suspense>
+      </Stack>
+      <JobApplicationModal
+        mode="create"
+        opened={createModalOpened}
+        onClose={closeCreate}
+      />
+      <JobApplicationModal
+        mode="edit"
+        initialData={selectedApplication || undefined}
+        opened={editModalOpened}
+        onClose={() => {
+          closeEdit();
+          setSelectedApplication(null);
+        }}
+      />
+      <DeleteJobApplicationModal
+        opened={deleteModalOpened}
+        onClose={closeDelete}
+        application={selectedApplication}
+      />
     </Container>
   );
 };
