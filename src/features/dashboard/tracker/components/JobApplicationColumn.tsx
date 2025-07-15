@@ -183,7 +183,8 @@ export const createColumns = ({
             <Tooltip label="View your application history">
               <Badge
                 color={getStatusColor(localStatus)}
-                variant="filled"
+                variant="light"
+                radius="sm"
                 size="sm"
                 style={{ cursor: "pointer" }}
                 onClick={openModal}
