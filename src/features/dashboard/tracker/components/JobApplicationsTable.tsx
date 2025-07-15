@@ -57,7 +57,7 @@ export const JobApplicationsTable = ({
 }: JobApplicationsTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: "dateApplied",
+      id: "appliedAt",
       desc: true,
     },
   ]);
