@@ -4,7 +4,6 @@ import {
   Group,
   ActionIcon,
   Text,
-  Avatar,
   Stack,
   Tooltip,
   Modal,
@@ -21,6 +20,7 @@ import {
 } from "@tabler/icons-react";
 import { JobTracker } from "../types/jobTracker.type";
 import { useUpdateJobApplication } from "../hooks/useUpdateJobApplication";
+import { StatusHistoryTimeline } from "./StatusHistoryTimeline";
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { Link } from "@tanstack/react-router";
@@ -28,19 +28,19 @@ import { Link } from "@tanstack/react-router";
 const getStatusColor = (status: string) => {
   switch (status) {
     case "applied":
-      return "blue";
+      return "gray.6";
     case "interview":
-      return "yellow";
+      return "indigo.6";
     case "offer":
-      return "green";
+      return "teal.5";
     case "accepted":
-      return "teal";
+      return "green.6";
     case "rejected":
-      return "red";
+      return "red.6";
     case "ghosted":
-      return "gray";
+      return "dark.4";
     default:
-      return "blue";
+      return "gray.6";
   }
 };
 
@@ -68,16 +68,6 @@ type ActionsColumnProps = {
   onDelete: (application: JobTracker) => void;
 };
 
-const formatAvatar = (companyName: string) => {
-  const name = companyName.toLowerCase().trim();
-  const words = name.split(/\s+/);
-
-  if (name.startsWith("pt")) {
-    return words[1].charAt(0).toUpperCase();
-  }
-  return words[0].charAt(0).toUpperCase();
-};
-
 export const createColumns = ({
   onEdit,
   onDelete,
@@ -89,17 +79,12 @@ export const createColumns = ({
     cell: ({ row }) => {
       const application = row.original;
       return (
-        <Group gap="sm">
-          <Avatar size={32} radius="sm" color="blue">
-            {formatAvatar(application.companyName)}
-          </Avatar>
-          <Stack gap={0}>
-            <Text size="sm">{application.jobTitle}</Text>
-            <Text size="xs" c="dimmed">
-              {application.companyName}
-            </Text>
-          </Stack>
-        </Group>
+        <Stack gap={0}>
+          <Text size="sm">{application.jobTitle}</Text>
+          <Text size="xs" c="dimmed">
+            {application.companyName}
+          </Text>
+        </Stack>
       );
     },
     enableSorting: true,
@@ -193,7 +178,7 @@ export const createColumns = ({
       return (
         <>
           <Group gap={4}>
-            <Tooltip label="Click to view status history">
+            <Tooltip label="View your application history">
               <Badge
                 color={getStatusColor(localStatus)}
                 variant="filled"
@@ -279,12 +264,15 @@ export const createColumns = ({
           <Modal
             opened={modalOpened}
             onClose={closeModal}
-            title="Status History"
-            centered={false}
-            yOffset="5vh"
-            xOffset={0}
+            withCloseButton={false}
+            size="sm"
+            styles={{ content: { background: "#f8f9fa" } }}
           >
-            <Text size="sm">Status history feature coming soon.</Text>
+            <StatusHistoryTimeline
+              applicationId={application.id}
+              jobTitle={application.jobTitle}
+              companyName={application.companyName}
+            />
           </Modal>
         </>
       );
