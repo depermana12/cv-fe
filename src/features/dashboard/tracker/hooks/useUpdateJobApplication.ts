@@ -22,14 +22,8 @@ export const useUpdateJobApplication = () => {
       queryClient.invalidateQueries({
         queryKey: ["job-application", applicationId],
       });
-
-      notifications.show({
-        position: "top-center",
-        withCloseButton: true,
-        autoClose: 3000,
-        title: "Job application updated",
-        message: `Your Job Application has been updated successfully.`,
-        color: "green",
+      queryClient.invalidateQueries({
+        queryKey: ["status-timeline", applicationId],
       });
     },
     onError: (err) => {
