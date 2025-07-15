@@ -14,7 +14,7 @@ export const jobApplicationsQuery = (options?: JobTrackerQueryOptions) => {
         offset: res.data.pagination.offset,
       };
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: Infinity,
   });
 };
 
@@ -26,7 +26,7 @@ export const jobApplicationByIdQuery = (applicationId: number) =>
       return res.data;
     },
     enabled: !!applicationId,
-    staleTime: 1000 * 60 * 5, // minutes
+    staleTime: Infinity,
   });
 
 export const jobApplicationStatusQuery = (applicationId: number) =>
@@ -37,5 +37,5 @@ export const jobApplicationStatusQuery = (applicationId: number) =>
       return res.data.data;
     },
     enabled: !!applicationId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: Infinity,
   });
