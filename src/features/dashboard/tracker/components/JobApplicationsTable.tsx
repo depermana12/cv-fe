@@ -102,7 +102,7 @@ export const JobApplicationsTable = ({
         <Table.Tr key={index}>
           {columns.map((_, colIndex) => (
             <Table.Td key={colIndex}>
-              <Skeleton height={20} />
+              <Skeleton height={24} radius="sm" />
             </Table.Td>
           ))}
         </Table.Tr>
@@ -111,10 +111,9 @@ export const JobApplicationsTable = ({
   );
 
   return (
-    <Paper radius="md" withBorder w="100%">
-      <LoadingOverlay visible={loading} />
+    <Paper radius="md" withBorder w="100%" pos="relative">
+      <LoadingOverlay visible={loading} zIndex={1000} />
 
-      {/* Search and Filters */}
       <Group p="md" justify="space-between">
         <TextInput
           placeholder="Search applications..."
@@ -134,6 +133,7 @@ export const JobApplicationsTable = ({
             ) : null
           }
           style={{ minWidth: 300 }}
+          disabled={loading}
         />
         <Group gap="xs">
           <Select
@@ -146,6 +146,7 @@ export const JobApplicationsTable = ({
             clearable
             leftSection={<IconFilter size={16} />}
             style={{ minWidth: 150 }}
+            disabled={loading}
           />
         </Group>
       </Group>
@@ -198,7 +199,7 @@ export const JobApplicationsTable = ({
             ))}
           </Table.Thead>
           <Table.Tbody>
-            {loading ? (
+            {loading && applications.length === 0 ? (
               <SkeletonRows />
             ) : applications.length === 0 ? (
               <Table.Tr>
@@ -223,8 +224,7 @@ export const JobApplicationsTable = ({
           </Table.Tbody>
         </Table>
       </Table.ScrollContainer>
-      {/* Pagination */}
-      {!loading && applications.length > 0 && (
+      {applications.length > 0 && (
         <Group justify="space-between" p="md">
           <Text size="sm" c="dimmed">
             Showing {table.getRowModel().rows.length} of{" "}
@@ -244,6 +244,7 @@ export const JobApplicationsTable = ({
             size="md"
             siblings={1}
             boundaries={1}
+            disabled={loading}
           />
         </Group>
       )}
