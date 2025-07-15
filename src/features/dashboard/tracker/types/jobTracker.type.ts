@@ -68,7 +68,7 @@ export type JobApplicationFormProps =
       opened: boolean;
       onClose: () => void;
       mode: "edit";
-      initialData: JobTracker;
+      initialData?: JobTracker;
     };
 
 export type DeleteJobApplicationProps = {

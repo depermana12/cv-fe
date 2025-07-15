@@ -33,7 +33,9 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
   const [statusChangedAt, setStatusChangedAt] = useState<Date | undefined>(
     undefined,
   );
-  const [lastStatus] = useState(isEdit ? props.initialData.status : undefined);
+  const [lastStatus] = useState(
+    isEdit && props.initialData ? props.initialData.status : undefined,
+  );
 
   const { mutate: addApplication, isPending: isCreating } =
     useCreateJobApplication();
@@ -42,34 +44,35 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
   const { data: cvsResponse } = useCvs();
   const cvs = cvsResponse || [];
 
-  const defaultValues = isEdit
-    ? {
-        ...props.initialData,
-        appliedAt: props.initialData.appliedAt
-          ? new Date(props.initialData.appliedAt)
-          : new Date(),
-      }
-    : {
-        cvId: props.initialData?.cvId ?? null,
-        jobPortal: props.initialData?.jobPortal ?? "",
-        jobUrl: props.initialData?.jobUrl ?? "",
-        companyName: props.initialData?.companyName ?? "",
-        jobTitle: props.initialData?.jobTitle ?? "",
-        jobType: props.initialData?.jobType ?? "Full-time",
-        position: props.initialData?.position ?? "Mid-level",
-        location: props.initialData?.location ?? "",
-        locationType: props.initialData?.locationType ?? "On-site",
-        status: props.initialData?.status ?? "applied",
-        notes: props.initialData?.notes ?? "",
-        appliedAt: props.initialData?.appliedAt
-          ? new Date(props.initialData?.appliedAt)
-          : new Date(),
-      };
+  const defaultValues =
+    isEdit && props.initialData
+      ? {
+          ...props.initialData,
+          appliedAt: props.initialData.appliedAt
+            ? new Date(props.initialData.appliedAt)
+            : new Date(),
+        }
+      : {
+          cvId: props.initialData?.cvId ?? null,
+          jobPortal: props.initialData?.jobPortal ?? "",
+          jobUrl: props.initialData?.jobUrl ?? "",
+          companyName: props.initialData?.companyName ?? "",
+          jobTitle: props.initialData?.jobTitle ?? "",
+          jobType: props.initialData?.jobType ?? "Full-time",
+          position: props.initialData?.position ?? "Mid-level",
+          location: props.initialData?.location ?? "",
+          locationType: props.initialData?.locationType ?? "On-site",
+          status: props.initialData?.status ?? "applied",
+          notes: props.initialData?.notes ?? "",
+          appliedAt: props.initialData?.appliedAt
+            ? new Date(props.initialData?.appliedAt)
+            : new Date(),
+        };
 
   const { Field, handleSubmit } = useForm({
     defaultValues,
     onSubmit: ({ value }) => {
-      if (isEdit) {
+      if (isEdit && props.initialData) {
         const updatePayload =
           lastStatus !== value.status && statusChangedAt
             ? { ...value, statusChangedAt }
@@ -113,6 +116,8 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
     label: cv.title,
   }));
 
+  const isLoading = isCreating || isUpdating;
+
   return (
     <form
       onSubmit={(e) => {
@@ -136,6 +141,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                 onBlur={handleBlur}
                 error={useFieldError(state.meta)}
                 required
+                disabled={isLoading}
               />
             )}
           </Field>
@@ -153,6 +159,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                 onBlur={handleBlur}
                 error={useFieldError(state.meta)}
                 required
+                disabled={isLoading}
               />
             )}
           </Field>
@@ -176,6 +183,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                     "Volunteer",
                   ].map((value) => ({ value, label: value }))}
                   required
+                  disabled={isLoading}
                 />
               )}
             </Field>
@@ -202,6 +210,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                     "Other",
                   ].map((value) => ({ value, label: value }))}
                   required
+                  disabled={isLoading}
                 />
               )}
             </Field>
@@ -221,6 +230,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                   onBlur={handleBlur}
                   error={useFieldError(state.meta)}
                   required
+                  disabled={isLoading}
                 />
               )}
             </Field>
@@ -238,6 +248,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                     value: v,
                     label: v,
                   }))}
+                  disabled={isLoading}
                 />
               )}
             </Field>
@@ -253,6 +264,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                   onChange={(v) => handleChange(v || new Date())}
                   maxDate={new Date()}
                   required
+                  disabled={isLoading}
                 />
               )}
             </Field>
@@ -280,10 +292,11 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                     "ghosted",
                   ].map((v) => ({ value: v, label: v }))}
                   required
+                  disabled={isLoading}
                 />
               )}
             </Field>
-            {isEdit && statusChangedAt && (
+            {isEdit && statusChangedAt && props.initialData && (
               <DatePickerInput
                 label="Status Updated At"
                 value={statusChangedAt}
@@ -291,6 +304,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                 minDate={new Date(props.initialData.appliedAt)}
                 maxDate={new Date()}
                 required
+                disabled={isLoading}
               />
             )}
           </Group>
@@ -309,6 +323,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                   onBlur={handleBlur}
                   error={useFieldError(state.meta)}
                   required
+                  disabled={isLoading}
                 />
               )}
             </Field>
@@ -320,6 +335,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                   onChange={(e) => handleChange(e.target.value)}
                   onBlur={handleBlur}
                   error={useFieldError(state.meta)}
+                  disabled={isLoading}
                 />
               )}
             </Field>
@@ -334,6 +350,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                     onChange={(v) => handleChange(v ? parseInt(v) : null)}
                     data={cvOptions}
                     clearable
+                    disabled={isLoading}
                   />
                 )}
               </Field>
@@ -348,6 +365,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                 onBlur={handleBlur}
                 error={useFieldError(state.meta)}
                 rows={3}
+                disabled={isLoading}
               />
             )}
           </Field>
@@ -364,13 +382,14 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
         }}
       >
         <Group justify="flex-end" mt="md">
-          <Button variant="default" onClick={onClose}>
+          <Button variant="default" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
           <Button
             type="submit"
             variant="outline"
-            loading={isCreating || isUpdating}
+            loading={isLoading}
+            disabled={isLoading}
           >
             {btnTitle}
           </Button>
