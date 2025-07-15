@@ -112,10 +112,8 @@ export const JobApplicationsTable = ({
   );
 
   return (
-    <Paper radius="md" withBorder w="100%" pos="relative">
-      <LoadingOverlay visible={loading} zIndex={1000} />
-
-      <Group p="md" justify="space-between">
+    <>
+      <Group mt="md" justify="space-between">
         <TextInput
           placeholder="Search applications..."
           leftSection={<IconSearch size={16} />}
@@ -151,127 +149,130 @@ export const JobApplicationsTable = ({
           />
         </Group>
       </Group>
-      {/* Table */}
-      <Table.ScrollContainer minWidth={800} type="native">
-        <Table
-          verticalSpacing="sm"
-          horizontalSpacing="md"
-          highlightOnHover
-          withTableBorder={false}
-        >
-          <Table.Thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Table.Tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Table.Th key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <Group
-                        gap="xs"
-                        justify="space-between"
-                        style={{
-                          cursor: header.column.getCanSort()
-                            ? "pointer"
-                            : "default",
-                        }}
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        <Text size="sm" fw={600}>
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                        </Text>
-                        {header.column.getCanSort() && (
-                          <Box>
-                            {header.column.getIsSorted() === "asc" ? (
-                              <IconChevronUp size={14} />
-                            ) : header.column.getIsSorted() === "desc" ? (
-                              <IconChevronDown size={14} />
-                            ) : (
-                              <IconSelector size={14} />
+      <Paper radius="md" withBorder w="100%" pos="relative">
+        <LoadingOverlay visible={loading} zIndex={1000} />
+        {/* Table */}
+        <Table.ScrollContainer minWidth={800} type="native">
+          <Table
+            verticalSpacing="sm"
+            horizontalSpacing="md"
+            highlightOnHover
+            withTableBorder={false}
+          >
+            <Table.Thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <Table.Tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <Table.Th key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <Group
+                          gap="xs"
+                          justify="space-between"
+                          style={{
+                            cursor: header.column.getCanSort()
+                              ? "pointer"
+                              : "default",
+                          }}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          <Text size="sm" fw={600}>
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
                             )}
-                          </Box>
-                        )}
-                      </Group>
-                    )}
-                  </Table.Th>
-                ))}
-              </Table.Tr>
-            ))}
-          </Table.Thead>
-          <Table.Tbody>
-            {loading && applications.length === 0 ? (
-              <SkeletonRows />
-            ) : applications.length === 0 ? (
-              <Table.Tr>
-                <Table.Td colSpan={columns.length}>
-                  <JobApplicationEmpty />
-                </Table.Td>
-              </Table.Tr>
-            ) : (
-              table.getRowModel().rows.map((row) => (
-                <Table.Tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <Table.Td key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
+                          </Text>
+                          {header.column.getCanSort() && (
+                            <Box>
+                              {header.column.getIsSorted() === "asc" ? (
+                                <IconChevronUp size={14} />
+                              ) : header.column.getIsSorted() === "desc" ? (
+                                <IconChevronDown size={14} />
+                              ) : (
+                                <IconSelector size={14} />
+                              )}
+                            </Box>
+                          )}
+                        </Group>
                       )}
-                    </Table.Td>
+                    </Table.Th>
                   ))}
                 </Table.Tr>
-              ))
-            )}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
-      {applications.length > 0 && (
-        <Group justify="space-between" p="md">
-          <Text size="sm" c="dimmed">
-            Showing {table.getRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} results
-            {table.getFilteredRowModel().rows.length !== applications.length &&
-              ` (${applications.length} total)`}
-          </Text>
+              ))}
+            </Table.Thead>
+            <Table.Tbody>
+              {loading && applications.length === 0 ? (
+                <SkeletonRows />
+              ) : applications.length === 0 ? (
+                <Table.Tr>
+                  <Table.Td colSpan={columns.length}>
+                    <JobApplicationEmpty />
+                  </Table.Td>
+                </Table.Tr>
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <Table.Tr key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <Table.Td key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </Table.Td>
+                    ))}
+                  </Table.Tr>
+                ))
+              )}
+            </Table.Tbody>
+          </Table>
+        </Table.ScrollContainer>
+        {applications.length > 0 && (
+          <Group justify="space-between" p="md">
+            <Text size="sm" c="dimmed">
+              Showing {table.getRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} results
+              {table.getFilteredRowModel().rows.length !==
+                applications.length && ` (${applications.length} total)`}
+            </Text>
 
-          <Group gap="md">
-            <Group gap="xs">
+            <Group gap="md">
+              <Group gap="xs">
+                <Text size="sm" c="dimmed">
+                  Rows per page:
+                </Text>
+                <Select
+                  data={[
+                    { value: "10", label: "10" },
+                    { value: "20", label: "20" },
+                    { value: "30", label: "30" },
+                    { value: "40", label: "40" },
+                    { value: "50", label: "50" },
+                  ]}
+                  value={pageSize.toString()}
+                  onChange={onPageSizeChange}
+                  checkIconPosition="right"
+                  size="sm"
+                  w={70}
+                  disabled={loading}
+                />
+              </Group>
+
               <Text size="sm" c="dimmed">
-                Rows per page:
+                Page {page} of {Math.ceil(total / pageSize)}
               </Text>
-              <Select
-                data={[
-                  { value: "10", label: "10" },
-                  { value: "20", label: "20" },
-                  { value: "30", label: "30" },
-                  { value: "40", label: "40" },
-                  { value: "50", label: "50" },
-                ]}
-                value={pageSize.toString()}
-                onChange={onPageSizeChange}
-                checkIconPosition="right"
-                size="sm"
-                w={70}
+
+              <Pagination
+                value={page}
+                onChange={onPageChange}
+                total={Math.ceil(total / pageSize)}
+                size="md"
+                siblings={1}
+                boundaries={1}
                 disabled={loading}
               />
             </Group>
-
-            <Text size="sm" c="dimmed">
-              Page {page} of {Math.ceil(total / pageSize)}
-            </Text>
-
-            <Pagination
-              value={page}
-              onChange={onPageChange}
-              total={Math.ceil(total / pageSize)}
-              size="md"
-              siblings={1}
-              boundaries={1}
-              disabled={loading}
-            />
           </Group>
-        </Group>
-      )}
-    </Paper>
+        )}
+      </Paper>
+    </>
   );
 };
