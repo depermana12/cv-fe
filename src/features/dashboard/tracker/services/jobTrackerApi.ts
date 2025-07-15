@@ -2,10 +2,10 @@ import { AxiosResponse } from "axios";
 import { axiosClient } from "../../../../lib/axiosClient";
 import {
   JobApplicationsResponse,
+  JobApplicationStatusResponse,
   JobTracker,
   JobTrackerCreate,
   JobTrackerQueryOptions,
-  JobTrackerStatus,
 } from "../types/jobTracker.type";
 import { ResourceApi } from "../../../../api/ResourceApi";
 
@@ -27,6 +27,6 @@ export class jobTrackerApi extends ResourceApi<JobTracker, JobTrackerCreate> {
 
   async getStatusTimeline(applicationId: number) {
     const url = `${this.resource}/${applicationId}/statuses`;
-    return axiosClient.get<JobTrackerStatus[]>(url);
+    return axiosClient.get<JobApplicationStatusResponse>(url);
   }
 }

@@ -34,7 +34,7 @@ export const jobApplicationStatusQuery = (applicationId: number) =>
     queryKey: ["status-timeline", applicationId],
     queryFn: async () => {
       const res = await jobTrackerService.getStatusTimeline(applicationId);
-      return res.data;
+      return res.data.data;
     },
     enabled: !!applicationId,
     staleTime: 1000 * 60 * 5, // 5 minutes
