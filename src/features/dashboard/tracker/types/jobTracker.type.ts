@@ -56,6 +56,8 @@ export type JobApplicationsTableProps = {
   onEdit: (application: JobTracker) => void;
   onDelete: (application: JobTracker) => void;
   onCreateNew: () => void;
+  dateRange?: [Date | null, Date | null];
+  onDateRangeChange?: (dateRange: [Date | null, Date | null]) => void;
 };
 
 export type JobApplicationFormProps =

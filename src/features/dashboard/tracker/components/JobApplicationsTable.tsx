@@ -15,6 +15,7 @@ import {
   Button,
   Stack,
 } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
 import {
   IconSearch,
   IconChevronUp,
@@ -23,6 +24,7 @@ import {
   IconFilter,
   IconSelector,
   IconColumns,
+  IconCalendar,
 } from "@tabler/icons-react";
 import {
   useReactTable,
@@ -60,6 +62,8 @@ export const JobApplicationsTable = ({
   total,
   onPageChange,
   onPageSizeChange,
+  dateRange,
+  onDateRangeChange,
 }: JobApplicationsTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([
     {
@@ -179,6 +183,16 @@ export const JobApplicationsTable = ({
             leftSection={<IconFilter size={16} />}
             checkIconPosition="right"
             disabled={loading}
+          />
+          <DatePickerInput
+            type="range"
+            placeholder="Pick dates range"
+            value={dateRange}
+            onChange={(value) => onDateRangeChange?.(value)}
+            leftSection={<IconCalendar size={16} />}
+            clearable
+            disabled={loading}
+            size="sm"
           />
           <Popover width={220} position="bottom-end" withArrow shadow="md">
             <Popover.Target>

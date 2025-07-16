@@ -24,6 +24,10 @@ export const JobsTrackerPage = () => {
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
 
   const {
     data: res,
@@ -32,6 +36,8 @@ export const JobsTrackerPage = () => {
   } = useJobApplications({
     limit: pageSize,
     offset: (page - 1) * pageSize,
+    appliedAtFrom: dateRange[0] || undefined,
+    appliedAtTo: dateRange[1] || undefined,
   });
 
   const applications = res?.data || [];
@@ -47,11 +53,17 @@ export const JobsTrackerPage = () => {
     openDelete();
   };
 
+  // Possibly i implemented bug where the initial select of date triger render before select the range second date
   const handlePageSizeChange = (newSize: string | null) => {
     if (newSize) {
       setPageSize(Number(newSize));
       setPage(1);
     }
+  };
+
+  const handleDateRangeChange = (newDateRange: [Date | null, Date | null]) => {
+    setDateRange(newDateRange);
+    setPage(1);
   };
 
   if (isLoading) {
@@ -89,6 +101,8 @@ export const JobsTrackerPage = () => {
           total={total}
           onPageChange={setPage}
           onPageSizeChange={handlePageSizeChange}
+          dateRange={dateRange}
+          onDateRangeChange={handleDateRangeChange}
         />
       </Stack>
       <JobApplicationModal
