@@ -298,6 +298,32 @@ export const createColumns = ({
     enableSorting: true,
   },
   {
+    accessorKey: "cvId",
+    header: "CV Used",
+    cell: ({ getValue }) => {
+      const cvId = getValue() as number | null;
+      return (
+        <Text size="sm" c={cvId ? "inherit" : "dimmed"}>
+          {cvId ? `CV #${cvId}` : "Not specified"}
+        </Text>
+      );
+    },
+    enableSorting: false,
+  },
+  {
+    accessorKey: "note",
+    header: "Note",
+    cell: ({ getValue }) => {
+      const note = getValue() as string | null;
+      return (
+        <Text size="sm" c={note ? "inherit" : "dimmed"} truncate>
+          {note || "No note"}
+        </Text>
+      );
+    },
+    enableSorting: false,
+  },
+  {
     id: "jobPortal",
     header: "Source",
     accessorFn: (row) => `${row.jobPortal}${row.jobUrl}`,
