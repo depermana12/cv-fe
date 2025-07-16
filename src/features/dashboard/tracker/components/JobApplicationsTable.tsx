@@ -12,8 +12,8 @@ import {
   Pagination,
   Popover,
   Checkbox,
-  Button,
   Stack,
+  Tooltip,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import {
@@ -23,7 +23,7 @@ import {
   IconX,
   IconFilter,
   IconSelector,
-  IconColumns,
+  IconColumns3,
   IconCalendar,
 } from "@tabler/icons-react";
 import {
@@ -193,14 +193,11 @@ export const JobApplicationsTable = ({
           />
           <Popover width={220} position="bottom-end" withArrow shadow="md">
             <Popover.Target>
-              <Button
-                variant="default"
-                leftSection={<IconColumns size={16} />}
-                disabled={loading}
-                size="sm"
-              >
-                Columns
-              </Button>
+              <Tooltip label="Toggle columns" withArrow>
+                <ActionIcon variant="default" disabled={loading} size="lg">
+                  <IconColumns3 size={15} />
+                </ActionIcon>
+              </Tooltip>
             </Popover.Target>
             <Popover.Dropdown>
               <Text size="sm" fw={600} mb="xs">
