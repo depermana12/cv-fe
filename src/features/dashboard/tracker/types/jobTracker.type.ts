@@ -58,6 +58,8 @@ export type JobApplicationsTableProps = {
   onCreateNew: () => void;
   dateRange?: [Date | null, Date | null];
   onDateRangeChange?: (dateRange: [Date | null, Date | null]) => void;
+  searchQuery?: string;
+  onSearchChange?: (search: string) => void;
 };
 
 export type JobApplicationFormProps =

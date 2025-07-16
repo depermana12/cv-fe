@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Container, Group, Title, Button, Stack, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 
 import { JobTracker } from "../types/jobTracker.type";
 import { useJobApplications } from "../hooks/useJobApplications";
@@ -28,6 +28,8 @@ export const JobsTrackerPage = () => {
     null,
     null,
   ]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 300);
 
   const {
     data: res,
@@ -38,6 +40,7 @@ export const JobsTrackerPage = () => {
     offset: (page - 1) * pageSize,
     appliedAtFrom: dateRange[0] || undefined,
     appliedAtTo: dateRange[1] || undefined,
+    search: debouncedSearchQuery || undefined,
   });
 
   const applications = res?.data || [];
@@ -63,6 +66,11 @@ export const JobsTrackerPage = () => {
 
   const handleDateRangeChange = (newDateRange: [Date | null, Date | null]) => {
     setDateRange(newDateRange);
+    setPage(1);
+  };
+
+  const handleSearchChange = (newSearch: string) => {
+    setSearchQuery(newSearch);
     setPage(1);
   };
 
@@ -103,6 +111,8 @@ export const JobsTrackerPage = () => {
           onPageSizeChange={handlePageSizeChange}
           dateRange={dateRange}
           onDateRangeChange={handleDateRangeChange}
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
         />
       </Stack>
       <JobApplicationModal

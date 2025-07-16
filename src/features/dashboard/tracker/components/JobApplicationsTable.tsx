@@ -40,7 +40,6 @@ import { useState, useMemo } from "react";
 import { createColumns } from "./JobApplicationColumn";
 import { JobApplicationsTableProps } from "../types/jobTracker.type";
 import { JobApplicationEmpty } from "./JobApplicationEmpty";
-import { useDebouncedValue } from "@mantine/hooks";
 
 const STATUS_OPTIONS = [
   { value: "", label: "All statuses", color: "gray" },
@@ -64,6 +63,8 @@ export const JobApplicationsTable = ({
   onPageSizeChange,
   dateRange,
   onDateRangeChange,
+  searchQuery = "",
+  onSearchChange,
 }: JobApplicationsTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([
     {
@@ -72,8 +73,6 @@ export const JobApplicationsTable = ({
     },
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 300);
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     cvId: false,
@@ -117,12 +116,10 @@ export const JobApplicationsTable = ({
     state: {
       sorting,
       columnFilters,
-      globalFilter: debouncedGlobalFilter,
       columnVisibility,
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -155,14 +152,14 @@ export const JobApplicationsTable = ({
         <TextInput
           placeholder="Search applications..."
           leftSection={<IconSearch size={16} />}
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
+          value={searchQuery}
+          onChange={(e) => onSearchChange?.(e.target.value)}
           rightSection={
-            globalFilter ? (
+            searchQuery ? (
               <ActionIcon
                 variant="subtle"
                 color="gray"
-                onClick={() => setGlobalFilter("")}
+                onClick={() => onSearchChange?.("")}
                 size="sm"
               >
                 <IconX size={16} />
