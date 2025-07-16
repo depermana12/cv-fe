@@ -185,7 +185,7 @@ export const createColumns = ({
                 color={getStatusColor(localStatus)}
                 variant="light"
                 radius="sm"
-                size="sm"
+                size="md"
                 style={{ cursor: "pointer" }}
                 onClick={openModal}
               >
