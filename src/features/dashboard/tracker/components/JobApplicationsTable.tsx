@@ -187,6 +187,10 @@ export const JobApplicationsTable = ({
             clearable
             disabled={loading}
             size="sm"
+            popoverProps={{
+              withinPortal: true,
+              position: "bottom-end",
+            }}
           />
           <Popover width={220} position="bottom-end" withArrow shadow="md">
             <Popover.Target>
@@ -208,7 +212,9 @@ export const JobApplicationsTable = ({
                       label={option.label}
                       checked={selectedStatuses.includes(option.value)}
                       onChange={() => handleStatusChange(option.value)}
-                      size="sm"
+                      color="inherit"
+                      radius="sm"
+                      variant="outline"
                     />
                   ),
                 )}
@@ -240,7 +246,9 @@ export const JobApplicationsTable = ({
                         : visibleColumns.filter((col) => col !== option.value);
                       handleColumnVisibilityChange(newColumns);
                     }}
-                    size="sm"
+                    color="inherit"
+                    radius="sm"
+                    variant="outline"
                   />
                 ))}
               </Stack>
