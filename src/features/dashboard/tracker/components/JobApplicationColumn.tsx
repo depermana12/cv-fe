@@ -281,7 +281,10 @@ export const createColumns = ({
       );
     },
     enableSorting: false,
-    filterFn: "equals",
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue.length === 0) return true;
+      return filterValue.includes(row.getValue(columnId));
+    },
   },
   {
     accessorKey: "appliedAt",

@@ -73,6 +73,7 @@ export const JobApplicationsTable = ({
     },
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     cvId: false,
@@ -110,6 +111,17 @@ export const JobApplicationsTable = ({
     setColumnVisibility(newVisibility);
   };
 
+  const handleStatusChange = (statusValue: string) => {
+    const newStatuses = selectedStatuses.includes(statusValue)
+      ? selectedStatuses.filter((status) => status !== statusValue)
+      : [...selectedStatuses, statusValue];
+
+    setSelectedStatuses(newStatuses);
+
+    const statusFilter = newStatuses.length === 0 ? undefined : newStatuses;
+    table.getColumn("status")?.setFilterValue(statusFilter);
+  };
+
   const table = useReactTable({
     data: applications,
     columns,
@@ -127,10 +139,6 @@ export const JobApplicationsTable = ({
     manualPagination: true,
     autoResetPageIndex: false,
   });
-
-  const currentStatusFilter = table
-    .getColumn("status")
-    ?.getFilterValue() as string;
 
   const SkeletonRows = () => (
     <>
@@ -170,17 +178,6 @@ export const JobApplicationsTable = ({
           disabled={loading}
         />
         <Group gap="xs">
-          <Select
-            data={STATUS_OPTIONS}
-            value={currentStatusFilter ?? ""}
-            onChange={(value) =>
-              table.getColumn("status")?.setFilterValue(value || undefined)
-            }
-            clearable
-            leftSection={<IconFilter size={16} />}
-            checkIconPosition="right"
-            disabled={loading}
-          />
           <DatePickerInput
             type="range"
             placeholder="Pick dates range"
@@ -193,7 +190,34 @@ export const JobApplicationsTable = ({
           />
           <Popover width={220} position="bottom-end" withArrow shadow="md">
             <Popover.Target>
-              <Tooltip label="Toggle columns" withArrow>
+              <Tooltip label="Filter by status" withArrow>
+                <ActionIcon variant="default" disabled={loading} size="lg">
+                  <IconFilter size={15} />
+                </ActionIcon>
+              </Tooltip>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <Text size="sm" fw={600} mb="xs">
+                Filter by status
+              </Text>
+              <Stack gap="xs">
+                {STATUS_OPTIONS.filter((option) => option.value !== "").map(
+                  (option) => (
+                    <Checkbox
+                      key={option.value}
+                      label={option.label}
+                      checked={selectedStatuses.includes(option.value)}
+                      onChange={() => handleStatusChange(option.value)}
+                      size="sm"
+                    />
+                  ),
+                )}
+              </Stack>
+            </Popover.Dropdown>
+          </Popover>
+          <Popover width={220} position="bottom-end" withArrow shadow="md">
+            <Popover.Target>
+              <Tooltip label="Show/hide columns" withArrow>
                 <ActionIcon variant="default" disabled={loading} size="lg">
                   <IconColumns3 size={15} />
                 </ActionIcon>
