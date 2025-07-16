@@ -10,6 +10,10 @@ import {
   Box,
   Skeleton,
   Pagination,
+  Popover,
+  Checkbox,
+  Button,
+  Stack,
 } from "@mantine/core";
 import {
   IconSearch,
@@ -18,6 +22,7 @@ import {
   IconX,
   IconFilter,
   IconSelector,
+  IconColumns,
 } from "@tabler/icons-react";
 import {
   useReactTable,
@@ -66,12 +71,41 @@ export const JobApplicationsTable = ({
   const [globalFilter, setGlobalFilter] = useState("");
   const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 300);
 
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    cvId: false,
+    note: false,
+  });
 
   const columns = useMemo(
     () => createColumns({ onEdit, onDelete }),
     [onEdit, onDelete],
   );
+
+  const columnVisibilityOptions = [
+    { value: "company", label: "Job & Company" },
+    { value: "type", label: "Type & Level" },
+    { value: "location", label: "Location & Type" },
+    { value: "status", label: "Status" },
+    { value: "appliedAt", label: "Applied" },
+    { value: "cvId", label: "CV Used" },
+    { value: "note", label: "Note" },
+    { value: "jobPortal", label: "Source" },
+  ];
+
+  const visibleColumns =
+    Object.keys(columnVisibility).length === 0
+      ? columnVisibilityOptions.map((opt) => opt.value)
+      : columnVisibilityOptions
+          .filter(({ value }) => columnVisibility[value] !== false)
+          .map(({ value }) => value);
+
+  const handleColumnVisibilityChange = (selectedColumns: string[]) => {
+    const newVisibility: VisibilityState = {};
+    columnVisibilityOptions.forEach(({ value }) => {
+      newVisibility[value] = selectedColumns.includes(value);
+    });
+    setColumnVisibility(newVisibility);
+  };
 
   const table = useReactTable({
     data: applications,
@@ -131,12 +165,11 @@ export const JobApplicationsTable = ({
               </ActionIcon>
             ) : null
           }
-          style={{ minWidth: 300 }}
+          miw={300}
           disabled={loading}
         />
         <Group gap="xs">
           <Select
-            placeholder="Filter by status"
             data={STATUS_OPTIONS}
             value={currentStatusFilter ?? ""}
             onChange={(value) =>
@@ -144,9 +177,43 @@ export const JobApplicationsTable = ({
             }
             clearable
             leftSection={<IconFilter size={16} />}
-            style={{ minWidth: 150 }}
+            checkIconPosition="right"
             disabled={loading}
           />
+          <Popover width={220} position="bottom-end" withArrow shadow="md">
+            <Popover.Target>
+              <Button
+                variant="default"
+                leftSection={<IconColumns size={16} />}
+                disabled={loading}
+                size="sm"
+              >
+                Columns
+              </Button>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <Text size="sm" fw={600} mb="xs">
+                Show columns
+              </Text>
+              <Stack gap="xs">
+                {columnVisibilityOptions.map((option) => (
+                  <Checkbox
+                    key={option.value}
+                    label={option.label}
+                    checked={visibleColumns.includes(option.value)}
+                    onChange={(event) => {
+                      const checked = event.currentTarget.checked;
+                      const newColumns = checked
+                        ? [...visibleColumns, option.value]
+                        : visibleColumns.filter((col) => col !== option.value);
+                      handleColumnVisibilityChange(newColumns);
+                    }}
+                    size="sm"
+                  />
+                ))}
+              </Stack>
+            </Popover.Dropdown>
+          </Popover>
         </Group>
       </Group>
       <Paper radius="md" withBorder w="100%" pos="relative">
