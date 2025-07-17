@@ -1,7 +1,6 @@
 import { Divider, NavLink, Stack, Text } from "@mantine/core";
 import {
   IconFileCv,
-  IconDeviceDesktopAnalytics,
   IconTools,
   IconLayoutDashboard,
   IconSettings,
@@ -25,11 +24,6 @@ const mainNavItems: NavItem[] = [
   { label: "CV Builder", route: "/dashboard/cv/create", icon: IconFileCv },
   { label: "Templates", route: "/dashboard/templates", icon: IconTools },
   { label: "Jobs Tracker", route: "/dashboard/tracker", icon: IconMapRoute },
-  {
-    label: "Analytics",
-    route: "/dashboard/analytics",
-    icon: IconDeviceDesktopAnalytics,
-  },
 ];
 
 export const Sidebar = () => {
