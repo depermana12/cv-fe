@@ -12,7 +12,7 @@ import {
   Paper,
   Grid,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { DateTimePicker } from "@mantine/dates";
 import { notifications } from "@mantine/notifications";
 import { useForm } from "@tanstack/react-form";
 
@@ -26,6 +26,7 @@ import { jobTrackerCreateSchema } from "../schema/jobTracker";
 import { useCvsNonSuspense } from "../../../cv/hooks/useCvs";
 import useFieldError from "../../../cv/hooks/useFieldError";
 import { zFieldValidator } from "../../../cv/utils/zFieldValidator";
+import { IconClock } from "@tabler/icons-react";
 
 export const JobApplicationForm = (props: JobApplicationFormProps) => {
   const { onClose } = props;
@@ -200,6 +201,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                         "Freelance",
                         "Volunteer",
                       ].map((value) => ({ value, label: value }))}
+                      checkIconPosition="right"
                       required
                       disabled={isLoading}
                     />
@@ -226,6 +228,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                         "Staff",
                         "Other",
                       ].map((value) => ({ value, label: value }))}
+                      checkIconPosition="right"
                       required
                       disabled={isLoading}
                     />
@@ -268,6 +271,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                         value: v,
                         label: v,
                       }))}
+                      checkIconPosition="right"
                       disabled={isLoading}
                     />
                   )}
@@ -285,13 +289,21 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
               <Group grow>
                 <Field name="appliedAt">
                   {({ state, handleChange }) => (
-                    <DatePickerInput
+                    <DateTimePicker
                       label="Applied Date"
-                      valueFormat="D MMMM YYYY"
+                      valueFormat="DD MMM YYYY, HH:mm:ss"
                       locale="id"
                       value={state.value}
-                      onChange={(v) => handleChange(v || new Date())}
+                      onChange={(val) =>
+                        handleChange(val ? new Date(val) : new Date())
+                      }
                       maxDate={new Date()}
+                      timePickerProps={{
+                        leftSection: <IconClock size={16} />,
+                        withDropdown: true,
+                        format: "24h",
+                        withSeconds: true,
+                      }}
                       required
                       disabled={isLoading}
                     />
@@ -321,19 +333,30 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                         "ghosted",
                       ].map((v) => ({ value: v, label: v }))}
                       required
+                      checkIconPosition="right"
                       disabled={isLoading}
                     />
                   )}
                 </Field>
                 {isEdit && statusChangedAt && props.initialData && (
-                  <DatePickerInput
+                  <DateTimePicker
                     label="Status Updated At"
                     value={statusChangedAt}
-                    onChange={(value) => setStatusChangedAt(value ?? undefined)}
+                    valueFormat="DD MMM YYYY, HH:mm:ss"
+                    onChange={(value) =>
+                      setStatusChangedAt(value ? new Date(value) : undefined)
+                    }
                     minDate={new Date(props.initialData.appliedAt)}
                     maxDate={new Date()}
                     required
                     disabled={isLoading}
+                    timePickerProps={{
+                      leftSection: <IconClock size={16} />,
+                      withDropdown: true,
+                      format: "24h",
+                      withSeconds: true,
+                    }}
+                    withSeconds={true}
                   />
                 )}
               </Group>
@@ -394,6 +417,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                         onChange={(v) => handleChange(v ? parseInt(v) : null)}
                         data={cvOptions}
                         clearable
+                        checkIconPosition="right"
                         disabled={isLoading}
                         placeholder="Select your cv"
                       />

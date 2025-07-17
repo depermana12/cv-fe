@@ -13,13 +13,14 @@ import {
   Menu,
   Anchor,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { DateTimePicker } from "@mantine/dates";
 import {
   IconTrash,
   IconExternalLink,
   IconPencil,
   IconCalendar,
   IconDots,
+  IconClock,
 } from "@tabler/icons-react";
 import { JobTracker } from "../types/jobTracker.type";
 import { useUpdateJobApplication } from "../hooks/useUpdateJobApplication";
@@ -221,23 +222,32 @@ export const createColumns = ({
                   size="xs"
                   data={statusOptions}
                   value={localStatus}
-                  onChange={handleStatusSelect}
+                  onChange={(value) => handleStatusSelect(value)}
                   disabled={isPending}
                   allowDeselect={false}
                   mb="xs"
                 />
-                <DatePickerInput
+                <DateTimePicker
                   label="When?"
                   value={statusChangedAt}
                   leftSection={<IconCalendar size={16} />}
-                  onChange={(date) => {
-                    setStatusChangedAt(date);
-                  }}
-                  placeholder="Pick date"
+                  onChange={(value) => setStatusChangedAt(value as Date | null)}
+                  placeholder="Pick date & time"
                   minDate={new Date(application.appliedAt)}
                   maxDate={new Date()}
                   disabled={isPending || localStatus === status}
                   size="xs"
+                  timePickerProps={{
+                    leftSection: <IconClock size={16} />,
+                    withDropdown: true,
+                    format: "24h",
+                    withSeconds: true,
+                  }}
+                  valueFormat="DD MMM YYYY, HH:mm:ss"
+                  popoverProps={{
+                    position: "bottom-start",
+                    withinPortal: true,
+                  }}
                 />
                 <Group gap="md" mt="md" align="center">
                   <Button
