@@ -11,36 +11,28 @@ export const JobTrackerSkeleton = () => (
         <Skeleton height={34} width={140} radius="md" />
       </Group>
 
-      <Paper radius="md" withBorder w="100%">
-        {/* Search and Filters skeleton */}
-        <Group p="md" justify="space-between">
-          <Skeleton height={36} width={300} radius="md" />
+      {/* Search and Filters skeleton */}
+      <Group justify="space-between">
+        <Skeleton height={36} width={300} radius="md" />
+        <Group>
           <Skeleton height={36} width={150} radius="md" />
+          <Skeleton height={36} width={36} radius="md" />
+          <Skeleton height={36} width={36} radius="md" />
         </Group>
+      </Group>
 
-        {/* Table skeleton */}
+      {/* Table skeleton */}
+      <Paper radius="md" withBorder w="100%">
         <Stack gap="xs" p="md">
-          {/* Table header */}
-          <Group justify="space-between">
-            <Skeleton height={20} width={120} />
-            <Skeleton height={20} width={100} />
-            <Skeleton height={20} width={120} />
-            <Skeleton height={20} width={80} />
-            <Skeleton height={20} width={120} />
-            <Skeleton height={20} width={100} />
-            <Skeleton height={20} width={80} />
-          </Group>
-
           {/* Table rows */}
           {Array.from({ length: 5 }).map((_, index) => (
-            <Group key={index} justify="space-between">
-              <Skeleton height={40} width={120} />
-              <Skeleton height={40} width={100} />
-              <Skeleton height={40} width={120} />
-              <Skeleton height={40} width={80} />
-              <Skeleton height={40} width={120} />
-              <Skeleton height={40} width={100} />
-              <Skeleton height={40} width={80} />
+            <Group key={index} justify="space-between" grow>
+              <Skeleton height={40} />
+              <Skeleton height={40} />
+              <Skeleton height={40} />
+              <Skeleton height={40} />
+              <Skeleton height={40} />
+              <Skeleton height={40} />
             </Group>
           ))}
         </Stack>
@@ -48,8 +40,10 @@ export const JobTrackerSkeleton = () => (
         {/* Pagination skeleton */}
         <Group justify="space-between" p="md">
           <Skeleton height={20} width={150} />
-          <Skeleton height={20} width={100} />
-          <Skeleton height={32} width={200} />
+          <Group>
+            <Skeleton height={20} width={100} />
+            <Skeleton height={32} width={250} />
+          </Group>
         </Group>
       </Paper>
     </Stack>
