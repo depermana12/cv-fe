@@ -58,7 +58,6 @@ export const jobTrackerSchema = z.object({
 });
 
 export const jobTrackerImportSchema = jobTrackerSchema.omit({
-  id: true,
   userId: true,
   cvId: true,
 });
