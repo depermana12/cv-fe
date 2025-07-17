@@ -21,7 +21,7 @@ export function JobApplicationModal(props: JobApplicationFormProps) {
       opened={shouldOpen}
       onClose={onClose}
       title={title}
-      size="xl"
+      size="lg"
       closeOnClickOutside={!isLoading}
       closeOnEscape={!isLoading}
     >
@@ -33,7 +33,12 @@ export function JobApplicationModal(props: JobApplicationFormProps) {
           opened={opened}
         />
       ) : (
-        <JobApplicationForm mode="create" onClose={onClose} opened={opened} />
+        <JobApplicationForm
+          mode="create"
+          initialData={props.initialData}
+          onClose={onClose}
+          opened={opened}
+        />
       )}
     </Modal>
   );

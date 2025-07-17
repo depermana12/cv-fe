@@ -9,6 +9,7 @@ import {
   Card,
   Box,
   Grid,
+  LoadingOverlay,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { notifications } from "@mantine/notifications";
@@ -21,7 +22,7 @@ import {
   JobTrackerCreate,
 } from "../types/jobTracker.type";
 import { jobTrackerCreateSchema } from "../schema/jobTracker";
-import { useCvs } from "../../../cv/hooks/useCvs";
+import { useCvsNonSuspense } from "../../../cv/hooks/useCvs";
 import useFieldError from "../../../cv/hooks/useFieldError";
 import { zFieldValidator } from "../../../cv/utils/zFieldValidator";
 
@@ -41,8 +42,10 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
     useCreateJobApplication();
   const { mutate: updateApplication, isPending: isUpdating } =
     useUpdateJobApplication();
-  const { data: cvsResponse } = useCvs();
+  const { data: cvsResponse, isLoading: cvsLoading } = useCvsNonSuspense();
   const cvs = cvsResponse || [];
+
+  const isLoading = isCreating || isUpdating || cvsLoading;
 
   const defaultValues =
     isEdit && props.initialData
@@ -116,115 +119,28 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
     label: cv.title,
   }));
 
-  const isLoading = isCreating || isUpdating;
-
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSubmit();
-      }}
-    >
-      <Card padding="md" radius="md" withBorder>
-        <Stack gap="md">
-          <Field
-            name="companyName"
-            validators={{
-              onBlur: zFieldValidator(jobTrackerCreateSchema.shape.companyName),
-            }}
-          >
-            {({ state, handleChange, handleBlur }) => (
-              <TextInput
-                label="Company Name"
-                value={state.value}
-                onChange={(e) => handleChange(e.target.value)}
-                onBlur={handleBlur}
-                error={useFieldError(state.meta)}
-                required
-                disabled={isLoading}
-              />
-            )}
-          </Field>
-          <Field
-            name="jobTitle"
-            validators={{
-              onBlur: zFieldValidator(jobTrackerCreateSchema.shape.jobTitle),
-            }}
-          >
-            {({ state, handleChange, handleBlur }) => (
-              <TextInput
-                label="Job Title"
-                value={state.value}
-                onChange={(e) => handleChange(e.target.value)}
-                onBlur={handleBlur}
-                error={useFieldError(state.meta)}
-                required
-                disabled={isLoading}
-              />
-            )}
-          </Field>
-          <Group grow>
-            <Field name="jobType">
-              {({ state, handleChange }) => (
-                <Select
-                  label="Job Type"
-                  value={state.value}
-                  onChange={(v) =>
-                    handleChange(
-                      (v as JobTrackerCreate["jobType"]) || "Full-time",
-                    )
-                  }
-                  data={[
-                    "Full-time",
-                    "Part-time",
-                    "Contract",
-                    "Internship",
-                    "Freelance",
-                    "Volunteer",
-                  ].map((value) => ({ value, label: value }))}
-                  required
-                  disabled={isLoading}
-                />
-              )}
-            </Field>
-
-            <Field name="position">
-              {({ state, handleChange }) => (
-                <Select
-                  label="Position Level"
-                  value={state.value}
-                  onChange={(v) =>
-                    handleChange(
-                      (v as JobTrackerCreate["position"]) || "Mid-level",
-                    )
-                  }
-                  data={[
-                    "Manager",
-                    "Lead",
-                    "Senior",
-                    "Mid-level",
-                    "Junior",
-                    "Intern",
-                    "Entry-level",
-                    "Staff",
-                    "Other",
-                  ].map((value) => ({ value, label: value }))}
-                  required
-                  disabled={isLoading}
-                />
-              )}
-            </Field>
-          </Group>
-          <Group grow>
+    <Box style={{ position: "relative" }}>
+      <LoadingOverlay visible={isLoading} />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+      >
+        <Card padding="md" radius="md" withBorder>
+          <Stack gap="md">
             <Field
-              name="location"
+              name="companyName"
               validators={{
-                onBlur: zFieldValidator(jobTrackerCreateSchema.shape.location),
+                onBlur: zFieldValidator(
+                  jobTrackerCreateSchema.shape.companyName,
+                ),
               }}
             >
               {({ state, handleChange, handleBlur }) => (
                 <TextInput
-                  label="Company Location"
+                  label="Company Name"
                   value={state.value}
                   onChange={(e) => handleChange(e.target.value)}
                   onBlur={handleBlur}
@@ -234,167 +150,261 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
                 />
               )}
             </Field>
-            <Field name="locationType">
-              {({ state, handleChange }) => (
-                <Select
-                  label="Work Location Type"
+            <Field
+              name="jobTitle"
+              validators={{
+                onBlur: zFieldValidator(jobTrackerCreateSchema.shape.jobTitle),
+              }}
+            >
+              {({ state, handleChange, handleBlur }) => (
+                <TextInput
+                  label="Job Title"
                   value={state.value}
-                  onChange={(v) =>
-                    handleChange(
-                      (v as JobTrackerCreate["locationType"]) || "On-site",
-                    )
-                  }
-                  data={["Remote", "On-site", "Hybrid"].map((v) => ({
-                    value: v,
-                    label: v,
-                  }))}
+                  onChange={(e) => handleChange(e.target.value)}
+                  onBlur={handleBlur}
+                  error={useFieldError(state.meta)}
+                  required
                   disabled={isLoading}
                 />
               )}
             </Field>
-          </Group>
-          <Group grow>
-            <Field name="appliedAt">
-              {({ state, handleChange }) => (
+            <Group grow>
+              <Field name="jobType">
+                {({ state, handleChange }) => (
+                  <Select
+                    label="Job Type"
+                    value={state.value}
+                    onChange={(v) =>
+                      handleChange(
+                        (v as JobTrackerCreate["jobType"]) || "Full-time",
+                      )
+                    }
+                    data={[
+                      "Full-time",
+                      "Part-time",
+                      "Contract",
+                      "Internship",
+                      "Freelance",
+                      "Volunteer",
+                    ].map((value) => ({ value, label: value }))}
+                    required
+                    disabled={isLoading}
+                  />
+                )}
+              </Field>
+
+              <Field name="position">
+                {({ state, handleChange }) => (
+                  <Select
+                    label="Position Level"
+                    value={state.value}
+                    onChange={(v) =>
+                      handleChange(
+                        (v as JobTrackerCreate["position"]) || "Mid-level",
+                      )
+                    }
+                    data={[
+                      "Manager",
+                      "Lead",
+                      "Senior",
+                      "Mid-level",
+                      "Junior",
+                      "Intern",
+                      "Entry-level",
+                      "Staff",
+                      "Other",
+                    ].map((value) => ({ value, label: value }))}
+                    required
+                    disabled={isLoading}
+                  />
+                )}
+              </Field>
+            </Group>
+            <Group grow>
+              <Field
+                name="location"
+                validators={{
+                  onBlur: zFieldValidator(
+                    jobTrackerCreateSchema.shape.location,
+                  ),
+                }}
+              >
+                {({ state, handleChange, handleBlur }) => (
+                  <TextInput
+                    label="Company Location"
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={useFieldError(state.meta)}
+                    required
+                    disabled={isLoading}
+                  />
+                )}
+              </Field>
+              <Field name="locationType">
+                {({ state, handleChange }) => (
+                  <Select
+                    label="Work Location Type"
+                    value={state.value}
+                    onChange={(v) =>
+                      handleChange(
+                        (v as JobTrackerCreate["locationType"]) || "On-site",
+                      )
+                    }
+                    data={["Remote", "On-site", "Hybrid"].map((v) => ({
+                      value: v,
+                      label: v,
+                    }))}
+                    disabled={isLoading}
+                  />
+                )}
+              </Field>
+            </Group>
+            <Group grow>
+              <Field name="appliedAt">
+                {({ state, handleChange }) => (
+                  <DatePickerInput
+                    label="Applied Date"
+                    valueFormat="D MMMM YYYY"
+                    locale="id"
+                    value={state.value}
+                    onChange={(v) => handleChange(v || new Date())}
+                    maxDate={new Date()}
+                    required
+                    disabled={isLoading}
+                  />
+                )}
+              </Field>
+              <Field name="status">
+                {({ state, handleChange }) => (
+                  <Select
+                    label="Application Status"
+                    value={state.value}
+                    onChange={(v) => {
+                      handleChange(
+                        (v as JobTrackerCreate["status"]) || "applied",
+                      );
+                      if (isEdit && v && v !== lastStatus) {
+                        setStatusChangedAt(new Date());
+                      } else if (isEdit && v === lastStatus) {
+                        setStatusChangedAt(undefined);
+                      }
+                    }}
+                    data={[
+                      "applied",
+                      "interview",
+                      "offer",
+                      "rejected",
+                      "accepted",
+                      "ghosted",
+                    ].map((v) => ({ value: v, label: v }))}
+                    required
+                    disabled={isLoading}
+                  />
+                )}
+              </Field>
+              {isEdit && statusChangedAt && props.initialData && (
                 <DatePickerInput
-                  label="Applied Date"
-                  valueFormat="D MMMM YYYY"
-                  locale="id"
-                  value={state.value}
-                  onChange={(v) => handleChange(v || new Date())}
+                  label="Status Updated At"
+                  value={statusChangedAt}
+                  onChange={(value) => setStatusChangedAt(value ?? undefined)}
+                  minDate={new Date(props.initialData.appliedAt)}
                   maxDate={new Date()}
                   required
                   disabled={isLoading}
                 />
               )}
-            </Field>
-            <Field name="status">
-              {({ state, handleChange }) => (
-                <Select
-                  label="Application Status"
-                  value={state.value}
-                  onChange={(v) => {
-                    handleChange(
-                      (v as JobTrackerCreate["status"]) || "applied",
-                    );
-                    if (isEdit && v && v !== lastStatus) {
-                      setStatusChangedAt(new Date());
-                    } else if (isEdit && v === lastStatus) {
-                      setStatusChangedAt(undefined);
-                    }
-                  }}
-                  data={[
-                    "applied",
-                    "interview",
-                    "offer",
-                    "rejected",
-                    "accepted",
-                    "ghosted",
-                  ].map((v) => ({ value: v, label: v }))}
-                  required
-                  disabled={isLoading}
-                />
-              )}
-            </Field>
-            {isEdit && statusChangedAt && props.initialData && (
-              <DatePickerInput
-                label="Status Updated At"
-                value={statusChangedAt}
-                onChange={(value) => setStatusChangedAt(value ?? undefined)}
-                minDate={new Date(props.initialData.appliedAt)}
-                maxDate={new Date()}
-                required
-                disabled={isLoading}
-              />
-            )}
-          </Group>
-          <Group grow>
-            <Field
-              name="jobPortal"
-              validators={{
-                onBlur: zFieldValidator(jobTrackerCreateSchema.shape.jobPortal),
-              }}
-            >
-              {({ state, handleChange, handleBlur }) => (
-                <TextInput
-                  label="Job Portal"
-                  value={state.value}
-                  onChange={(e) => handleChange(e.target.value)}
-                  onBlur={handleBlur}
-                  error={useFieldError(state.meta)}
-                  required
-                  disabled={isLoading}
-                />
-              )}
-            </Field>
-            <Field name="jobUrl">
-              {({ state, handleChange, handleBlur }) => (
-                <TextInput
-                  label="Job URL"
-                  value={state.value || ""}
-                  onChange={(e) => handleChange(e.target.value)}
-                  onBlur={handleBlur}
-                  error={useFieldError(state.meta)}
-                  disabled={isLoading}
-                />
-              )}
-            </Field>
-          </Group>
-          <Grid>
-            <Grid.Col span={6}>
-              <Field name="cvId">
-                {({ state, handleChange }) => (
-                  <Select
-                    label="CV Used"
-                    value={state.value?.toString() || ""}
-                    onChange={(v) => handleChange(v ? parseInt(v) : null)}
-                    data={cvOptions}
-                    clearable
+            </Group>
+            <Group grow>
+              <Field
+                name="jobPortal"
+                validators={{
+                  onBlur: zFieldValidator(
+                    jobTrackerCreateSchema.shape.jobPortal,
+                  ),
+                }}
+              >
+                {({ state, handleChange, handleBlur }) => (
+                  <TextInput
+                    label="Job Portal"
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={useFieldError(state.meta)}
+                    required
                     disabled={isLoading}
                   />
                 )}
               </Field>
-            </Grid.Col>
-          </Grid>
-          <Field name="notes">
-            {({ state, handleChange, handleBlur }) => (
-              <Textarea
-                label="Notes"
-                value={state.value || ""}
-                onChange={(e) => handleChange(e.target.value)}
-                onBlur={handleBlur}
-                error={useFieldError(state.meta)}
-                rows={3}
-                disabled={isLoading}
-              />
-            )}
-          </Field>
-        </Stack>
-      </Card>
+              <Field name="jobUrl">
+                {({ state, handleChange, handleBlur }) => (
+                  <TextInput
+                    label="Job URL"
+                    value={state.value || ""}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={useFieldError(state.meta)}
+                    disabled={isLoading}
+                  />
+                )}
+              </Field>
+            </Group>
+            <Grid>
+              <Grid.Col span={6}>
+                <Field name="cvId">
+                  {({ state, handleChange }) => (
+                    <Select
+                      label="CV Used"
+                      value={state.value?.toString() || ""}
+                      onChange={(v) => handleChange(v ? parseInt(v) : null)}
+                      data={cvOptions}
+                      clearable
+                      disabled={isLoading}
+                    />
+                  )}
+                </Field>
+              </Grid.Col>
+            </Grid>
+            <Field name="notes">
+              {({ state, handleChange, handleBlur }) => (
+                <Textarea
+                  label="Notes"
+                  value={state.value || ""}
+                  onChange={(e) => handleChange(e.target.value)}
+                  onBlur={handleBlur}
+                  error={useFieldError(state.meta)}
+                  rows={3}
+                  disabled={isLoading}
+                />
+              )}
+            </Field>
+          </Stack>
+        </Card>
 
-      <Box
-        style={{
-          position: "sticky",
-          bottom: 0,
-          zIndex: 10,
-          backgroundColor: "white",
-          padding: "1rem",
-        }}
-      >
-        <Group justify="flex-end" mt="md">
-          <Button variant="default" onClick={onClose} disabled={isLoading}>
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="outline"
-            loading={isLoading}
-            disabled={isLoading}
-          >
-            {btnTitle}
-          </Button>
-        </Group>
-      </Box>
-    </form>
+        <Box
+          style={{
+            position: "sticky",
+            bottom: 0,
+            zIndex: 10,
+            backgroundColor: "white",
+            padding: "1rem",
+          }}
+        >
+          <Group justify="flex-end" mt="md">
+            <Button variant="default" onClick={onClose} disabled={isLoading}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="outline"
+              loading={isLoading}
+              disabled={isLoading}
+            >
+              {btnTitle}
+            </Button>
+          </Group>
+        </Box>
+      </form>
+    </Box>
   );
 };
