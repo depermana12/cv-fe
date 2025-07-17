@@ -9,6 +9,7 @@ import { JobApplicationsTable } from "../components/JobApplicationsTable";
 import { DeleteJobApplicationModal } from "../components/DeleteJobApplicationModal";
 import { JobApplicationModal } from "../components/JobApplicationModal";
 import { JobTrackerSkeleton } from "../components/JobTrackerSkeleton";
+import { JobsTrackerError } from "../components/JobTrackerError";
 
 export const JobsTrackerPage = () => {
   const [createModalOpened, { open: openCreate, close: closeCreate }] =
@@ -35,6 +36,8 @@ export const JobsTrackerPage = () => {
     data: res,
     isLoading,
     isFetching,
+    error,
+    refetch,
   } = useJobApplications({
     limit: pageSize,
     offset: (page - 1) * pageSize,
@@ -76,6 +79,10 @@ export const JobsTrackerPage = () => {
 
   if (isLoading) {
     return <JobTrackerSkeleton />;
+  }
+
+  if (error) {
+    return <JobsTrackerError error={error} onRetry={refetch} />;
   }
 
   return (
