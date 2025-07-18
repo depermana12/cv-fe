@@ -41,6 +41,7 @@ export const userInsertSchema = userSchema.omit({
 
 export const userUpdateSchema = userSchema
   .pick({
+    profileImage: true,
     birthDate: true,
     firstName: true,
     lastName: true,
