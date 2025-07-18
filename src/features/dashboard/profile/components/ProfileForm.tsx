@@ -33,7 +33,6 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
       gender: user?.gender || null,
     },
     onSubmit: async ({ value }) => {
-      if (!state.isDirty) return;
       updateProfile(value, {
         onSuccess: () => {
           setIsEditing(false);
@@ -161,7 +160,7 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                   variant="outline"
                   type="submit"
                   loading={state.isSubmitting || isPending}
-                  disabled={!state.isDirty}
+                  disabled={state.isSubmitting || isPending}
                 >
                   Save Changes
                 </Button>
