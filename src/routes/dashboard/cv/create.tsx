@@ -3,4 +3,7 @@ import { CVBuilderPage } from "../../../features/dashboard/pages/CVBuilderPage";
 
 export const Route = createFileRoute("/dashboard/cv/create")({
   component: CVBuilderPage,
+  staticData: {
+    breadcrumb: "create",
+  },
 });
