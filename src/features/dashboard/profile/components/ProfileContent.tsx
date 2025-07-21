@@ -1,5 +1,5 @@
 import { Stack, Group, Title, Text, Grid, Tabs } from "@mantine/core";
-import { useUser } from "../../../user/hooks/useUser";
+import { useUser } from "@features/user/hooks/useUser";
 import { ProfilePicture } from "./ProfilePicture";
 import { ProfileForm } from "./ProfileForm";
 import { AccountInformation } from "./AccountInformation";

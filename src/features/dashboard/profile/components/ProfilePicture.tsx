@@ -13,8 +13,8 @@ import {
 } from "@mantine/core";
 import { IconCamera, IconUpload } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
-import { useUpdateProfile } from "../../../user/hooks/useUpdateProfile";
-import { useUploadPP } from "../../../user/hooks/useUploadPP";
+import { useUpdateProfile } from "@features/user/hooks/useUpdateProfile";
+import { useUploadPP } from "@features/user/hooks/useUploadPP";
 import { ProfilePictureProps } from "../types/profile.type";
 
 export const ProfilePicture = ({ user }: ProfilePictureProps) => {

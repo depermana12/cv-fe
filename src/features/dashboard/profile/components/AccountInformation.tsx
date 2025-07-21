@@ -10,7 +10,7 @@ import {
   Anchor,
 } from "@mantine/core";
 import { useInterval, useTimeout } from "@mantine/hooks";
-import { useSendEmailVerification } from "../../../user/hooks/useSendEmailVerification";
+import { useSendEmailVerification } from "@features/user/hooks/useSendEmailVerification";
 import { AccountInformationProps } from "../types/profile.type";
 
 export const AccountInformation = ({ user }: AccountInformationProps) => {

@@ -21,8 +21,8 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
-import { useUser } from "../../../user/hooks/useUser";
-import { useSendEmailVerification } from "../../../user/hooks/useSendEmailVerification";
+import { useUser } from "@features/user/hooks/useUser";
+import { useSendEmailVerification } from "@features/user/hooks/useSendEmailVerification";
 
 const AccountContent = () => {
   const { data: user } = useUser();
@@ -48,8 +48,7 @@ const AccountContent = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [newUsername, setNewUsername] = useState("");
 
-  const { mutate: sendVerificationEmail, isPending: isSendingEmail } =
-    useSendEmailVerification();
+  const { mutate: sendVerificationEmail } = useSendEmailVerification();
 
   return (
     <Stack gap="lg">

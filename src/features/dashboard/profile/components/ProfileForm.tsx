@@ -11,10 +11,10 @@ import {
 } from "@mantine/core";
 import { useForm } from "@tanstack/react-form";
 import { DatePickerInput } from "@mantine/dates";
-import { useUpdateProfile } from "../../../user/hooks/useUpdateProfile";
-import useFieldError from "../../../cv/hooks/useFieldError";
-import { zFieldValidator } from "../../../cv/utils/zFieldValidator";
-import { userUpdateSchema } from "../../../user/schema/user";
+import { useUpdateProfile } from "@features/user/hooks/useUpdateProfile";
+import useFieldError from "@shared/hooks/useFieldError";
+import { zFieldValidator } from "@shared/utils/zFieldValidator";
+import { userUpdateSchema } from "@features/user/schema/user";
 import { ProfileFormProps } from "../types/profile.type";
 
 export const ProfileForm = ({ user }: ProfileFormProps) => {
