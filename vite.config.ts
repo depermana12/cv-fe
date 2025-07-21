@@ -17,12 +17,14 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@src": path.resolve(__dirname, "./src"),
-      "@components": path.resolve(__dirname, "./src/components"),
-      "@lib": path.resolve(__dirname, "./src/lib"),
+      "@": path.resolve(__dirname, "./src"),
+      "@shared": path.resolve(__dirname, "./src/shared"),
       "@features": path.resolve(__dirname, "./src/features"),
-      "@routes": path.resolve(__dirname, "./src/routes"),
+      "@layouts": path.resolve(__dirname, "./src/layouts"),
+      "@app": path.resolve(__dirname, "./src/app"),
       "@assets": path.resolve(__dirname, "./src/assets"),
+      "@styles": path.resolve(__dirname, "./src/styles"),
+      "@pages": path.resolve(__dirname, "./src/pages"),
     },
   },
 });
