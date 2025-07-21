@@ -1,9 +1,9 @@
-import { queryClient } from "../../../lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
-import { cvApi } from "../services/CvApi";
-import type { CvCreate } from "../types/types";
+import { queryClient } from "@shared/lib/queryClient";
 import { notifications } from "@mantine/notifications";
+import { cvApi } from "../services/CvApi";
 import { useCvStore } from "../store/cvStore";
+import type { CvCreate } from "../types/types";
 
 export const useCreateCv = () => {
   const { setActiveCvId } = useCvStore();
@@ -11,7 +11,7 @@ export const useCreateCv = () => {
   return useMutation({
     mutationFn: async (data: CvCreate) => {
       const res = await cvApi.post(data);
-      return res.data.data;
+      return res.data;
     },
     onSuccess: (newCv) => {
       queryClient.invalidateQueries({ queryKey: ["cvs"] });

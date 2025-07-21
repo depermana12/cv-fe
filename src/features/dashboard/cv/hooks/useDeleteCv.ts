@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "../../../lib/queryClient";
+import { queryClient } from "@shared/lib/queryClient";
 import { cvApi } from "../services/CvApi";
 import { notifications } from "@mantine/notifications";
 

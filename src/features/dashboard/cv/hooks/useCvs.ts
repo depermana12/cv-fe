@@ -7,4 +7,4 @@ export const useCvs = () => useSuspenseQuery(cvsQuery());
 export const useCvsNonSuspense = () => useQuery(cvsQuery());
 
 export const useCvsPaginated = (options?: CvQueryOptions) =>
-  useSuspenseQuery(cvsPaginatedQuery(options));
+  useQuery(cvsPaginatedQuery(options));
