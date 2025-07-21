@@ -182,7 +182,25 @@ export const JobApplicationsTable = ({
             type="range"
             placeholder="Pick dates range"
             value={dateRange}
-            onChange={(value) => onDateRangeChange?.(value)}
+            onChange={(value) => {
+              if (!value) {
+                onDateRangeChange?.([null, null]);
+                return;
+              }
+
+              if (Array.isArray(value) && value.length === 2) {
+                const [startStrDate, endStrDate] = value;
+
+                if (!startStrDate && !endStrDate) {
+                  onDateRangeChange?.([null, null]);
+                } else if (startStrDate && endStrDate) {
+                  onDateRangeChange?.([
+                    new Date(startStrDate),
+                    new Date(endStrDate),
+                  ]);
+                }
+              }
+            }}
             leftSection={<IconCalendar size={16} />}
             clearable
             disabled={loading}

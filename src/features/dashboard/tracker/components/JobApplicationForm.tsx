@@ -23,10 +23,11 @@ import {
   JobTrackerCreate,
 } from "../types/jobTracker.type";
 import { jobTrackerCreateSchema } from "../schema/jobTracker";
-import { useCvsNonSuspense } from "../../../cv/hooks/useCvs";
-import useFieldError from "../../../cv/hooks/useFieldError";
-import { zFieldValidator } from "../../../cv/utils/zFieldValidator";
+import { useCvsNonSuspense } from "@features/cv/hooks/useCvs";
+import useFieldError from "@shared/hooks/useFieldError";
+import { zFieldValidator } from "@shared/utils/zFieldValidator";
 import { IconClock } from "@tabler/icons-react";
+import { Cv } from "../../cv/types/types";
 
 export const JobApplicationForm = (props: JobApplicationFormProps) => {
   const { onClose } = props;
@@ -116,7 +117,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
     },
   });
 
-  const cvOptions = cvs.map((cv) => ({
+  const cvOptions = cvs.map((cv: Cv) => ({
     value: cv.id.toString(),
     label: cv.title,
   }));

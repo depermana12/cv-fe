@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { JobTrackerUpdate } from "../types/jobTracker.type";
 import { jobTrackerService } from "../services/jobTrackerService";
-import { queryClient } from "../../../../lib/queryClient";
+import { queryClient } from "@shared/lib/queryClient";
 import { notifications } from "@mantine/notifications";
 
 export const useUpdateJobApplication = () => {
@@ -13,7 +13,7 @@ export const useUpdateJobApplication = () => {
       const { applicationId, data } = payload;
 
       const res = await jobTrackerService.patch(applicationId, data);
-      return res.data.data;
+      return res.data;
     },
     onSuccess: (_updatedJobApp, payload) => {
       const { applicationId } = payload;

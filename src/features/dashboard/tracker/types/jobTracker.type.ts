@@ -1,7 +1,6 @@
 import { z } from "zod";
 import {
   jobTrackerCreateSchema,
-  jobTrackerImportSchema,
   jobTrackerQueryOptionsSchema,
   jobTrackerSchema,
   jobTrackerStatusSchema,
@@ -9,7 +8,6 @@ import {
 } from "../schema/jobTracker";
 
 export type JobTracker = z.infer<typeof jobTrackerSchema>;
-export type JobTrackerImport = z.infer<typeof jobTrackerImportSchema>;
 export type JobTrackerCreate = z.infer<typeof jobTrackerCreateSchema>;
 export type JobTrackerUpdate = Partial<
   z.infer<typeof jobTrackerUpdateSchema>
@@ -21,12 +19,6 @@ export type JobTrackerQueryOptions = z.infer<
 >;
 
 export type JobTrackerStatus = z.infer<typeof jobTrackerStatusSchema>;
-
-export type JobApplicationResponse = {
-  success: boolean;
-  message: string;
-  data: JobTracker;
-};
 
 export type JobApplicationStatusResponse = {
   success: boolean;

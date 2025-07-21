@@ -1,11 +1,7 @@
 import { z } from "zod";
 
-const idSchema = z.number().int().positive();
-
-export const jobTrackerSchema = z.object({
-  id: idSchema,
-  userId: idSchema,
-  cvId: idSchema.nullable(),
+export const jobTrackerCreateSchema = z.object({
+  cvId: z.number().int().positive().nullable(),
   jobPortal: z
     .string()
     .max(100, { message: "Job portal must be 100 characters or less" }),
@@ -40,7 +36,6 @@ export const jobTrackerSchema = z.object({
     "Staff",
     "Other",
   ]),
-
   location: z.string().max(255, {
     message: "Location must be 255 characters or less",
   }),
@@ -53,18 +48,20 @@ export const jobTrackerSchema = z.object({
     .default("applied"),
   notes: z.string().nullable(),
   appliedAt: z.coerce.date(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
 });
 
-export const jobTrackerImportSchema = jobTrackerSchema.omit({
-  userId: true,
-  cvId: true,
+export const jobTrackerUpdateSchema = jobTrackerCreateSchema.partial();
+
+export const jobTrackerSchema = jobTrackerCreateSchema.extend({
+  id: z.number().int().positive(),
+  userId: z.number().int().positive(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 });
 
 export const jobTrackerStatusSchema = z.object({
-  id: idSchema,
-  applicationId: idSchema,
+  id: z.number().int().positive(),
+  applicationId: z.number().int().positive(),
   status: z
     .enum(
       ["applied", "interview", "offer", "rejected", "accepted", "ghosted"],
@@ -74,23 +71,9 @@ export const jobTrackerStatusSchema = z.object({
   changedAt: z.coerce.date(),
 });
 
-export const jobTrackerStatusCreateSchema = jobTrackerStatusSchema.omit({
-  id: true,
-  applicationId: true,
-});
-
-export const jobTrackerStatusUpdateSchema = jobTrackerStatusCreateSchema
+export const jobTrackerStatusUpdateSchema = jobTrackerStatusSchema
   .partial()
   .extend({ statusChangedAt: z.coerce.date().optional() });
-
-export const jobTrackerCreateSchema = jobTrackerSchema.omit({
-  id: true,
-  userId: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const jobTrackerUpdateSchema = jobTrackerCreateSchema.partial();
 
 export const jobTrackerQueryOptionsSchema = z.object({
   search: z.string().optional(),

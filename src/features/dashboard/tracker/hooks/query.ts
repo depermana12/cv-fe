@@ -8,10 +8,10 @@ export const jobApplicationsQuery = (options?: JobTrackerQueryOptions) => {
     queryFn: async () => {
       const res = await jobTrackerService.getAllwithPagination(options);
       return {
-        data: res.data.data,
-        total: res.data.pagination.total,
-        limit: res.data.pagination.limit,
-        offset: res.data.pagination.offset,
+        data: res.data,
+        total: res.pagination.total,
+        limit: res.pagination.limit,
+        offset: res.pagination.offset,
       };
     },
     staleTime: Infinity,
@@ -34,7 +34,7 @@ export const jobApplicationStatusQuery = (applicationId: number) =>
     queryKey: ["status-timeline", applicationId],
     queryFn: async () => {
       const res = await jobTrackerService.getStatusTimeline(applicationId);
-      return res.data.data;
+      return res.data;
     },
     enabled: !!applicationId,
     staleTime: Infinity,

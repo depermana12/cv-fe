@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { jobTrackerService } from "../services/jobTrackerService";
-import { queryClient } from "../../../../lib/queryClient";
+import { queryClient } from "@shared/lib/queryClient";
 import { notifications } from "@mantine/notifications";
 
 export const useDeleteJobApplication = () => {

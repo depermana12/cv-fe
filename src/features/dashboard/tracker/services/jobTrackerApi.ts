@@ -1,5 +1,4 @@
-import { AxiosResponse } from "axios";
-import { axiosClient } from "../../../../lib/axiosClient";
+import { axiosClient } from "@shared/lib/axiosClient";
 import {
   JobApplicationsResponse,
   JobApplicationStatusResponse,
@@ -7,26 +6,36 @@ import {
   JobTrackerCreate,
   JobTrackerQueryOptions,
 } from "../types/jobTracker.type";
-import { ResourceApi } from "../../../../api/ResourceApi";
+import { ResourceApi } from "@shared/api/ResourceApi";
 
-export class jobTrackerApi extends ResourceApi<JobTracker, JobTrackerCreate> {
+export interface IjobTrackerApi {
+  getAllwithPagination(
+    options?: JobTrackerQueryOptions,
+  ): Promise<JobApplicationsResponse>;
+  getStatusTimeline(
+    applicationId: number,
+  ): Promise<JobApplicationStatusResponse>;
+}
+
+export class jobTrackerApi
+  extends ResourceApi<JobTracker, JobTrackerCreate>
+  implements IjobTrackerApi
+{
   constructor() {
     super("/applications-tracking");
   }
-  async getAllwithPagination(
-    options?: JobTrackerQueryOptions,
-  ): Promise<AxiosResponse<JobApplicationsResponse>> {
-    // For now, just fetch all data - TanStack Table handles client-side pagination/filtering
-    // TODO: Add server-side pagination when backend is fixed
-    // backend is fixed brow
+
+  async getAllwithPagination(options?: JobTrackerQueryOptions) {
     const url = `${this.resource}`;
-    return axiosClient.get<JobApplicationsResponse>(url, {
+    const res = await axiosClient.get<JobApplicationsResponse>(url, {
       params: options,
     });
+    return res.data;
   }
 
   async getStatusTimeline(applicationId: number) {
     const url = `${this.resource}/${applicationId}/statuses`;
-    return axiosClient.get<JobApplicationStatusResponse>(url);
+    const res = await axiosClient.get<JobApplicationStatusResponse>(url);
+    return res.data;
   }
 }
