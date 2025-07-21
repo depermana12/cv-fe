@@ -1,9 +1,6 @@
 import { Box, Divider } from "@mantine/core";
-import { FeaturesCards } from "./components/FeatureCards";
-import { HeroBullets } from "./components/HeroBullets";
-import { FAQ } from "./components/FAQ";
-import { Footer } from "../../components/layout/Footer";
-import { CTA } from "./components/CTA";
+import { FeaturesCards, HeroBullets, FAQ, CTA } from "../components";
+import { Footer } from "@shared/components/layout/Footer";
 
 const HomePage = () => {
   const deviderProps = {
