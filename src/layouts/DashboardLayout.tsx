@@ -14,10 +14,10 @@ import { useDisclosure, useLocalStorage, useMediaQuery } from "@mantine/hooks";
 import { Outlet, Link, useMatches } from "@tanstack/react-router";
 import { IconFile } from "@tabler/icons-react";
 
-import { Sidebar } from "../features/dashboard/components/Sidebar";
-import DashboardHeaderNav from "../features/dashboard/components/DashboardHeaderNav";
-import { useBreadcrumbItems } from "../hooks/useBreadcrumbItems";
-import { HeaderSection } from "../features/dashboard/components/HeaderSection";
+import { Sidebar } from "@features/dashboard/components/Sidebar";
+import DashboardHeaderNav from "@features/dashboard/components/DashboardHeaderNav";
+import { useBreadcrumbItems } from "@shared/hooks/useBreadcrumbItems";
+import { HeaderSection } from "@features/dashboard/components/HeaderSection";
 
 export type SidebarState = "collapsed" | "expanded";
 

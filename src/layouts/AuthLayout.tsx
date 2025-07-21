@@ -1,8 +1,8 @@
 import { Box, useMantineColorScheme, useMantineTheme } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
 
-import { Header } from "../components/layout/Header";
-import { Footer } from "../components/layout/Footer";
+import { Header } from "@shared/components/layout/Header";
+import { Footer } from "@shared/components/layout/Footer";
 
 export const AuthLayout = () => {
   const theme = useMantineTheme();

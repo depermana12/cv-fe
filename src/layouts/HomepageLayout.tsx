@@ -1,7 +1,7 @@
 import { ReactNode } from "@tanstack/react-router";
 import { Box, useMantineColorScheme, useMantineTheme } from "@mantine/core";
 
-import { Header } from "../components/layout/Header";
+import { Header } from "@shared/components/layout/Header";
 
 const LandingLayout = ({ children }: { children: ReactNode }) => {
   const theme = useMantineTheme();
@@ -10,7 +10,9 @@ const LandingLayout = ({ children }: { children: ReactNode }) => {
   return (
     <Box
       bg={colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[0]}
-      className="min-h-screen min-w-dvw flex flex-col"
+      mih="100vh"
+      miw="100vw"
+      style={{ display: "flex", flexDirection: "column" }}
     >
       <Header />
       <Box component="main">{children}</Box>
