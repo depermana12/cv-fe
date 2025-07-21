@@ -1,7 +1,7 @@
-import type { ApiResponse } from "../features/types/types";
 import { AxiosResponse } from "axios";
 import { axiosClient } from "../lib/axiosClient";
 import { bucketAxiosClient } from "../lib/bucketAxiosClient";
+import { ApiResponse } from "../types/type";
 
 type ImageMeta = {
   key: string;

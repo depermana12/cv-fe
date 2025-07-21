@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useAuthStore } from "../features/auth/store/authStore";
+import { useAuthStore } from "../../app/store/authStore";
 
 export const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -33,9 +33,11 @@ axiosClient.interceptors.response.use(
         );
 
         const accessToken = refreshResponse.data.data;
-        useAuthStore.setState((state) => ({
-          user: state.user ? { ...state.user, token: accessToken } : null,
-        }));
+        useAuthStore.setState(
+          (state: ReturnType<typeof useAuthStore.getState>) => ({
+            user: state.user ? { ...state.user, token: accessToken } : null,
+          }),
+        );
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return axiosClient(originalRequest);
       } catch {
