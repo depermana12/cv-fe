@@ -1,6 +1,13 @@
-import { createTheme } from "@mantine/core";
+import { Button, createTheme } from "@mantine/core";
 
 export const myTheme = createTheme({
+  components: {
+    Button: Button.extend({
+      defaultProps: {
+        variant: "outline",
+      },
+    }),
+  },
   colors: {
     blue: [
       "#e6f4ff",
