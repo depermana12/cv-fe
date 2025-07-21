@@ -4,20 +4,19 @@ import { createRoot } from "react-dom/client";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/notifications/styles.css";
-import "./index.css";
 
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./lib/queryClient";
+import { queryClient } from "./shared/lib/queryClient";
 
 import { MantineProvider } from "@mantine/core";
 import { emotionTransform, MantineEmotionProvider } from "@mantine/emotion";
 import { Notifications } from "@mantine/notifications";
 
 import { useAuthStore } from "./features/auth/store/authStore";
-import { myTheme } from "./themes/blao";
+import { myTheme } from "./styles/themes/blao";
 
 declare module "@tanstack/react-router" {
   interface Register {

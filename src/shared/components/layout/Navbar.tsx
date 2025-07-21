@@ -1,4 +1,4 @@
-import { Title, ActionIcon } from "@mantine/core";
+import { Title, ActionIcon, Box } from "@mantine/core";
 import { useMantineColorScheme } from "@mantine/core";
 import { IconSun, IconMoonStars } from "@tabler/icons-react";
 
@@ -6,7 +6,19 @@ export const Navbar = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   return (
-    <header className="h-16 w-full px-6 flex items-center justify-between border-b bg-white dark:bg-dark-700 dark:border-dark-400">
+    <Box
+      component="header"
+      h={64}
+      w="100%"
+      px="md"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        borderBottom: "1px solid var(--mantine-color-default-border)",
+      }}
+      bg="var(--mantine-color-body)"
+    >
       <Title order={3}>Kodedroid CV</Title>
       <ActionIcon
         variant="default"
@@ -19,6 +31,6 @@ export const Navbar = () => {
           <IconMoonStars size="1.1rem" />
         )}
       </ActionIcon>
-    </header>
+    </Box>
   );
 };
