@@ -16,9 +16,9 @@ import { IconFileCv, IconPlus, IconSearch } from "@tabler/icons-react";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import { useState, useEffect } from "react";
 import { CvGridCard } from "./CvGridCard";
-import { Cv, CvQueryOptions } from "../../../cv/types/types";
-import { useCvsPaginated } from "../../../cv/hooks/useCvs";
-import { CvForm } from "../../../cv/components/CvForm";
+import { Cv, CvQueryOptions } from "@features/dashboard/cv/types/types";
+import { useCvsPaginated } from "@features/dashboard/cv/hooks/useCvs";
+import { CvForm } from "@features/dashboard/cv/components/CvForm";
 
 type SortField = "title" | "createdAt" | "updatedAt";
 type SortOrder = "asc" | "desc";

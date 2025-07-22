@@ -10,10 +10,10 @@ import {
   Card,
 } from "@mantine/core";
 import { useForm } from "@tanstack/react-form";
-import { useUpdateCv } from "../../../cv/hooks/useUpdateCv";
+import { useUpdateCv } from "@features/dashboard/cv/hooks/useUpdateCv";
 import { useQuery } from "@tanstack/react-query";
-import { cvQuery } from "../../../cv/hooks/query";
-import useFieldError from "../../../cv/hooks/useFieldError";
+import { cvQuery } from "@features/dashboard/cv/hooks/query";
+import useFieldError from "@features/dashboard/cv/hooks/useFieldError";
 
 interface CvQuickEditModalProps {
   opened: boolean;

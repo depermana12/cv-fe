@@ -1,34 +1,21 @@
 import { z } from "zod";
 
 export const cvSchema = z.object({
-  id: z
-    .number()
-    .int({ message: "Invalid ID" })
-    .positive({ message: "ID must be positive" }),
-  userId: z
-    .number()
-    .int({ message: "Invalid user ID" })
-    .positive({ message: "User ID must be positive" }),
+  id: z.number().int().positive(),
+  userId: z.number().int().positive(),
   title: z
-    .string()
+    .string({ required_error: "Title is required" })
     .min(1, { message: "Title required" })
     .max(255, { message: "Max 255 characters" }),
   description: z
-    .string()
-    .max(1000, { message: "Max 1000 characters" })
-    .nullable()
-    .default(null),
+    .string({ required_error: "Description is required" })
+    .max(1000, { message: "Max 1000 characters" }),
   theme: z
     .string()
     .max(100, { message: "Max 100 characters" })
-    .nullable()
-    .default(null),
+    .default("default"),
   isPublic: z.boolean().default(false),
-  slug: z
-    .string()
-    .max(255, { message: "Max 255 characters" })
-    .nullable()
-    .default(null),
+  slug: z.string().max(255, { message: "Max 255 characters" }).optional(),
   views: z.number().int().nonnegative().default(0),
   downloads: z.number().int().nonnegative().default(0),
   language: z.string().length(2).default("id"),
@@ -45,12 +32,7 @@ export const cvCreateSchema = cvSchema.omit({
   updatedAt: true,
 });
 
-export const cvUpdateSchema = cvCreateSchema.partial().extend({
-  id: z
-    .number()
-    .int({ message: "Invalid ID" })
-    .positive({ message: "ID must be positive" }),
-});
+export const cvUpdateSchema = cvCreateSchema.partial();
 
 export const cvQueryOptionsSchema = z.object({
   search: z.string().optional(),

@@ -29,7 +29,7 @@ export const cvsPaginatedQuery = (options?: CvQueryOptions) =>
     queryFn: async () => {
       const response = await cvApi.getAllWithPagination(options);
       return {
-        cvs: response.data,
+        data: response.data,
         total: response.pagination.total,
         limit: response.pagination.limit,
         offset: response.pagination.offset,

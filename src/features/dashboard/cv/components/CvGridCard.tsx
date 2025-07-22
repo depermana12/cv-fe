@@ -15,18 +15,16 @@ import {
   IconDots,
   IconEdit,
   IconPencil,
-  IconList,
   IconLock,
   IconWorld,
   IconTrash,
 } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
-import { Cv } from "../../../cv/types/types";
-import { useUpdateCv } from "../../../cv/hooks/useUpdateCv";
-import { useDeleteCv } from "../../../cv/hooks/useDeleteCv";
+import { Cv } from "@features/dashboard/cv/types/types";
+import { useUpdateCv } from "@features/dashboard/cv/hooks/useUpdateCv";
+import { useDeleteCv } from "@features/dashboard/cv/hooks/useDeleteCv";
 import { CvQuickEditModal } from "./CvQuickEditModal";
-import { CvFullEditModal } from "./CvFullEditModal";
 
 export const CvGridCard = ({
   cv,
@@ -40,7 +38,6 @@ export const CvGridCard = ({
     { open: openDeleteModal, close: closeDeleteModal },
   ] = useDisclosure(false);
   const [quickEditModalOpened, setQuickEditModalOpened] = useState(false);
-  const [fullEditModalOpened, setFullEditModalOpened] = useState(false);
   const updateCv = useUpdateCv();
   const deleteCv = useDeleteCv();
 
@@ -92,12 +89,6 @@ export const CvGridCard = ({
                   onClick={() => setQuickEditModalOpened(true)}
                 >
                   Quick Edit
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={<IconList size={14} />}
-                  onClick={() => setFullEditModalOpened(true)}
-                >
-                  View All Details
                 </Menu.Item>
                 <Menu.Divider />
                 <Menu.Item
@@ -168,11 +159,6 @@ export const CvGridCard = ({
       <CvQuickEditModal
         opened={quickEditModalOpened}
         onClose={() => setQuickEditModalOpened(false)}
-        cvId={cv.id}
-      />
-      <CvFullEditModal
-        opened={fullEditModalOpened}
-        onClose={() => setFullEditModalOpened(false)}
         cvId={cv.id}
       />
     </>

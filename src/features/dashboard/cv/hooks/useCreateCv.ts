@@ -17,15 +17,6 @@ export const useCreateCv = () => {
       queryClient.invalidateQueries({ queryKey: ["cvs"] });
       queryClient.invalidateQueries({ queryKey: ["cvs-paginated"] });
       setActiveCvId(newCv.id);
-
-      notifications.show({
-        position: "top-center",
-        withCloseButton: true,
-        autoClose: 3000,
-        title: "CV created",
-        message: `Your CV "${newCv.title}" has been created successfully.`,
-        color: "green",
-      });
     },
     onError: (err) => {
       notifications.show({

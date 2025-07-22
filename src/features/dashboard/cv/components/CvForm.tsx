@@ -19,10 +19,23 @@ import { useForm } from "@tanstack/react-form";
 import { notifications } from "@mantine/notifications";
 import { cvCreateSchema } from "../schema/cv.schema";
 import { useCreateCv } from "../hooks/useCreateCv";
-import useFieldError from "../hooks/useFieldError";
-import { zFieldValidator } from "../utils/zFieldValidator";
+import useFieldError from "@shared/hooks/useFieldError";
+import { zFieldValidator } from "@shared/utils/zFieldValidator";
 import type { CvCreate, CvFormProps } from "../types/types";
-import { CV_THEMES, LANGUAGES } from "../constant/cvForm";
+
+export const CV_THEMES = [
+  {
+    value: "modern",
+    label: "Modern",
+    description: "Clean and contemporary design",
+  },
+  { value: "minimal", label: "Minimal", description: "Simple and elegant" },
+];
+
+export const LANGUAGES = [
+  { value: "en", label: "English" },
+  { value: "id", label: "Indonesian" },
+];
 
 export const CvForm = ({
   opened,
@@ -39,24 +52,19 @@ export const CvForm = ({
     theme: initialData?.theme || "modern",
     isPublic: initialData?.isPublic || false,
     slug: initialData?.slug || "",
-    language: initialData?.language || "en",
+    language: initialData?.language || "id",
   };
 
   const { Field, handleSubmit, state, setFieldValue } = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      try {
-        // TODO: rn notification in mutation, use this one
-        await createCv.mutateAsync(value);
-        onClose();
-        notifications.show({
-          title: "Success!",
-          message: `CV "${value.title}" has been ${mode === "create" ? "created" : "updated"} successfully.`,
-          color: "green",
-        });
-      } catch (error) {
-        console.error("Failed to submit CV form:", error);
-      }
+      await createCv.mutateAsync(value);
+      onClose();
+      notifications.show({
+        title: "Success!",
+        message: `CV "${value.title}" has been ${mode === "create" ? "created" : "updated"} successfully.`,
+        color: "green",
+      });
     },
   });
 
@@ -64,7 +72,6 @@ export const CvForm = ({
     onClose();
   };
 
-  // TODO: add uniqueness
   const generateSlug = (title: string) => {
     if (title) {
       return title
