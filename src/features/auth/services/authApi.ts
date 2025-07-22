@@ -4,68 +4,56 @@ import {
   ForgetPassword,
   SignIn,
   SignUp,
-} from "../types/auth.schema";
-import { AuthApiResponse } from "../types/types";
-import { AxiosResponse } from "axios";
+} from "../schema/auth.schema";
+import { ApiResponse } from "@shared/types/type";
 
 export class AuthApi {
   private base = "/auth";
 
-  async signUp<T>(
-    inputData: SignUp,
-  ): Promise<AxiosResponse<AuthApiResponse<T>>> {
-    return axiosClient.post<AuthApiResponse<T>>(
-      `${this.base}/signup`,
-      inputData,
-    );
+  async signUp<T>(data: SignUp): Promise<ApiResponse<T>> {
+    return axiosClient.post<ApiResponse<T>>(`${this.base}/signup`, data);
   }
 
-  async signIn<T>(
-    inputData: SignIn,
-  ): Promise<AxiosResponse<AuthApiResponse<T>>> {
-    return axiosClient.post<AuthApiResponse<T>>(
-      `${this.base}/signin`,
-      inputData,
-    );
+  async signIn<T>(data: SignIn): Promise<ApiResponse<T>> {
+    return axiosClient.post<ApiResponse<T>>(`${this.base}/signin`, data);
   }
 
-  async forgetPassword<T>(
-    inputData: ForgetPassword,
-  ): Promise<AxiosResponse<AuthApiResponse<T>>> {
-    return axiosClient.post<AuthApiResponse<T>>(
+  async forgetPassword<T>(data: ForgetPassword): Promise<ApiResponse<T>> {
+    return axiosClient.post<ApiResponse<T>>(
       `${this.base}/forget-password`,
-      inputData,
+      data,
     );
   }
+
   async resetPassword<T>(
     token: string,
     newPassword: ResetPassword,
-  ): Promise<AxiosResponse<AuthApiResponse<T>>> {
-    return axiosClient.post<AuthApiResponse<T>>(
+  ): Promise<ApiResponse<T>> {
+    return axiosClient.post<ApiResponse<T>>(
       `${this.base}/reset-password/${token}`,
       newPassword,
     );
   }
-  async verifyEmail<T>(
-    token: string,
-  ): Promise<AxiosResponse<AuthApiResponse<T>>> {
-    return axiosClient.post<AuthApiResponse<T>>(
+
+  async verifyEmail<T>(token: string): Promise<ApiResponse<T>> {
+    return axiosClient.post<ApiResponse<T>>(
       `${this.base}/verify-email/${token}`,
     );
   }
-  async emailVerificationStatus<T>(
-    userId: number,
-  ): Promise<AxiosResponse<AuthApiResponse<T>>> {
-    return axiosClient.get<AuthApiResponse<T>>(
+
+  async emailVerificationStatus<T>(userId: number): Promise<ApiResponse<T>> {
+    return axiosClient.get<ApiResponse<T>>(
       `${this.base}/email-verification-status/${userId}`,
     );
   }
-  async sendEmailVerification<T>(): Promise<AxiosResponse<AuthApiResponse<T>>> {
-    return axiosClient.post<AuthApiResponse<T>>(
+
+  async sendEmailVerification<T>(): Promise<ApiResponse<T>> {
+    return axiosClient.post<ApiResponse<T>>(
       `${this.base}/send-email-verification`,
     );
   }
-  async refreshToken<T>(): Promise<AxiosResponse<AuthApiResponse<T>>> {
-    return axiosClient.post<AuthApiResponse<T>>(`${this.base}/refresh-token`);
+
+  async refreshToken<T>(): Promise<ApiResponse<T>> {
+    return axiosClient.post<ApiResponse<T>>(`${this.base}/refresh-token`);
   }
 }

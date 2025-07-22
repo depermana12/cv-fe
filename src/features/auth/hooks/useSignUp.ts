@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { notifications } from "@mantine/notifications";
 
-import { useAuthStore } from "../store/authStore";
-import { SignUp } from "../types/auth.schema";
+import { useAuthStore } from "@app/store/authStore";
+import { SignUp } from "../schema/auth.schema";
 
 export const useSignUp = () => {
   const { signUp } = useAuthStore();
@@ -11,20 +11,12 @@ export const useSignUp = () => {
 
   return useMutation({
     mutationFn: async (inputSignUp: SignUp) => signUp(inputSignUp),
-    onSuccess: (user) => {
-      notifications.show({
-        position: "top-right",
-        withCloseButton: true,
-        autoClose: 3000,
-        title: "Succesfully create account",
-        message: `Thanks for joining! ${user.username} account has been created`,
-        color: "green",
-      });
+    onSuccess: () => {
       navigate({ to: "/dashboard/overview" });
     },
     onError: (error) => {
       notifications.show({
-        position: "top-center",
+        position: "top-right",
         withCloseButton: true,
         autoClose: 3000,
         title: "Sign Up failed",

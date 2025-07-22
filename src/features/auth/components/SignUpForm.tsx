@@ -15,8 +15,8 @@ import {
   Progress,
   Popover,
 } from "@mantine/core";
-import { zFieldValidator } from "../../cv/utils/zFieldValidator";
-import useFieldError from "../../cv/hooks/useFieldError";
+import { zFieldValidator } from "@shared/utils/zFieldValidator";
+import useFieldError from "@shared/hooks/useFieldError";
 import { Link } from "@tanstack/react-router";
 import { IconBrandGoogle, IconX, IconCheck } from "@tabler/icons-react";
 

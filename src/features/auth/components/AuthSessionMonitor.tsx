@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuthStore } from "../store/authStore";
+import { useAuthStore } from "@app/store/authStore";
 
 export const AuthSessionMonitor = () => {
   const { checkAuthValidity } = useAuthStore();

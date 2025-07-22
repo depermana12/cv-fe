@@ -13,7 +13,7 @@ import {
   Flex,
 } from "@mantine/core";
 import { IconCheck, IconX, IconMail } from "@tabler/icons-react";
-import { useVerifyEmail } from "../../user/hooks/useVerifyEmail";
+import { useVerifyEmail } from "@features/user/hooks/useVerifyEmail";
 
 type VerificationStatus = "loading" | "success" | "error" | "expired";
 // TODO 1: reflect theme color

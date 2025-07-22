@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { signInSchema } from "../types/auth.schema";
+import { signInSchema } from "../schema/auth.schema";
 import { useSignIn } from "../hooks/useSignIn";
 import {
   Anchor,
@@ -13,8 +13,8 @@ import {
   TextInput,
 } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
-import { zFieldValidator } from "../../cv/utils/zFieldValidator";
-import useFieldError from "../../cv/hooks/useFieldError";
+import { zFieldValidator } from "@shared/utils/zFieldValidator";
+import useFieldError from "@shared/hooks/useFieldError";
 
 const SignInForm = () => {
   const { mutate, isPending } = useSignIn();
