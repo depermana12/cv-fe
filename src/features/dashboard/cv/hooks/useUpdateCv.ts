@@ -1,15 +1,15 @@
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@shared/lib/queryClient";
-import { cvApi } from "../services/CvApi";
 import type { CvUpdate } from "../types/types";
 import { notifications } from "@mantine/notifications";
+import { cvService } from "../services/cvService";
 
 export const useUpdateCv = () => {
   return useMutation({
     mutationFn: async (payload: { cvId: number; data: CvUpdate }) => {
       const { cvId, data } = payload;
 
-      const res = await cvApi.patch(cvId, data);
+      const res = await cvService.patch(cvId, data);
       return res.data;
     },
     onSuccess: (_updatedCv, payload) => {

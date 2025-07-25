@@ -15,7 +15,13 @@ export const cvSchema = z.object({
     .max(100, { message: "Max 100 characters" })
     .default("default"),
   isPublic: z.boolean().default(false),
-  slug: z.string().max(255, { message: "Max 255 characters" }).optional(),
+  slug: z
+    .string()
+    .max(255, { message: "Max 255 characters" })
+    .regex(/^[a-z0-9-]+$/, {
+      message: "Slug can only contain lowercase letters, numbers, and hyphens",
+    })
+    .optional(),
   views: z.number().int().nonnegative().default(0),
   downloads: z.number().int().nonnegative().default(0),
   language: z.string().length(2).default("id"),
@@ -56,4 +62,33 @@ export const cvQueryOptionsSchema = z.object({
     .default(0),
   from: z.coerce.date({ message: "Invalid from date" }).optional(),
   to: z.coerce.date({ message: "Invalid to date" }).optional(),
+});
+
+export const cvStatsSchema = z.object({
+  totalCvs: z.number().int().nonnegative(),
+  publicCvs: z.number().int().nonnegative(),
+  privateCvs: z.number().int().nonnegative(),
+  totalViews: z.number().int().nonnegative(),
+  totalDownloads: z.number().int().nonnegative(),
+  averageViews: z.number().nonnegative(),
+  averageDownloads: z.number().nonnegative(),
+  mostViewedCv: z
+    .object({
+      id: z.number().int().positive(),
+      title: z.string(),
+      views: z.number().int().nonnegative(),
+    })
+    .nullable(),
+  mostDownloadedCv: z
+    .object({
+      id: z.number().int().positive(),
+      title: z.string(),
+      downloads: z.number().int().nonnegative(),
+    })
+    .nullable(),
+});
+
+export const cvSlugParamsSchema = z.object({
+  username: z.string().min(1, { message: "Username is required" }),
+  slug: z.string().min(1, { message: "Slug is required" }),
 });

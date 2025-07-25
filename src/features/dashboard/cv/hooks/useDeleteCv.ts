@@ -1,12 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@shared/lib/queryClient";
-import { cvApi } from "../services/CvApi";
 import { notifications } from "@mantine/notifications";
+import { cvService } from "../services/cvService";
 
 export const useDeleteCv = () => {
   return useMutation({
     mutationFn: async (cvId: number) => {
-      const res = await cvApi.delete(cvId);
+      const res = await cvService.delete(cvId);
       return res.data;
     },
     onSuccess: (_data, cvId) => {

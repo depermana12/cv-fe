@@ -4,12 +4,16 @@ import {
   cvCreateSchema,
   cvUpdateSchema,
   cvQueryOptionsSchema,
+  cvStatsSchema,
+  cvSlugParamsSchema,
 } from "../schema/cv.schema";
 
 export type Cv = z.infer<typeof cvSchema>;
 export type CvCreate = z.infer<typeof cvCreateSchema>;
 export type CvUpdate = z.infer<typeof cvUpdateSchema>;
 export type CvQueryOptions = z.infer<typeof cvQueryOptionsSchema>;
+export type CvStats = z.infer<typeof cvStatsSchema>;
+export type CvSlugParams = z.infer<typeof cvSlugParamsSchema>;
 
 export type CvStore = {
   activeCvId: number | null;
@@ -20,7 +24,7 @@ export type CvStore = {
 export type CvFormProps = {
   opened: boolean;
   onClose: () => void;
-  initialData?: Partial<CvCreate>;
+  initialData?: Partial<CvCreate> & { id?: number };
   mode?: "create" | "edit";
 };
 

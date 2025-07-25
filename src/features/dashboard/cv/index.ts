@@ -4,6 +4,8 @@ export type {
   CvCreate,
   CvUpdate,
   CvQueryOptions,
+  CvStats,
+  CvSlugParams,
   CvStore,
   CvFormProps,
   CvListResponse,
@@ -15,10 +17,24 @@ export {
   cvCreateSchema,
   cvUpdateSchema,
   cvQueryOptionsSchema,
+  cvStatsSchema,
+  cvSlugParamsSchema,
 } from "./schema/cv.schema";
 
 // Export CV API
-export { cvApi } from "./services/CvApi";
+export { cvService } from "./services/cvService";
 
 // Export CV queries
-export { cvsQuery, cvsPaginatedQuery, cvQuery } from "./hooks/query";
+export {
+  cvsQuery,
+  cvsPaginatedQuery,
+  cvQuery,
+  cvStatsQuery,
+  cvByUsernameSlugQuery,
+  slugAvailabilityQuery,
+} from "./hooks/query";
+
+// Export CV hooks
+export { useCvStats } from "./hooks/useCvStats";
+export { useCvByUsernameSlug } from "./hooks/useCvByUsernameSlug";
+export { useSlugAvailability } from "./hooks/useSlugExist";

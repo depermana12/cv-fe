@@ -15,10 +15,12 @@ import {
   Box,
   Grid,
 } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
 import { useForm } from "@tanstack/react-form";
 import { notifications } from "@mantine/notifications";
 import { cvCreateSchema } from "../schema/cv.schema";
 import { useCreateCv } from "../hooks/useCreateCv";
+import { useSlugAvailability } from "../hooks/useSlugExist";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
 import type { CvCreate, CvFormProps } from "../types/types";
@@ -58,6 +60,29 @@ export const CvForm = ({
   const { Field, handleSubmit, state, setFieldValue } = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
+      // Validate slug availability before submission if CV is public
+      if (value.isPublic && value.slug) {
+        // Make sure we have the latest slug availability check
+        if (debouncedSlug !== value.slug) {
+          notifications.show({
+            title: "Please wait",
+            message: "Checking slug availability...",
+            color: "blue",
+          });
+          return;
+        }
+
+        if (slugAvailability?.data && !slugAvailability.data.available) {
+          notifications.show({
+            title: "Error",
+            message:
+              "The chosen slug is not available. Please choose a different one.",
+            color: "red",
+          });
+          return;
+        }
+      }
+
       await createCv.mutateAsync(value);
       onClose();
       notifications.show({
@@ -67,6 +92,19 @@ export const CvForm = ({
       });
     },
   });
+
+  // Only check slug availability when CV is public and slug exists
+  const [debouncedSlug] = useDebouncedValue(state.values.slug || "", 500); // 500ms debounce
+  const shouldCheckSlug =
+    state.values.isPublic && !!debouncedSlug && debouncedSlug.length > 0;
+  const excludeCvId =
+    mode === "edit" && initialData?.id ? initialData.id : undefined;
+
+  const slugAvailability = useSlugAvailability(
+    debouncedSlug,
+    excludeCvId,
+    shouldCheckSlug,
+  );
 
   const handleClose = () => {
     onClose();
@@ -95,7 +133,13 @@ export const CvForm = ({
     }
   }, [state.values.slug, isSlugEdited]);
 
-  const isFormValid = state.values.title && state.values.title.length >= 3;
+  const isFormValid =
+    state.values.title &&
+    state.values.title.length >= 3 &&
+    (!shouldCheckSlug ||
+      (debouncedSlug === state.values.slug &&
+        slugAvailability.data &&
+        slugAvailability.data.available));
 
   return (
     <Modal
@@ -256,50 +300,92 @@ export const CvForm = ({
                         onBlur: zFieldValidator(cvCreateSchema.shape.slug),
                       }}
                     >
-                      {({ state, handleChange, handleBlur }) => (
-                        <Tooltip label="Use a custom URL or leave as default">
-                          <TextInput
-                            label="URL Slug"
-                            placeholder="my-awesome-cv"
-                            value={state.value}
-                            onChange={(e) => {
-                              const newValue = e.target.value;
-                              handleChange(newValue);
-                              // Mark as manually edited if user types something
-                              if (newValue) {
-                                setIsSlugEdited(true);
+                      {({ state, handleChange, handleBlur }) => {
+                        const fieldError = useFieldError(state.meta);
+                        const isCheckingSlug =
+                          shouldCheckSlug &&
+                          slugAvailability.isLoading &&
+                          debouncedSlug === state.value;
+                        const slugNotAvailable =
+                          shouldCheckSlug &&
+                          slugAvailability.data &&
+                          !slugAvailability.data.available &&
+                          debouncedSlug === state.value;
+                        const slugAvailable =
+                          shouldCheckSlug &&
+                          slugAvailability.data &&
+                          slugAvailability.data.available &&
+                          debouncedSlug === state.value;
+
+                        let slugError = fieldError;
+                        if (slugNotAvailable) {
+                          slugError = "This slug is already taken";
+                        }
+
+                        return (
+                          <Tooltip label="Use a custom URL or leave as default">
+                            <TextInput
+                              label="URL Slug"
+                              placeholder="my-awesome-cv"
+                              value={state.value}
+                              onChange={(e) => {
+                                const newValue = e.target.value;
+                                handleChange(newValue);
+                                // Mark as manually edited if user types something
+                                if (newValue) {
+                                  setIsSlugEdited(true);
+                                }
+                              }}
+                              onBlur={handleBlur}
+                              error={slugError}
+                              rightSection={
+                                isCheckingSlug ? (
+                                  <Text size="xs" c="dimmed">
+                                    Checking...
+                                  </Text>
+                                ) : slugAvailable ? (
+                                  <Text size="xs" c="green.6">
+                                    ✓
+                                  </Text>
+                                ) : slugNotAvailable ? (
+                                  <Text size="xs" c="red.6">
+                                    ✗
+                                  </Text>
+                                ) : null
                               }
-                            }}
-                            onBlur={handleBlur}
-                            error={useFieldError(state.meta)}
-                            description={
-                              isSlugEdited
-                                ? "Custom URL (unlinked from title)"
-                                : "Auto-generated from title"
-                            }
-                          />
-                        </Tooltip>
-                      )}
+                              description={
+                                isSlugEdited
+                                  ? "Custom URL (unlinked from title)"
+                                  : "Auto-generated from title"
+                              }
+                            />
+                          </Tooltip>
+                        );
+                      }}
                     </Field>
                   </Grid.Col>
                 </Grid>
 
-                {state.values.isPublic && (
-                  <Alert color="blue" variant="light">
-                    <Text size="sm">
-                      {state.values.slug ? (
-                        <>
-                          Your CV will be publicly accessible at:{" "}
-                          <Text component="span" fw={500} c="blue.7">
-                            /cv/{state.values.slug}
-                          </Text>
-                        </>
-                      ) : (
-                        "Your CV will be public. Add a URL slug to make it accessible."
-                      )}
-                    </Text>
-                  </Alert>
-                )}
+                {state.values.isPublic &&
+                  shouldCheckSlug &&
+                  slugAvailability.data &&
+                  slugAvailability.data.available &&
+                  debouncedSlug === state.values.slug && (
+                    <Alert color="blue" variant="light">
+                      <Text size="sm">
+                        {state.values.slug ? (
+                          <>
+                            Your CV will be publicly accessible at:{" "}
+                            <Text component="span" fw={500} c="blue.7">
+                              /cv/{state.values.slug}
+                            </Text>
+                          </>
+                        ) : (
+                          "Your CV will be public. Add a URL slug to make it accessible."
+                        )}
+                      </Text>
+                    </Alert>
+                  )}
               </Stack>
             </Card>
 
