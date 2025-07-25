@@ -1,8 +1,11 @@
 import { Box, Divider } from "@mantine/core";
-import { FeaturesCards, HeroBullets, FAQ, CTA } from "../components";
+import { CTA } from "../components/CTA";
+import { FAQ } from "../components/FAQ";
+import { FeaturesCards } from "../components/FeatureCards";
+import { HeroBullets } from "../components/HeroBullets";
 import { Footer } from "@shared/components/layout/Footer";
 
-const HomePage = () => {
+export const HomePage = () => {
   const deviderProps = {
     variant: "dashed",
     color: "gray.8",
@@ -21,4 +24,3 @@ const HomePage = () => {
     </Box>
   );
 };
-export default HomePage;
