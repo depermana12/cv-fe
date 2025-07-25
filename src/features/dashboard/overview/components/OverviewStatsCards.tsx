@@ -1,8 +1,37 @@
-import { SimpleGrid, Card, Text, Stack } from "@mantine/core";
+import { SimpleGrid, Card, Text, Stack, Skeleton } from "@mantine/core";
 import { useUserStats } from "../../../user/hooks/useUserStats";
 
 export const OverviewStatsCards = () => {
-  const { data: stats } = useUserStats();
+  const { data: stats, isLoading, error } = useUserStats();
+
+  if (isLoading) {
+    return (
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} height={100} radius="md" />
+        ))}
+      </SimpleGrid>
+    );
+  }
+
+  if (error || !stats) {
+    return (
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i} withBorder p="md" radius="md">
+            <Stack gap="xs">
+              <Text size="sm" c="dimmed">
+                Error loading stats
+              </Text>
+              <Text fw={700} size="xl">
+                -
+              </Text>
+            </Stack>
+          </Card>
+        ))}
+      </SimpleGrid>
+    );
+  }
 
   const calculateProfileCompletion = () => {
     const user = stats.user;
@@ -21,6 +50,7 @@ export const OverviewStatsCards = () => {
   };
 
   const normalizeAccountAge = () => {
+    if (!stats) return "-";
     const day = stats.accountAge;
     if (day < 7) return day + " days";
     if (day < 30) return Math.floor(day / 7) + " weeks";

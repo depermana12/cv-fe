@@ -1,4 +1,4 @@
-import { Stack, Group, Title, Text, Grid, Tabs } from "@mantine/core";
+import { Stack, Group, Title, Text, Grid, Tabs, Skeleton } from "@mantine/core";
 import { useUser } from "@features/user/hooks/useUser";
 import { ProfilePicture } from "./ProfilePicture";
 import { ProfileForm } from "./ProfileForm";
@@ -6,7 +6,53 @@ import { AccountInformation } from "./AccountInformation";
 import { AccountSettings } from "./AccountSettings";
 
 export const ProfileContent = () => {
-  const { data: user } = useUser();
+  const { data: user, isLoading, error } = useUser();
+
+  if (isLoading) {
+    return (
+      <Stack gap="lg">
+        <Group justify="space-between">
+          <Stack gap={0}>
+            <Skeleton height={32} width={100} />
+            <Skeleton height={16} width={300} mt={4} />
+          </Stack>
+        </Group>
+
+        <Grid>
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Skeleton height={200} radius="md" />
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, md: 8 }}>
+            <Stack gap="md">
+              <Skeleton height={300} radius="md" />
+              <Skeleton height={150} radius="md" />
+            </Stack>
+          </Grid.Col>
+        </Grid>
+      </Stack>
+    );
+  }
+
+  if (error) {
+    return (
+      <Stack gap="lg">
+        <Title order={2}>Error loading profile</Title>
+        <Text c="red">
+          Unable to load your profile information. Please try again.
+        </Text>
+      </Stack>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Stack gap="lg">
+        <Title order={2}>Profile not found</Title>
+        <Text c="dimmed">Unable to load your profile information.</Text>
+      </Stack>
+    );
+  }
 
   return (
     <Tabs defaultValue="profile">

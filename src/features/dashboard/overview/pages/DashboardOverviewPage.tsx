@@ -1,13 +1,4 @@
-import {
-  Stack,
-  Title,
-  Text,
-  SimpleGrid,
-  Skeleton,
-  Box,
-  Grid,
-} from "@mantine/core";
-import { Suspense } from "react";
+import { Stack, Title, Text, Box, Grid } from "@mantine/core";
 import { OverviewStatsCards } from "../components/OverviewStatsCards";
 import { OverviewRecentCvs } from "../components/OverviewRecentCvs";
 import { OverviewQuickItems } from "../components/OverviewQuickItems";
@@ -23,23 +14,11 @@ export const DashboardOverviewPage = () => {
         </Text>
       </Box>
 
-      <Suspense
-        fallback={
-          <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} height={100} radius="md" />
-            ))}
-          </SimpleGrid>
-        }
-      >
-        <OverviewStatsCards />
-      </Suspense>
+      <OverviewStatsCards />
       <Grid>
         <Grid.Col span={{ base: 12, lg: 8 }}>
           <Stack gap="lg">
-            <Suspense fallback={<Skeleton height={300} radius="md" />}>
-              <OverviewRecentCvs />
-            </Suspense>
+            <OverviewRecentCvs />
             <OverviewQuickItems />
           </Stack>
         </Grid.Col>

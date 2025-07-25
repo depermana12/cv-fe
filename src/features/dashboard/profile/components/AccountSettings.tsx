@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import {
   Stack,
   Group,
@@ -24,8 +24,8 @@ import { useDisclosure } from "@mantine/hooks";
 import { useUser } from "@features/user/hooks/useUser";
 import { useSendEmailVerification } from "@features/user/hooks/useSendEmailVerification";
 
-const AccountContent = () => {
-  const { data: user } = useUser();
+export const AccountSettings = () => {
+  const { data: user, isLoading, error } = useUser();
   const [emailModalOpened, { open: openEmailModal, close: closeEmailModal }] =
     useDisclosure(false);
   const [
@@ -49,6 +49,85 @@ const AccountContent = () => {
   const [newUsername, setNewUsername] = useState("");
 
   const { mutate: sendVerificationEmail } = useSendEmailVerification();
+
+  if (isLoading) {
+    return (
+      <Stack gap="lg">
+        <Stack gap="xs">
+          <Skeleton height={32} width={200} />
+          <Skeleton height={16} width={350} />
+        </Stack>
+
+        <Grid>
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            {/* Security Overview Skeleton */}
+            <Card padding="lg" radius="md" mb="md" withBorder>
+              <Skeleton height={24} width={180} mb="md" />
+              <Stack gap="md">
+                <Group justify="space-between">
+                  <Stack gap="xs">
+                    <Skeleton height={16} width={120} />
+                    <Skeleton height={12} width={200} />
+                  </Stack>
+                  <Skeleton height={32} width={100} />
+                </Group>
+                <Skeleton height={80} radius="sm" />
+                <Skeleton height={1} />
+                <Group justify="space-between">
+                  <Stack gap="xs">
+                    <Skeleton height={16} width={160} />
+                    <Skeleton height={12} width={220} />
+                  </Stack>
+                  <Skeleton height={32} width={80} />
+                </Group>
+                <Skeleton height={60} radius="sm" />
+              </Stack>
+            </Card>
+
+            {/* Login Credentials Skeleton */}
+            <Card padding="lg" radius="md" mb="md" withBorder>
+              <Skeleton height={24} width={180} mb="md" />
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i}>
+                  <Group justify="space-between">
+                    <Stack gap="xs">
+                      <Skeleton height={16} width={140} />
+                      <Skeleton height={12} width={200} />
+                    </Stack>
+                    <Skeleton height={32} width={120} />
+                  </Group>
+                  {i < 2 && <Skeleton height={1} my="md" />}
+                </div>
+              ))}
+            </Card>
+
+            {/* Delete Account Skeleton */}
+            <Card padding="lg" radius="md" mb="md" withBorder>
+              <Group gap="sm" mb="md">
+                <Skeleton height={20} width={20} />
+                <Skeleton height={24} width={140} />
+              </Group>
+              <Stack gap="md">
+                <Skeleton height={16} width={300} />
+                <Skeleton height={32} width={120} />
+              </Stack>
+            </Card>
+          </Grid.Col>
+        </Grid>
+      </Stack>
+    );
+  }
+
+  if (error || !user) {
+    return (
+      <Stack gap="lg">
+        <Title order={2}>Error loading account settings</Title>
+        <Text c="red">
+          Unable to load your account settings. Please try again.
+        </Text>
+      </Stack>
+    );
+  }
 
   return (
     <Stack gap="lg">
@@ -344,71 +423,5 @@ const AccountContent = () => {
         </Stack>
       </Modal>
     </Stack>
-  );
-};
-
-// Loading State Component
-const AccountLoading = () => (
-  <Stack gap="lg">
-    <Stack gap="xs">
-      <Skeleton height={32} width={200} />
-      <Skeleton height={16} width={350} />
-    </Stack>
-
-    {/* Security Overview */}
-    <Card padding="lg" radius="md" withBorder>
-      <Skeleton height={24} width={180} mb="md" />
-      <Stack gap="md">
-        <Group justify="space-between">
-          <Stack gap="xs">
-            <Skeleton height={16} width={120} />
-            <Skeleton height={12} width={200} />
-          </Stack>
-          <Skeleton height={32} width={100} />
-        </Group>
-        <Skeleton height={80} radius="sm" />
-        <Skeleton height={1} />
-        <Group justify="space-between">
-          <Stack gap="xs">
-            <Skeleton height={16} width={160} />
-            <Skeleton height={12} width={220} />
-          </Stack>
-          <Skeleton height={32} width={80} />
-        </Group>
-        <Skeleton height={60} radius="sm" />
-      </Stack>
-    </Card>
-
-    {/* Login Credentials */}
-    <Card padding="lg" radius="md" withBorder>
-      <Skeleton height={24} width={180} mb="md" />
-      {Array.from({ length: 3 }).map((_, i) => (
-        <>
-          <Group key={i} justify="space-between">
-            <Stack gap="xs">
-              <Skeleton height={16} width={140} />
-              <Skeleton height={12} width={200} />
-            </Stack>
-            <Skeleton height={32} width={120} />
-          </Group>
-          {i < 2 && <Skeleton height={1} />}
-        </>
-      ))}
-    </Card>
-
-    {/* Delete Account */}
-    <Card padding="lg" radius="md" withBorder>
-      <Skeleton height={20} width={160} mb="md" />
-      <Skeleton height={48} radius="sm" />
-      <Skeleton height={32} width={140} mt="md" />
-    </Card>
-  </Stack>
-);
-
-export const AccountSettings = () => {
-  return (
-    <Suspense fallback={<AccountLoading />}>
-      <AccountContent />
-    </Suspense>
   );
 };

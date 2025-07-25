@@ -1,20 +1,8 @@
-import { Suspense } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { LoadingOverlay, Stack } from "@mantine/core";
 import { DashboardOverviewPage } from "@features/dashboard/overview/pages/DashboardOverviewPage";
 
 const DashboardOverview = () => {
-  return (
-    <Suspense
-      fallback={
-        <Stack h="100vh" justify="center" align="center">
-          <LoadingOverlay visible />
-        </Stack>
-      }
-    >
-      <DashboardOverviewPage />
-    </Suspense>
-  );
+  return <DashboardOverviewPage />;
 };
 
 export const Route = createFileRoute("/dashboard/overview/")({
