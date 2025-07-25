@@ -9,7 +9,6 @@ import {
   Paper,
   Select,
 } from "@mantine/core";
-import { useParams } from "@tanstack/react-router";
 
 import {
   languageInsertSchema,
@@ -24,6 +23,7 @@ import type {
 } from "../types/language.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
+import { useCvStore } from "../../../store/cvStore";
 
 const fluencyOptions = [
   { value: "beginner", label: "Beginner" },
@@ -38,8 +38,14 @@ export const LanguageForm = ({
 }: LanguageFormProps) => {
   const { mutate: createLanguage, isPending: isCreating } = useCreateLanguage();
   const { mutate: updateLanguage, isPending: isUpdating } = useUpdateLanguage();
-  const params = useParams({ from: "/dashboard/cv/$cvId" });
-  const cvId = Number(params.cvId);
+
+  const { activeCvId } = useCvStore();
+
+  if (!activeCvId) {
+    throw new Error("No active CV selected");
+  }
+
+  const cvId = activeCvId;
 
   const defaultLanguageValues: LanguageInsert = {
     language: "",

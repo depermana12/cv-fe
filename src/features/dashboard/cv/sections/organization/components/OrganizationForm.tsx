@@ -15,7 +15,6 @@ import {
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { useParams } from "@tanstack/react-router";
 
 import {
   organizationCreateSchema,
@@ -30,6 +29,7 @@ import type {
 } from "../types/organization.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
+import { useCvStore } from "../../../store/cvStore";
 
 export const OrganizationForm = ({
   mode,
@@ -40,8 +40,14 @@ export const OrganizationForm = ({
     useCreateOrganization();
   const { mutate: updateOrganization, isPending: isUpdating } =
     useUpdateOrganization();
-  const params = useParams({ from: "/dashboard/cv/$cvId" });
-  const cvId = Number(params.cvId);
+
+  const { activeCvId } = useCvStore();
+
+  if (!activeCvId) {
+    throw new Error("No active CV selected");
+  }
+
+  const cvId = activeCvId;
 
   // Dynamic descriptions state
   const [descriptions, setDescriptions] = useState<string[]>(

@@ -11,7 +11,6 @@ import {
   Textarea,
   TagsInput,
 } from "@mantine/core";
-import { useParams } from "@tanstack/react-router";
 
 import {
   skillCreateSchema,
@@ -23,6 +22,7 @@ import { useUpdateSkill } from "../hooks/useUpdateSkill";
 import type { SkillFormProps, SkillInsert } from "../types/skill.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
+import { useCvStore } from "../../../store/cvStore";
 
 const skillTypes = [
   { value: "technical", label: "Technical" },
@@ -55,8 +55,14 @@ const proficiencyLevels = [
 export const SkillForm = ({ mode, initialData, onSuccess }: SkillFormProps) => {
   const { mutate: createSkill, isPending: isCreating } = useCreateSkill();
   const { mutate: updateSkill, isPending: isUpdating } = useUpdateSkill();
-  const params = useParams({ from: "/dashboard/cv/$cvId" });
-  const cvId = Number(params.cvId);
+
+  const { activeCvId } = useCvStore();
+
+  if (!activeCvId) {
+    throw new Error("No active CV selected");
+  }
+
+  const cvId = activeCvId;
 
   const defaultSkillValues: SkillInsert = {
     type: "technical",

@@ -15,7 +15,6 @@ import {
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { useParams } from "@tanstack/react-router";
 
 import {
   courseInsertSchema,
@@ -27,6 +26,7 @@ import { useUpdateCourse } from "../hooks/useUpdateCourse";
 import type { CourseInsert, CourseFormProps } from "../types/course.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
+import { useCvStore } from "../../../store/cvStore";
 
 export const CourseForm = ({
   mode,
@@ -35,8 +35,14 @@ export const CourseForm = ({
 }: CourseFormProps) => {
   const { mutate: createCourse, isPending: isCreating } = useCreateCourse();
   const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
-  const params = useParams({ from: "/dashboard/cv/$cvId" });
-  const cvId = Number(params.cvId);
+
+  const { activeCvId } = useCvStore();
+
+  if (!activeCvId) {
+    throw new Error("No active CV selected");
+  }
+
+  const cvId = activeCvId;
 
   // Dynamic descriptions state
   const [descriptions, setDescriptions] = useState<string[]>(

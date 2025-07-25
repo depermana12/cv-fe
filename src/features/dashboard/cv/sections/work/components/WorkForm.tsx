@@ -16,7 +16,6 @@ import {
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { useParams } from "@tanstack/react-router";
 
 import {
   workCreateSchema,
@@ -28,12 +27,19 @@ import { useUpdateWork } from "../hooks/useUpdateWork";
 import type { WorkFormProps, WorkInsert } from "../types/work.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
+import { useCvStore } from "../../../store/cvStore";
 
 export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
   const { mutate: createWork, isPending: isCreating } = useCreateWork();
   const { mutate: updateWork, isPending: isUpdating } = useUpdateWork();
-  const params = useParams({ from: "/dashboard/cv/$cvId" });
-  const cvId = Number(params.cvId);
+
+  const { activeCvId } = useCvStore();
+
+  if (!activeCvId) {
+    throw new Error("No active CV selected");
+  }
+
+  const cvId = activeCvId;
 
   // Dynamic descriptions state
   const [descriptions, setDescriptions] = useState<string[]>(

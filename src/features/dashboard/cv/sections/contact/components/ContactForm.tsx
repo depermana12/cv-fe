@@ -11,7 +11,6 @@ import {
   ActionIcon,
 } from "@mantine/core";
 import { IconPlus, IconTrash, IconUpload } from "@tabler/icons-react";
-import { useParams } from "@tanstack/react-router";
 
 import {
   contactCreateSchema,
@@ -23,6 +22,7 @@ import { useUpdateContact } from "../hooks/useUpdateContact";
 import type { ContactFormProps, ContactInsert } from "../types/contact.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
+import { useCvStore } from "../../../store/cvStore";
 
 export const ContactForm = ({
   mode,
@@ -31,8 +31,14 @@ export const ContactForm = ({
 }: ContactFormProps) => {
   const { mutate: createContact, isPending: isCreating } = useCreateContact();
   const { mutate: updateContact, isPending: isUpdating } = useUpdateContact();
-  const params = useParams({ from: "/dashboard/cv/$cvId" });
-  const cvId = Number(params.cvId);
+
+  const { activeCvId } = useCvStore();
+
+  if (!activeCvId) {
+    throw new Error("No active CV selected");
+  }
+
+  const cvId = activeCvId;
 
   const defaultContactValues: ContactInsert = {
     firstName: "",

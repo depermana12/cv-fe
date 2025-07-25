@@ -13,7 +13,6 @@ import {
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { useParams } from "@tanstack/react-router";
 
 import {
   educationCreateSchema,
@@ -28,6 +27,7 @@ import type {
 } from "../types/education.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
+import { useCvStore } from "../../../store/cvStore";
 
 const degreeOptions = [
   { value: "high_school", label: "High School" },
@@ -47,8 +47,13 @@ export const EducationForm = ({
   const { mutate: updateEducation, isPending: isUpdating } =
     useUpdateEducation();
 
-  const params = useParams({ from: "/dashboard/cv/$cvId" });
-  const cvId = Number(params.cvId);
+  const { activeCvId } = useCvStore();
+
+  if (!activeCvId) {
+    throw new Error("No active CV selected");
+  }
+
+  const cvId = activeCvId;
 
   const defaultEducationValues: EducationInsert = {
     institution: "",
