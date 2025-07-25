@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { LoadingOverlay, Stack } from "@mantine/core";
-import { DashboardOverviewPage } from "@features/dashboard/pages/DashboardOverviewPage";
+import { DashboardOverviewPage } from "@features/dashboard/overview/pages/DashboardOverviewPage";
 
 const DashboardOverview = () => {
   return (

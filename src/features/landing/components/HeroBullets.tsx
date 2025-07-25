@@ -15,7 +15,7 @@ import {
   Paper,
 } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
-import image from "./image.svg";
+import image from "@assets/landing/images/image.svg";
 
 export const HeroBullets = () => {
   const theme = useMantineTheme();
