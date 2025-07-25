@@ -5,7 +5,14 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [TanStackRouterVite({ target: "react" }), react()],
+  plugins: [
+    TanStackRouterVite({
+      target: "react",
+      routesDirectory: "./src/app/routes",
+      generatedRouteTree: "./src/app/routeTree.gen",
+    }),
+    react(),
+  ],
   server: {
     proxy: {
       "/api/v1": {

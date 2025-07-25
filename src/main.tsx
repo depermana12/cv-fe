@@ -9,7 +9,7 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { MantineProvider } from "@mantine/core";
 
-import { routeTree } from "./routeTree.gen";
+import { routeTree } from "./app/routeTree.gen";
 import { emotionTransform, MantineEmotionProvider } from "@mantine/emotion";
 import { Notifications } from "@mantine/notifications";
 
