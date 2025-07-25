@@ -23,7 +23,7 @@ import {
   JobTrackerCreate,
 } from "../types/jobTracker.type";
 import { jobTrackerCreateSchema } from "../schema/jobTracker";
-import { useCvsNonSuspense } from "@features/cv/hooks/useCvs";
+import { useCvs } from "@features/dashboard/cv/hooks/useCvs";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
 import { IconClock } from "@tabler/icons-react";
@@ -45,7 +45,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
     useCreateJobApplication();
   const { mutate: updateApplication, isPending: isUpdating } =
     useUpdateJobApplication();
-  const { data: cvsResponse, isLoading: cvsLoading } = useCvsNonSuspense();
+  const { data: cvsResponse, isLoading: cvsLoading } = useCvs();
   const cvs = cvsResponse || [];
 
   const isLoading = isCreating || isUpdating || cvsLoading;

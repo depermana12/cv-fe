@@ -1,6 +1,6 @@
 import { Card, Stack, Button, Group, Title } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
-import { useCvs } from "../../../cv/hooks/useCvs";
+import { useCvs } from "@features/dashboard/cv/hooks/useCvs";
 import { EmptyCv } from "./EmptyCv";
 import { CvCardItem } from "./CvCardItem";
 

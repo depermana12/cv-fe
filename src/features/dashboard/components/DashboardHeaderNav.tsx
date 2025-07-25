@@ -14,9 +14,8 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconLogout2, IconUserCircle } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 
-import { useAuthStore } from "../../auth/store/authStore";
-
-import { useUser } from "../../user/hooks/useUser";
+import { useAuthStore } from "@/app/store/authStore";
+import { useUser } from "@/features/user/hooks";
 
 const DashboardHeaderNav = () => {
   const [opened, { open: openModal, close: closeModal }] = useDisclosure(false);
@@ -36,14 +35,15 @@ const DashboardHeaderNav = () => {
   // the desicion on the db design using fullName is bad
   // i came back after refactor the backend, 16/06/2025
   const avatarInitials = useMemo(() => {
+    if (!user) return "n/a";
     if (user.firstName && user.lastName) {
       return `${user.firstName[0]}${user.lastName[0]}`;
     }
     return user.username ? user.username[0].toUpperCase() : "n/a";
-  }, [user.firstName, user.lastName, user.username]);
+  }, [user]);
 
   const baseCdn = import.meta.env.VITE_CDN;
-  const profileImgUrl = user.profileImage
+  const profileImgUrl = user?.profileImage
     ? `${baseCdn}/${user.profileImage.split("/")[1]}`
     : null;
 
@@ -80,7 +80,7 @@ const DashboardHeaderNav = () => {
                 cursor: "pointer",
               }}
             >
-              {user.profileImage ? (
+              {user?.profileImage ? (
                 <Avatar
                   src={profileImgUrl}
                   alt={user.username || "User avatar"}
@@ -107,10 +107,10 @@ const DashboardHeaderNav = () => {
         <Menu.Dropdown>
           <Menu.Label aria-label="User information">
             <Text size="xs" fw={500} truncate>
-              {user.username || "User"}
+              {user?.username || "User"}
             </Text>
             <Text size="xs" c="dimmed" truncate>
-              {user.email}
+              {user?.email}
             </Text>
           </Menu.Label>
           <Menu.Divider />{" "}

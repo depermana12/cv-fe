@@ -13,7 +13,7 @@ import { useForm } from "@tanstack/react-form";
 import { useUpdateCv } from "@features/dashboard/cv/hooks/useUpdateCv";
 import { useQuery } from "@tanstack/react-query";
 import { cvQuery } from "@features/dashboard/cv/hooks/query";
-import useFieldError from "@features/dashboard/cv/hooks/useFieldError";
+import useFieldError from "@/shared/hooks/useFieldError";
 
 interface CvQuickEditModalProps {
   opened: boolean;

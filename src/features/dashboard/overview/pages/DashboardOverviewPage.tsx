@@ -2,20 +2,16 @@ import {
   Stack,
   Title,
   Text,
-  Button,
-  Group,
   SimpleGrid,
   Skeleton,
   Box,
   Grid,
 } from "@mantine/core";
-import { IconPlus } from "@tabler/icons-react";
-import { Link } from "@tanstack/react-router";
 import { Suspense } from "react";
-import { OverviewStatsCards } from "../overview/components/OverviewStatsCards";
-import { OverviewRecentCvs } from "../overview/components/OverviewRecentCvs";
-import { OverviewQuickItems } from "../overview/components/OverviewQuickItems";
-import { OverviewRecentActivity } from "../overview/components/OverviewRecentActivity";
+import { OverviewStatsCards } from "../components/OverviewStatsCards";
+import { OverviewRecentCvs } from "../components/OverviewRecentCvs";
+import { OverviewQuickItems } from "../components/OverviewQuickItems";
+import { OverviewRecentActivity } from "../components/OverviewRecentActivity";
 
 export const DashboardOverviewPage = () => {
   return (

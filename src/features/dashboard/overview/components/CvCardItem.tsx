@@ -21,10 +21,9 @@ import {
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Cv } from "../../../cv/types/types";
-import { useUpdateCv } from "../../../cv/hooks/useUpdateCv";
-import { CvQuickEditModal } from "../../components/CvQuickEditModal";
-import { CvFullEditModal } from "../../components/CvFullEditModal";
+import { Cv } from "@features/dashboard/cv/types/types";
+import { useUpdateCv } from "@features/dashboard/cv/hooks/useUpdateCv";
+import { CvQuickEditModal } from "@features/dashboard/cv/components/CvQuickEditModal";
 
 export const CvCardItem = ({ cv }: { cv: Cv }) => {
   const formattedCreatedAt = new Date(cv.createdAt).toLocaleDateString();
@@ -33,7 +32,6 @@ export const CvCardItem = ({ cv }: { cv: Cv }) => {
     : "n/a";
   const updateCv = useUpdateCv();
   const [quickEditModalOpened, setQuickEditModalOpened] = useState(false);
-  const [fullEditModalOpened, setFullEditModalOpened] = useState(false);
 
   const handleToggleVisibility = () => {
     updateCv.mutate({
@@ -171,12 +169,6 @@ export const CvCardItem = ({ cv }: { cv: Cv }) => {
       <CvQuickEditModal
         opened={quickEditModalOpened}
         onClose={() => setQuickEditModalOpened(false)}
-        cvId={cv.id}
-      />
-      {/* Full Edit Modal - All CV details with child resources */}
-      <CvFullEditModal
-        opened={fullEditModalOpened}
-        onClose={() => setFullEditModalOpened(false)}
         cvId={cv.id}
       />
     </>
