@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { userMeQuery } from "./query";
 
-export const useUser = () => useSuspenseQuery(userMeQuery());
+export const useUser = () => useQuery(userMeQuery());

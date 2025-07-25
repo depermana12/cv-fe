@@ -1,24 +1,22 @@
 import { queryOptions } from "@tanstack/react-query";
-import { UserApi } from "../service/UserApi";
-import { User } from "../schema/user";
+import { userService } from "../service/userService";
 
-const userApi = new UserApi<User, any>();
 export const userMeQuery = () =>
   queryOptions({
     queryKey: ["user", "me"],
     queryFn: async () => {
-      const res = await userApi.getMe();
-      return res.data.data;
+      const res = await userService.getMe();
+      return res.data;
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: Infinity,
   });
 
 export const userStatsQuery = () =>
   queryOptions({
     queryKey: ["user", "stats"],
     queryFn: async () => {
-      const res = await userApi.getMyStats();
-      return res.data.data;
+      const res = await userService.getMyStats();
+      return res.data;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -27,19 +25,17 @@ export const checkUsernameQuery = (username: string) =>
   queryOptions({
     queryKey: ["user", "check-username", username],
     queryFn: async () => {
-      const res = await userApi.checkUsername(username);
-      return res.data.data;
+      const res = await userService.checkUsername(username);
+      return res.data;
     },
-    enabled: !!username, // only run if username is not empty
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    enabled: !!username,
   });
 
 export const emailVerificationQuery = () =>
   queryOptions({
     queryKey: ["user", "email-verification"],
     queryFn: async () => {
-      const res = await userApi.getMyEmailVerificationStatus();
-      return res.data.data;
+      const res = await userService.getMyEmailVerificationStatus();
+      return res.data;
     },
-    staleTime: 1000 * 60 * 2, // 2 minutes
   });

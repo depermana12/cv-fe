@@ -1,5 +1,4 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { emailVerificationQuery } from "./query";
 
-export const useEmailVerification = () =>
-  useSuspenseQuery(emailVerificationQuery());
+export const useEmailVerification = () => useQuery(emailVerificationQuery());

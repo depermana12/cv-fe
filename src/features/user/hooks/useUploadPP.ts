@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { uploadService } from "../service/uploadService";
-import { queryClient } from "../../../lib/queryClient";
+import { queryClient } from "@shared/lib/queryClient";
 import { notifications } from "@mantine/notifications";
 
 export const useUploadPP = () => {
@@ -13,7 +13,7 @@ export const useUploadPP = () => {
       queryClient.invalidateQueries({ queryKey: ["profile-picture"] });
 
       notifications.show({
-        position: "top-center",
+        position: "top-right",
         withCloseButton: true,
         autoClose: 5000,
         title: "Upload Successful",
@@ -23,7 +23,7 @@ export const useUploadPP = () => {
     },
     onError: (err) => {
       notifications.show({
-        position: "top-center",
+        position: "top-right",
         withCloseButton: true,
         autoClose: 5000,
         title: "Upload Failed",

@@ -8,26 +8,46 @@ export const userSchema = z.object({
     .max(50),
   email: z.string().email({ message: "Invalid email address" }).max(100),
   isEmailVerified: z.boolean().optional(),
-  profileImage: z
-    .string()
-    .url({ message: "Invalid image URL" })
-    .optional()
-    .nullable(),
+  profileImage: z.string().url({ message: "Invalid image URL" }).optional(),
   birthDate: z.coerce
     .date({ invalid_type_error: "Invalid birth date" })
-    .optional()
-    .nullable(),
+    .optional(),
   firstName: z
     .string()
     .max(50, { message: "First name must be 50 characters or fewer" })
-    .optional()
-    .nullable(),
+    .optional(),
   lastName: z
     .string()
     .max(50, { message: "Last name must be 50 characters or fewer" })
-    .optional()
-    .nullable(),
-  gender: z.enum(["male", "female"]).optional().nullable(),
+    .optional(),
+  gender: z.enum(["male", "female"]).optional(),
+  about: z
+    .string()
+    .max(1000, { message: "About section must be 1000 characters or fewer" })
+    .optional(),
+  bio: z
+    .string()
+    .max(255, { message: "Bio must be 255 characters or fewer" })
+    .optional(),
+  emailNotifications: z
+    .boolean({ message: "Email notifications must be true or false" })
+    .optional(),
+  monthlyReports: z
+    .boolean({ message: "Monthly reports must be true or false" })
+    .optional(),
+  subscriptionType: z
+    .enum(["free", "trial", "pro"], {
+      message: "Please select a valid subscription type",
+    })
+    .optional(),
+  subscriptionStatus: z
+    .enum(["active", "expired", "cancelled", "pending"], {
+      message: "Please select a valid subscription status",
+    })
+    .optional(),
+  subscriptionExpiresAt: z.coerce
+    .date({ invalid_type_error: "Invalid subscription expiry date format" })
+    .optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -37,6 +57,11 @@ export const userInsertSchema = userSchema.omit({
   isEmailVerified: true,
   createdAt: true,
   updatedAt: true,
+  emailNotifications: true,
+  monthlyReports: true,
+  subscriptionType: true,
+  subscriptionStatus: true,
+  subscriptionExpiresAt: true,
 });
 
 export const userUpdateSchema = userSchema
@@ -46,6 +71,8 @@ export const userUpdateSchema = userSchema
     firstName: true,
     lastName: true,
     gender: true,
+    about: true,
+    bio: true,
   })
   .partial();
 
@@ -53,6 +80,13 @@ export const userCredentialsUpdateSchema = userSchema
   .pick({
     username: true,
     email: true,
+  })
+  .partial();
+
+export const userPreferencesUpdateSchema = userSchema
+  .pick({
+    emailNotifications: true,
+    monthlyReports: true,
   })
   .partial();
 
@@ -72,10 +106,3 @@ export const checkUsernameSchema = z.object({
   available: z.boolean().describe("Indicates if the username is available"),
   exists: z.boolean().describe("Indicates if the username already exists"),
 });
-
-export type User = z.infer<typeof userSchema>;
-export type UserStats = z.infer<typeof userStats>;
-export type UserCreate = z.infer<typeof userInsertSchema>;
-export type UserUpdateProfile = z.infer<typeof userUpdateSchema>;
-export type UserCredentialsUpdate = z.infer<typeof userCredentialsUpdateSchema>;
-export type CheckUsername = z.infer<typeof checkUsernameSchema>;

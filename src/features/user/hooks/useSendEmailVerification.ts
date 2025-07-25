@@ -1,13 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
-import { AuthApi } from "../../auth/services/authApi";
-import { queryClient } from "../../../lib/queryClient";
+import { queryClient } from "@shared/lib/queryClient";
+import { authService } from "@/features/auth/services/autsService";
 
 export const useSendEmailVerification = () => {
-  const authApi = new AuthApi();
-
   return useMutation({
-    mutationFn: () => authApi.sendEmailVerification(),
+    mutationFn: () => authService.sendEmailVerification(),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["user", "email-verification"],

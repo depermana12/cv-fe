@@ -1,20 +1,19 @@
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "../../../lib/queryClient";
-import { User, UserUpdateProfile } from "../schema/user";
-import { UserApi } from "../service/UserApi";
+import { queryClient } from "@shared/lib/queryClient";
+import { UserUpdateProfile } from "../types/user.types";
 import { notifications } from "@mantine/notifications";
+import { userService } from "../service/userService";
 
-const userApi = new UserApi<User, UserUpdateProfile>();
 export const useUpdateProfile = () => {
   return useMutation({
     mutationFn: async (updateData: UserUpdateProfile) => {
-      const res = await userApi.updateMe(updateData);
-      return res.data.data;
+      const res = await userService.updateMe(updateData);
+      return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user", "me"] });
       notifications.show({
-        position: "top-center",
+        position: "top-right",
         withCloseButton: true,
         autoClose: 3000,
         title: "Profile updated",
@@ -24,7 +23,7 @@ export const useUpdateProfile = () => {
     },
     onError: (err) => {
       notifications.show({
-        position: "top-center",
+        position: "top-right",
         withCloseButton: true,
         autoClose: 3000,
         title: "Failed to update profile",

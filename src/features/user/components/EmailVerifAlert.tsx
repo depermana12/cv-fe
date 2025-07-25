@@ -12,7 +12,7 @@ export const EmailVerificationAlert = () => {
     sendVerificationEmail();
   };
 
-  if (emailStatus.verified) {
+  if (emailStatus?.verified) {
     return (
       <Alert icon={<IconMailCheck size={16} />} color="green" mb="md">
         Your email is verified!

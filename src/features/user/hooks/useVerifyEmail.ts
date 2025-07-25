@@ -1,13 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
-import { AuthApi } from "../../auth/services/authApi";
-import { queryClient } from "../../../lib/queryClient";
+import { queryClient } from "@shared/lib/queryClient";
+import { authService } from "@/features/auth/services/autsService";
 
 export const useVerifyEmail = () => {
-  const authApi = new AuthApi();
   return useMutation({
-    mutationFn: (token: string) => authApi.verifyEmail(token),
+    mutationFn: (token: string) => authService.verifyEmail(token),
     onSuccess: () => {
-      // Invalidate relevant queries to refresh user data
       queryClient.invalidateQueries({
         queryKey: ["user", "me"],
       });
