@@ -6,7 +6,7 @@ import {
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
-import { BreadcrumbItem } from "../../../hooks/useBreadcrumbItems";
+import { BreadcrumbItem } from "@shared/hooks/useBreadcrumbItems";
 
 const DASHBOARD_LABEL = "Dashboard";
 const DASHBOARD_PATH = "/dashboard";
