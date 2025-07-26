@@ -18,8 +18,6 @@ import {
   IconFileCv,
   IconPlus,
   IconSearch,
-  IconGridDots,
-  IconList,
   IconSortAscending,
   IconSortDescending,
 } from "@tabler/icons-react";
@@ -110,11 +108,11 @@ export const CvLibrary = ({ onCvSelect }: { onCvSelect: (cv: Cv) => void }) => {
             <Tooltip
               label={`Sort ${sortOrder === "asc" ? "Ascending" : "Descending"}`}
             >
-              <ActionIcon variant="light" size="lg" onClick={toggleSortOrder}>
+              <ActionIcon variant="outline" size="lg" onClick={toggleSortOrder}>
                 {sortOrder === "asc" ? (
-                  <IconSortAscending size={18} />
+                  <IconSortAscending size={20} />
                 ) : (
-                  <IconSortDescending size={18} />
+                  <IconSortDescending size={20} />
                 )}
               </ActionIcon>
             </Tooltip>
@@ -124,6 +122,7 @@ export const CvLibrary = ({ onCvSelect }: { onCvSelect: (cv: Cv) => void }) => {
         {/* View Mode Toggle */}
         <Group gap="md">
           <SegmentedControl
+            radius="sm"
             value={viewMode}
             onChange={(value) => setViewMode(value as ViewMode)}
             data={[
@@ -136,7 +135,6 @@ export const CvLibrary = ({ onCvSelect }: { onCvSelect: (cv: Cv) => void }) => {
                 label: "List",
               },
             ]}
-            size="sm"
           />
         </Group>
       </Group>

@@ -7,17 +7,9 @@ import {
   Menu,
   Box,
   Flex,
+  Title,
 } from "@mantine/core";
-import {
-  IconDots,
-  IconEdit,
-  IconTrash,
-  IconEye,
-  IconDownload,
-  IconCalendar,
-  IconWorld,
-  IconLock,
-} from "@tabler/icons-react";
+import { IconDots, IconEdit, IconTrash } from "@tabler/icons-react";
 import { Cv } from "@features/dashboard/cv/types/types";
 
 interface CvListItemProps {
@@ -42,68 +34,36 @@ export const CvListItem = ({
   };
 
   return (
-    <Card
-      padding="md"
-      radius="md"
-      withBorder
-      style={{
-        cursor: "pointer",
-        transition: "all 0.2s ease",
-        "&:hover": {
-          borderColor: "var(--mantine-color-blue-4)",
-          transform: "translateY(-1px)",
-          boxShadow: "var(--mantine-shadow-sm)",
-        },
-      }}
-      onClick={() => onSelect(cv)}
-    >
+    <Card radius="md" withBorder shadow="sm">
       <Flex justify="space-between" align="center" gap="md">
         {/* Left section - Main info */}
         <Box style={{ flex: 1, minWidth: 0 }}>
           <Group gap="sm" mb="xs">
-            <Text fw={600} size="md" truncate style={{ flex: 1, minWidth: 0 }}>
-              {cv.title}
-            </Text>
-            <Badge
-              variant="light"
-              color={cv.isPublic ? "green" : "gray"}
-              size="sm"
+            <Title
+              order={3}
+              size="h4"
+              lineClamp={1}
+              onClick={() => onSelect(cv)}
+              style={{ cursor: "pointer" }}
             >
-              {cv.isPublic ? (
-                <Group gap={4}>
-                  <IconWorld size={12} />
-                  Public
-                </Group>
-              ) : (
-                <Group gap={4}>
-                  <IconLock size={12} />
-                  Private
-                </Group>
-              )}
+              {cv.title}
+            </Title>
+            <Badge variant="default" size="xs">
+              {cv.isPublic ? "Public" : "Private"}
             </Badge>
           </Group>
 
           {cv.description && (
-            <Text size="sm" c="dimmed" lineClamp={2} mb="xs">
+            <Text size="sm" lineClamp={2}>
               {cv.description}
             </Text>
           )}
 
-          <Group gap="md" c="dimmed">
-            <Group gap={4}>
-              <IconCalendar size={14} />
-              <Text size="xs">Updated {formatDate(cv.updatedAt)}</Text>
-            </Group>
-
-            <Group gap={4}>
-              <IconEye size={14} />
-              <Text size="xs">{cv.views.toLocaleString()} views</Text>
-            </Group>
-
-            <Group gap={4}>
-              <IconDownload size={14} />
-              <Text size="xs">{cv.downloads.toLocaleString()} downloads</Text>
-            </Group>
+          <Group gap="md" c="dimmed" mt="xs">
+            <Text size="xs" c="dimmed">
+              Created: {new Date(cv.createdAt).toLocaleDateString()}
+            </Text>
+            <Text size="xs">Updated {formatDate(cv.updatedAt)}</Text>
           </Group>
         </Box>
 
