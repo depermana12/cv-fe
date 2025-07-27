@@ -38,3 +38,34 @@ export type CvListResponse = {
     offset: number;
   };
 };
+
+// ** CV Section Types **
+
+export type SectionType =
+  | "contact"
+  | "education"
+  | "work"
+  | "skill"
+  | "project"
+  | "organization"
+  | "course"
+  | "language";
+
+export type Section = {
+  id: SectionType;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+};
+
+export type SectionCardProps = {
+  section: Section;
+  variant: "selected" | "available";
+  onRemove?: () => void;
+  onClick?: () => void;
+};
+
+export type SortableSectionCardProps = {
+  section: Section;
+  onRemove: (sectionId: SectionType) => void;
+};
