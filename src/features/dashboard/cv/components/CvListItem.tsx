@@ -9,7 +9,13 @@ import {
   Flex,
   Title,
 } from "@mantine/core";
-import { IconDots, IconEdit, IconTrash } from "@tabler/icons-react";
+import {
+  IconDots,
+  IconTrash,
+  IconLock,
+  IconWorld,
+  IconPencil,
+} from "@tabler/icons-react";
 import { Cv } from "@features/dashboard/cv/types/types";
 
 interface CvListItemProps {
@@ -17,6 +23,7 @@ interface CvListItemProps {
   onSelect: (cv: Cv) => void;
   onEdit?: (cv: Cv) => void;
   onDelete?: (cv: Cv) => void;
+  onToggleVisibility?: () => void;
 }
 
 export const CvListItem = ({
@@ -24,6 +31,7 @@ export const CvListItem = ({
   onSelect,
   onEdit,
   onDelete,
+  onToggleVisibility,
 }: CvListItemProps) => {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -90,14 +98,27 @@ export const CvListItem = ({
 
             <Menu.Dropdown>
               <Menu.Item
-                leftSection={<IconEdit size={14} />}
+                leftSection={<IconPencil size={14} />}
                 onClick={(e) => {
                   e.stopPropagation();
                   onEdit?.(cv);
                 }}
               >
-                Edit
+                Quick Edit
               </Menu.Item>
+              <Menu.Divider />
+              <Menu.Item
+                leftSection={
+                  cv.isPublic ? <IconLock size={14} /> : <IconWorld size={14} />
+                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleVisibility?.();
+                }}
+              >
+                Make {cv.isPublic ? "Private" : "Public"}
+              </Menu.Item>
+              <Menu.Divider />
               <Menu.Item
                 leftSection={<IconTrash size={14} />}
                 color="red"

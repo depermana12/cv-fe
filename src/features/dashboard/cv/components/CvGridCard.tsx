@@ -8,8 +8,6 @@ import {
   ActionIcon,
   Text,
   Divider,
-  Modal,
-  Button,
 } from "@mantine/core";
 import {
   IconDots,
@@ -19,36 +17,21 @@ import {
   IconWorld,
   IconTrash,
 } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
-import { useState } from "react";
 import { Cv } from "@features/dashboard/cv/types/types";
-import { useUpdateCv } from "@features/dashboard/cv/hooks/useUpdateCv";
-import { useDeleteCv } from "@features/dashboard/cv/hooks/useDeleteCv";
-import { CvQuickEditModal } from "./CvQuickEditModal";
 
 export const CvGridCard = ({
   cv,
   onSelect,
+  onDelete,
+  onQuickEdit,
+  onToggleVisibility,
 }: {
   cv: Cv;
   onSelect: (cv: Cv) => void;
+  onDelete?: () => void;
+  onQuickEdit?: () => void;
+  onToggleVisibility?: () => void;
 }) => {
-  const [
-    deleteModalOpened,
-    { open: openDeleteModal, close: closeDeleteModal },
-  ] = useDisclosure(false);
-  const [quickEditModalOpened, setQuickEditModalOpened] = useState(false);
-  const updateCv = useUpdateCv();
-  const deleteCv = useDeleteCv();
-
-  const handleToggleVisibility = () => {
-    updateCv.mutate({ cvId: cv.id, data: { isPublic: !cv.isPublic } });
-  };
-
-  const handleDelete = () => {
-    deleteCv.mutate(cv.id, { onSuccess: closeDeleteModal });
-  };
-
   return (
     <>
       <Card radius="md" withBorder shadow="sm">
@@ -86,7 +69,7 @@ export const CvGridCard = ({
                 </Menu.Item>
                 <Menu.Item
                   leftSection={<IconPencil size={14} />}
-                  onClick={() => setQuickEditModalOpened(true)}
+                  onClick={onQuickEdit}
                 >
                   Quick Edit
                 </Menu.Item>
@@ -99,7 +82,7 @@ export const CvGridCard = ({
                       <IconWorld size={14} />
                     )
                   }
-                  onClick={handleToggleVisibility}
+                  onClick={onToggleVisibility}
                 >
                   Make {cv.isPublic ? "Private" : "Public"}
                 </Menu.Item>
@@ -107,7 +90,7 @@ export const CvGridCard = ({
                 <Menu.Item
                   color="red"
                   leftSection={<IconTrash size={14} />}
-                  onClick={openDeleteModal}
+                  onClick={onDelete}
                 >
                   Delete
                 </Menu.Item>
@@ -131,36 +114,6 @@ export const CvGridCard = ({
           </Group>
         </Stack>
       </Card>
-
-      <Modal
-        opened={deleteModalOpened}
-        onClose={closeDeleteModal}
-        title="Delete CV?"
-        centered
-      >
-        <Text mb="lg">
-          This will delete your cv{" "}
-          <span style={{ fontWeight: 700 }}>{cv.title}</span>
-        </Text>
-        <Group justify="flex-end">
-          <Button variant="default" onClick={closeDeleteModal}>
-            Cancel
-          </Button>
-          <Button
-            color="red"
-            onClick={handleDelete}
-            loading={deleteCv.isPending}
-          >
-            Delete
-          </Button>
-        </Group>
-      </Modal>
-
-      <CvQuickEditModal
-        opened={quickEditModalOpened}
-        onClose={() => setQuickEditModalOpened(false)}
-        cvId={cv.id}
-      />
     </>
   );
 };
