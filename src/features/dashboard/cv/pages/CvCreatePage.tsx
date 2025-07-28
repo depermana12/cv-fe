@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Button,
   TextInput,
@@ -13,19 +12,15 @@ import {
   Grid,
   Paper,
   Title,
-  ActionIcon,
   Container,
-  Breadcrumbs,
-  Anchor,
 } from "@mantine/core";
-import { IconRefresh, IconArrowLeft } from "@tabler/icons-react";
-import { useDebouncedValue } from "@mantine/hooks";
+import { IconArrowLeft } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { notifications } from "@mantine/notifications";
-import { useNavigate, Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { cvCreateSchema } from "../schema/cv.schema";
 import { useCreateCv } from "../hooks/useCreateCv";
-import { useSlugAvailability } from "../hooks/useSlugExist";
+import { cvService } from "../services/cvService";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
 import type { CvCreate } from "../types/types";
@@ -46,8 +41,7 @@ export const LANGUAGES = [
 
 export const CvCreatePage = () => {
   const navigate = useNavigate();
-  const createCv = useCreateCv();
-  const [isSlugEdited, setIsSlugEdited] = useState(false);
+  const { mutate: createCv, isPending } = useCreateCv();
 
   const defaultValues: CvCreate = {
     title: "",
@@ -58,104 +52,35 @@ export const CvCreatePage = () => {
     language: "id",
   };
 
-  const { Field, handleSubmit, state, setFieldValue } = useForm({
+  const cvform = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      // Validate slug availability before submission if CV is public
-      if (value.isPublic && value.slug) {
-        // Make sure we have the latest slug availability check
-        if (debouncedSlug !== value.slug) {
+      createCv(value, {
+        onSuccess: (createdCv) => {
           notifications.show({
-            title: "Please wait",
-            message: "Checking slug availability...",
-            color: "blue",
+            position: "top-right",
+            withCloseButton: true,
+            autoClose: 5000,
+            title: "Success!",
+            message: `CV "${value.title}" has been created successfully.`,
+            color: "green",
           });
-          return;
-        }
 
-        if (slugAvailability?.data && !slugAvailability.data.available) {
-          notifications.show({
-            title: "Error",
-            message:
-              "The chosen slug is not available. Please choose a different one.",
-            color: "red",
+          navigate({
+            to: "/dashboard/cv/library/$cvId",
+            params: { cvId: createdCv.id.toString() },
           });
-          return;
-        }
-      }
-
-      try {
-        const createdCv = await createCv.mutateAsync(value);
-        notifications.show({
-          title: "Success!",
-          message: `CV "${value.title}" has been created successfully.`,
-          color: "green",
-        });
-
-        // Redirect to the created CV
-        navigate({
-          to: "/dashboard/cv/library/$cvId",
-          params: { cvId: createdCv.id.toString() },
-        });
-      } catch (error) {
-        notifications.show({
-          title: "Error",
-          message: "Failed to create CV. Please try again.",
-          color: "red",
-        });
-      }
+        },
+      });
+    },
+    validators: {
+      onSubmit: zFieldValidator(cvCreateSchema),
     },
   });
-
-  // Only check slug availability when CV is public and slug exists
-  const [debouncedSlug] = useDebouncedValue(state.values.slug || "", 500);
-  const shouldCheckSlug =
-    state.values.isPublic && !!debouncedSlug && debouncedSlug.length > 0;
-
-  const slugAvailability = useSlugAvailability(
-    debouncedSlug,
-    undefined, // No excludeCvId for new CVs
-    shouldCheckSlug,
-  );
-
-  const generateSlug = (title: string) => {
-    if (title) {
-      return title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-    }
-    return "";
-  };
-
-  const updateSlugFromTitle = (title: string) => {
-    if (!isSlugEdited) {
-      const newSlug = generateSlug(title);
-      setFieldValue("slug", newSlug);
-    }
-  };
-
-  const handleCheckSlugAvailability = () => {
-    slugAvailability.refetch();
-  };
 
   const handleGoBack = () => {
     navigate({ to: "/dashboard/cv/library" });
   };
-
-  useEffect(() => {
-    if (!state.values.slug && isSlugEdited) {
-      setIsSlugEdited(false);
-    }
-  }, [state.values.slug, isSlugEdited]);
-
-  const isFormValid =
-    state.values.title &&
-    state.values.title.length >= 3 &&
-    (!state.values.isPublic ||
-      !state.values.slug ||
-      (shouldCheckSlug && slugAvailability.data?.available) ||
-      !shouldCheckSlug);
 
   return (
     <Container size="md">
@@ -172,13 +97,6 @@ export const CvCreatePage = () => {
             </Button>
           </Group>
 
-          <Breadcrumbs>
-            <Anchor component={Link} to="/dashboard/cv/library">
-              CVs
-            </Anchor>
-            <Text>Create New CV</Text>
-          </Breadcrumbs>
-
           <Title order={1}>Create New CV</Title>
           <Text c="dimmed">
             Fill in the details below to create your new CV
@@ -189,12 +107,12 @@ export const CvCreatePage = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit();
+            cvform.handleSubmit();
           }}
         >
           <Box pos="relative">
             <LoadingOverlay
-              visible={state.isSubmitting || createCv.isPending}
+              visible={cvform.state.isSubmitting || isPending}
               overlayProps={{ radius: "sm", blur: 2 }}
             />
 
@@ -205,7 +123,7 @@ export const CvCreatePage = () => {
                     Basic Information
                   </Title>
 
-                  <Field
+                  <cvform.Field
                     name="title"
                     validators={{
                       onBlur: zFieldValidator(cvCreateSchema.shape.title),
@@ -221,7 +139,6 @@ export const CvCreatePage = () => {
                           onChange={(e) => handleChange(e.target.value)}
                           onBlur={() => {
                             handleBlur();
-                            updateSlugFromTitle(state.value);
                           }}
                           error={errorField}
                         />
@@ -229,7 +146,7 @@ export const CvCreatePage = () => {
                     }}
                   />
 
-                  <Field
+                  <cvform.Field
                     name="description"
                     validators={{
                       onBlur: zFieldValidator(cvCreateSchema.shape.description),
@@ -261,7 +178,7 @@ export const CvCreatePage = () => {
                   </Title>
 
                   <Group grow>
-                    <Field
+                    <cvform.Field
                       name="theme"
                       children={({ state, handleChange }) => (
                         <Select
@@ -290,7 +207,7 @@ export const CvCreatePage = () => {
                       )}
                     />
 
-                    <Field
+                    <cvform.Field
                       name="language"
                       children={({ state, handleChange }) => (
                         <Select
@@ -318,146 +235,117 @@ export const CvCreatePage = () => {
 
                   <Grid>
                     <Grid.Col span={4}>
-                      <Field name="isPublic">
-                        {({ state, handleChange }) => (
+                      <cvform.Field
+                        name="isPublic"
+                        children={({ state, handleChange }) => (
                           <Select
                             label="Visibility"
                             description="Who can view your CV"
                             data={[
-                              { value: "private", label: "Private" },
-                              { value: "public", label: "Public" },
+                              { value: "false", label: "Private" },
+                              { value: "true", label: "Public" },
                             ]}
-                            value={state.value ? "public" : "private"}
-                            onChange={(value) =>
-                              handleChange(value === "public")
-                            }
+                            value={state.value ? "true" : "false"}
+                            onChange={(value) => handleChange(value === "true")}
                             allowDeselect={false}
                           />
                         )}
-                      </Field>
+                      />
                     </Grid.Col>
 
                     <Grid.Col span={8}>
-                      {state.values.isPublic && (
-                        <Field
-                          name="slug"
-                          validators={{
-                            onBlur: zFieldValidator(cvCreateSchema.shape.slug),
-                          }}
-                        >
-                          {({ state: slugState, handleChange, handleBlur }) => {
-                            const fieldError = useFieldError(slugState.meta);
-                            const isCheckingSlug =
-                              shouldCheckSlug &&
-                              slugAvailability.isLoading &&
-                              debouncedSlug === slugState.value;
-                            const slugNotAvailable =
-                              shouldCheckSlug &&
-                              slugAvailability.data &&
-                              !slugAvailability.data.available &&
-                              debouncedSlug === slugState.value;
-                            const slugAvailable =
-                              shouldCheckSlug &&
-                              slugAvailability.data &&
-                              slugAvailability.data.available &&
-                              debouncedSlug === slugState.value;
-
-                            let slugError = fieldError;
-                            if (slugNotAvailable) {
-                              slugError = "This slug is already taken";
+                      <cvform.Field
+                        name="slug"
+                        asyncDebounceMs={500}
+                        validators={{
+                          onBlur: zFieldValidator(cvCreateSchema.shape.slug),
+                          onChangeAsync: async ({ value }) => {
+                            if (!value || value.length < 3) {
+                              return undefined;
                             }
+                            try {
+                              const response =
+                                await cvService.slugExists(value);
 
-                            return (
-                              <TextInput
-                                label="URL Slug"
-                                placeholder="my-awesome-cv"
-                                value={slugState.value}
-                                onChange={(e) => {
-                                  const newValue = e.target.value;
-                                  handleChange(newValue);
-                                  if (newValue) {
-                                    setIsSlugEdited(true);
-                                  }
-                                }}
-                                onBlur={handleBlur}
-                                error={slugError}
-                                rightSection={
-                                  slugState.value && (
-                                    <ActionIcon
-                                      variant="subtle"
-                                      size="sm"
-                                      loading={isCheckingSlug}
-                                      onClick={handleCheckSlugAvailability}
-                                      title="Check availability"
-                                    >
-                                      {!isCheckingSlug && slugAvailable && (
-                                        <Text size="xs" c="green.6">
-                                          ✓
-                                        </Text>
-                                      )}
-                                      {!isCheckingSlug && slugNotAvailable && (
-                                        <Text size="xs" c="red.6">
-                                          ✗
-                                        </Text>
-                                      )}
-                                      {!isCheckingSlug &&
-                                        !slugAvailable &&
-                                        !slugNotAvailable && (
-                                          <IconRefresh size={14} />
-                                        )}
-                                    </ActionIcon>
-                                  )
-                                }
-                                description={
-                                  isSlugEdited
-                                    ? "Custom URL (unlinked from title)"
-                                    : "Auto-generated from title"
-                                }
-                              />
-                            );
-                          }}
-                        </Field>
-                      )}
+                              if (!response.data.available) {
+                                return "This slug is already taken";
+                              }
 
-                      {!state.values.isPublic && (
-                        <TextInput
-                          label="URL Slug"
-                          placeholder="Enable public visibility to set a custom URL"
-                          disabled
-                          description="Enable public visibility to set a custom URL"
-                        />
-                      )}
+                              return undefined;
+                            } catch (err) {
+                              return "Unable to validate slug right now.";
+                            }
+                          },
+                        }}
+                        children={({ state, handleChange, handleBlur }) => {
+                          const errorField = state.meta.errors.join(", ");
+                          const isValidating = state.meta.isValidating;
+
+                          return (
+                            <TextInput
+                              label="URL Slug"
+                              placeholder="my-awesome-cv"
+                              description="Custom URL for your CV (e.g., /cv/my-awesome-cv)"
+                              value={state.value}
+                              onChange={(e) => handleChange(e.target.value)}
+                              onBlur={handleBlur}
+                              error={errorField}
+                              rightSection={
+                                isValidating ? (
+                                  <Text size="xs" c="blue.6">
+                                    ⏳
+                                  </Text>
+                                ) : state.value && !errorField ? (
+                                  <Text size="xs" c="green.6">
+                                    ✓
+                                  </Text>
+                                ) : state.value && errorField ? (
+                                  <Text size="xs" c="red.6">
+                                    ✗
+                                  </Text>
+                                ) : null
+                              }
+                            />
+                          );
+                        }}
+                      />
                     </Grid.Col>
                   </Grid>
                 </Stack>
               </Paper>
 
-              {/* Alert Section */}
-              {state.values.isPublic && (
-                <Alert color="blue" variant="light">
-                  <Text size="sm">
-                    {state.values.slug &&
-                    shouldCheckSlug &&
-                    slugAvailability.data?.available ? (
-                      <>
-                        Your CV will be publicly accessible at:{" "}
-                        <Text component="span" fw={500} c="blue.7">
-                          /cv/{state.values.slug}
+              {/* Alert Section - Using cvform.Subscribe for reactivity */}
+              <cvform.Subscribe
+                selector={(state) => ({
+                  isPublic: state.values.isPublic,
+                  slug: state.values.slug,
+                })}
+                children={({ isPublic, slug }) => (
+                  <>
+                    {/* Red alert when public but no slug */}
+                    {isPublic && !slug && (
+                      <Alert color="red" variant="light">
+                        <Text size="sm">
+                          A slug is required for public CVs. Please enter a URL
+                          slug below.
                         </Text>
-                      </>
-                    ) : state.values.slug &&
-                      shouldCheckSlug &&
-                      slugAvailability.data &&
-                      !slugAvailability.data.available ? (
-                      "Your CV will be public, but the current slug is not available. Please choose a different one."
-                    ) : state.values.slug ? (
-                      "Your CV will be public. Checking slug availability..."
-                    ) : (
-                      "Your CV will be public. Add a URL slug to make it accessible at a custom URL."
+                      </Alert>
                     )}
-                  </Text>
-                </Alert>
-              )}
+
+                    {/* Blue alert when public and has slug */}
+                    {isPublic && slug && (
+                      <Alert color="blue" variant="light">
+                        <Text size="sm">
+                          Your CV will be publicly accessible at:{" "}
+                          <Text component="span" fw={500} c="blue.7">
+                            domain.com/username/{slug}
+                          </Text>
+                        </Text>
+                      </Alert>
+                    )}
+                  </>
+                )}
+              />
 
               {/* Actions */}
               <Group justify="space-between">
@@ -467,8 +355,12 @@ export const CvCreatePage = () => {
 
                 <Button
                   type="submit"
-                  loading={state.isSubmitting || createCv.isPending}
-                  disabled={!isFormValid}
+                  loading={cvform.state.isSubmitting || isPending}
+                  disabled={
+                    cvform.state.isSubmitting ||
+                    isPending ||
+                    (cvform.state.values.isPublic && !cvform.state.values.slug)
+                  }
                 >
                   Create CV
                 </Button>
