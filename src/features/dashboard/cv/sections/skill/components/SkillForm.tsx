@@ -22,7 +22,7 @@ import { useUpdateSkill } from "../hooks/useUpdateSkill";
 import type { SkillFormProps, SkillInsert } from "../types/skill.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useCvStore } from "../../../store/cvStore";
+import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
 
 const skillTypes = [
   { value: "technical", label: "Technical" },
@@ -52,17 +52,14 @@ const proficiencyLevels = [
   { value: "expert", label: "Expert" },
 ];
 
-export const SkillForm = ({ mode, initialData, onSuccess }: SkillFormProps) => {
+export const SkillForm = ({
+  mode,
+  cvId,
+  initialData,
+  onSuccess,
+}: SkillFormProps) => {
   const { mutate: createSkill, isPending: isCreating } = useCreateSkill();
   const { mutate: updateSkill, isPending: isUpdating } = useUpdateSkill();
-
-  const { activeCvId } = useCvStore();
-
-  if (!activeCvId) {
-    throw new Error("No active CV selected");
-  }
-
-  const cvId = activeCvId;
 
   const defaultSkillValues: SkillInsert = {
     type: "technical",
@@ -85,7 +82,7 @@ export const SkillForm = ({ mode, initialData, onSuccess }: SkillFormProps) => {
         }
       : defaultSkillValues;
 
-  const { Field, handleSubmit, state } = useForm({
+  const skillForm = useForm({
     defaultValues: initialValues,
     onSubmit: ({ value }) => {
       const submitData = {
@@ -121,6 +118,11 @@ export const SkillForm = ({ mode, initialData, onSuccess }: SkillFormProps) => {
       },
     },
   });
+
+  // Auto-sync to form store for live preview using useFormStoreSync
+  useFormStoreSync(skillForm.store, "skill", cvId);
+
+  const { Field, handleSubmit, state } = skillForm;
 
   const isPending = isCreating || isUpdating;
 

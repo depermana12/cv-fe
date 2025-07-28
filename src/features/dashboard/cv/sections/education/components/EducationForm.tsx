@@ -27,7 +27,7 @@ import type {
 } from "../types/education.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useCvStore } from "../../../store/cvStore";
+import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
 
 const degreeOptions = [
   { value: "high_school", label: "High School" },
@@ -39,6 +39,7 @@ const degreeOptions = [
 
 export const EducationForm = ({
   mode,
+  cvId,
   initialData,
   onSuccess,
 }: EducationFormProps) => {
@@ -46,14 +47,6 @@ export const EducationForm = ({
     useCreateEducation();
   const { mutate: updateEducation, isPending: isUpdating } =
     useUpdateEducation();
-
-  const { activeCvId } = useCvStore();
-
-  if (!activeCvId) {
-    throw new Error("No active CV selected");
-  }
-
-  const cvId = activeCvId;
 
   const defaultEducationValues: EducationInsert = {
     institution: "",
@@ -82,7 +75,8 @@ export const EducationForm = ({
         }
       : defaultEducationValues;
 
-  const { Field, handleSubmit, state } = useForm({
+  // Enhanced: Create form instance that can be exposed
+  const educationForm = useForm({
     defaultValues: initialValues,
     onSubmit: ({ value }) => {
       if (mode === "create") {
@@ -112,6 +106,11 @@ export const EducationForm = ({
     },
   });
 
+  // Enhanced: Auto-sync to form store for live preview using useFormStoreSync
+  useFormStoreSync(educationForm.store, "education", cvId);
+
+  const { Field, handleSubmit, state } = educationForm;
+
   const isPending = isCreating || isUpdating;
 
   return (
@@ -123,113 +122,18 @@ export const EducationForm = ({
     >
       <LoadingOverlay visible={state.isSubmitting || isPending} />
 
-      <Stack gap="xl">
-        {/* Education Details Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Education Details
-            </Title>
+      {/* Education Details Section */}
+      <Paper withBorder p="md">
+        <Stack gap="md">
+          <Title order={4} size="md">
+            Education Details
+          </Title>
 
-            <Group grow>
-              <Field
-                name="institution"
-                validators={{
-                  onBlur: zFieldValidator(educationSchema.shape.institution),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <TextInput
-                      name={name}
-                      label="Institution"
-                      placeholder="e.g. University of Example"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      required
-                      autoComplete="organization"
-                    />
-                  );
-                }}
-              </Field>
-
-              <Field
-                name="degree"
-                validators={{
-                  onBlur: zFieldValidator(educationSchema.shape.degree),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <Select
-                      name={name}
-                      label="Degree"
-                      placeholder="Select degree type"
-                      data={degreeOptions}
-                      value={state.value}
-                      onChange={(value) => handleChange(value as any)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      required
-                      searchable
-                    />
-                  );
-                }}
-              </Field>
-            </Group>
-
-            <Group grow>
-              <Field
-                name="fieldOfStudy"
-                validators={{
-                  onBlur: zFieldValidator(educationSchema.shape.fieldOfStudy),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <TextInput
-                      name={name}
-                      label="Field of Study"
-                      placeholder="e.g. Computer Science"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      autoComplete="off"
-                    />
-                  );
-                }}
-              </Field>
-
-              <Field name="gpa">
-                {({ state, name, handleChange }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <TextInput
-                      name={name}
-                      label="GPA"
-                      placeholder="e.g. 3.5"
-                      value={state.value || ""}
-                      onChange={(e) =>
-                        handleChange(e.target.value || undefined)
-                      }
-                      error={errorField}
-                      autoComplete="off"
-                    />
-                  );
-                }}
-              </Field>
-            </Group>
-
+          <Group grow>
             <Field
-              name="location"
+              name="institution"
               validators={{
-                onBlur: zFieldValidator(educationSchema.shape.location),
+                onBlur: zFieldValidator(educationSchema.shape.institution),
               }}
             >
               {({ state, name, handleChange, handleBlur }) => {
@@ -237,8 +141,59 @@ export const EducationForm = ({
                 return (
                   <TextInput
                     name={name}
-                    label="Location"
-                    placeholder="e.g. New York, NY"
+                    label="Institution"
+                    placeholder="e.g. University of Example"
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    required
+                    autoComplete="organization"
+                  />
+                );
+              }}
+            </Field>
+
+            <Field
+              name="degree"
+              validators={{
+                onBlur: zFieldValidator(educationSchema.shape.degree),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <Select
+                    name={name}
+                    label="Degree"
+                    placeholder="Select degree type"
+                    data={degreeOptions}
+                    value={state.value}
+                    onChange={(value) => handleChange(value as any)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    required
+                    searchable
+                  />
+                );
+              }}
+            </Field>
+          </Group>
+
+          <Group grow>
+            <Field
+              name="fieldOfStudy"
+              validators={{
+                onBlur: zFieldValidator(educationSchema.shape.fieldOfStudy),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <TextInput
+                    name={name}
+                    label="Field of Study"
+                    placeholder="e.g. Computer Science"
                     value={state.value}
                     onChange={(e) => handleChange(e.target.value)}
                     onBlur={handleBlur}
@@ -248,152 +203,177 @@ export const EducationForm = ({
                 );
               }}
             </Field>
-          </Stack>
-        </Paper>
 
-        {/* Dates Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Dates
-            </Title>
-            <Group grow>
-              <Field name="startDate">
-                {({ state, name, handleChange }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <DateInput
-                      name={name}
-                      placeholder="Start Date"
-                      label="Start Date"
-                      value={state.value || null}
-                      onChange={(value) => handleChange(value as any)}
-                      error={errorField}
-                    />
-                  );
-                }}
-              </Field>
-              <Field name="endDate">
-                {({ state, name, handleChange }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <DateInput
-                      name={name}
-                      placeholder="End Date"
-                      label="End Date"
-                      value={state.value || null}
-                      onChange={(value) => handleChange(value as any)}
-                      error={errorField}
-                    />
-                  );
-                }}
-              </Field>
-            </Group>
-          </Stack>
-        </Paper>
-
-        {/* Description Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Description
-            </Title>
-
-            <Field name="description">
-              {({ state, handleChange }) => {
-                const descriptions = state.value || [];
-
-                const addDescription = () => {
-                  handleChange([...descriptions, ""]);
-                };
-
-                const updateDescription = (index: number, value: string) => {
-                  const updated = [...descriptions];
-                  updated[index] = value;
-                  handleChange(updated);
-                };
-
-                const removeDescription = (index: number) => {
-                  const updated = descriptions.filter((_, i) => i !== index);
-                  handleChange(updated);
-                };
-
-                return (
-                  <Stack gap="sm">
-                    {descriptions.map((desc, index) => (
-                      <Group key={index} align="flex-start">
-                        <Textarea
-                          placeholder={`Description ${index + 1}`}
-                          value={desc}
-                          onChange={(e) =>
-                            updateDescription(index, e.target.value)
-                          }
-                          style={{ flex: 1 }}
-                          autosize
-                          minRows={2}
-                        />
-                        <ActionIcon
-                          color="red"
-                          variant="subtle"
-                          onClick={() => removeDescription(index)}
-                        >
-                          <IconTrash size={16} />
-                        </ActionIcon>
-                      </Group>
-                    ))}
-
-                    <Button
-                      variant="light"
-                      leftSection={<IconPlus size={16} />}
-                      onClick={addDescription}
-                      size="sm"
-                    >
-                      Add Description
-                    </Button>
-                  </Stack>
-                );
-              }}
-            </Field>
-          </Stack>
-        </Paper>
-
-        {/* Verification Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Verification
-            </Title>
-            <Field
-              name="url"
-              validators={{
-                onBlur: zFieldValidator(educationSchema.shape.url),
-              }}
-            >
-              {({ state, name, handleChange, handleBlur }) => {
+            <Field name="gpa">
+              {({ state, name, handleChange }) => {
                 const errorField = useFieldError(state.meta);
                 return (
                   <TextInput
                     name={name}
-                    label="Verification URL"
-                    placeholder="https://example.ac.id/verify"
-                    value={state.value}
-                    onChange={(e) => handleChange(e.target.value)}
-                    onBlur={handleBlur}
+                    label="GPA"
+                    placeholder="e.g. 3.5"
+                    value={state.value || ""}
+                    onChange={(e) => handleChange(e.target.value || undefined)}
                     error={errorField}
-                    autoComplete="url"
+                    autoComplete="off"
                   />
                 );
               }}
             </Field>
-          </Stack>
-        </Paper>
+          </Group>
 
-        <Group justify="flex-end" mt="lg">
-          <Button type="submit" loading={state.isSubmitting || isPending}>
-            {mode === "create" ? "Create Education" : "Update Education"}
-          </Button>
-        </Group>
-      </Stack>
+          <Field
+            name="location"
+            validators={{
+              onBlur: zFieldValidator(educationSchema.shape.location),
+            }}
+          >
+            {({ state, name, handleChange, handleBlur }) => {
+              const errorField = useFieldError(state.meta);
+              return (
+                <TextInput
+                  name={name}
+                  label="Location"
+                  placeholder="e.g. New York, NY"
+                  value={state.value}
+                  onChange={(e) => handleChange(e.target.value)}
+                  onBlur={handleBlur}
+                  error={errorField}
+                  autoComplete="off"
+                />
+              );
+            }}
+          </Field>
+          {/* Dates Section */}
+          <Title order={4} size="md">
+            Dates
+          </Title>
+          <Group grow>
+            <Field name="startDate">
+              {({ state, name, handleChange }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <DateInput
+                    name={name}
+                    placeholder="Start Date"
+                    label="Start Date"
+                    value={state.value || null}
+                    onChange={(value) => handleChange(value as any)}
+                    error={errorField}
+                  />
+                );
+              }}
+            </Field>
+            <Field name="endDate">
+              {({ state, name, handleChange }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <DateInput
+                    name={name}
+                    placeholder="End Date"
+                    label="End Date"
+                    value={state.value || null}
+                    onChange={(value) => handleChange(value as any)}
+                    error={errorField}
+                  />
+                );
+              }}
+            </Field>
+          </Group>
+          {/* Description Section */}
+          <Title order={4} size="md">
+            Description
+          </Title>
+
+          <Field name="description">
+            {({ state, handleChange }) => {
+              const descriptions = state.value || [];
+
+              const addDescription = () => {
+                handleChange([...descriptions, ""]);
+              };
+
+              const updateDescription = (index: number, value: string) => {
+                const updated = [...descriptions];
+                updated[index] = value;
+                handleChange(updated);
+              };
+
+              const removeDescription = (index: number) => {
+                const updated = descriptions.filter((_, i) => i !== index);
+                handleChange(updated);
+              };
+
+              return (
+                <Stack gap="sm">
+                  {descriptions.map((desc, index) => (
+                    <Group key={index} align="flex-start">
+                      <Textarea
+                        placeholder={`Description ${index + 1}`}
+                        value={desc}
+                        onChange={(e) =>
+                          updateDescription(index, e.target.value)
+                        }
+                        style={{ flex: 1 }}
+                        autosize
+                        minRows={2}
+                      />
+                      <ActionIcon
+                        color="red"
+                        variant="subtle"
+                        onClick={() => removeDescription(index)}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Group>
+                  ))}
+
+                  <Button
+                    variant="light"
+                    leftSection={<IconPlus size={16} />}
+                    onClick={addDescription}
+                    size="sm"
+                  >
+                    Add Description
+                  </Button>
+                </Stack>
+              );
+            }}
+          </Field>
+          {/* Verification Section */}
+          <Title order={4} size="md">
+            Verification
+          </Title>
+          <Field
+            name="url"
+            validators={{
+              onBlur: zFieldValidator(educationSchema.shape.url),
+            }}
+          >
+            {({ state, name, handleChange, handleBlur }) => {
+              const errorField = useFieldError(state.meta);
+              return (
+                <TextInput
+                  name={name}
+                  label="Verification URL"
+                  placeholder="https://example.ac.id/verify"
+                  value={state.value}
+                  onChange={(e) => handleChange(e.target.value)}
+                  onBlur={handleBlur}
+                  error={errorField}
+                  autoComplete="url"
+                />
+              );
+            }}
+          </Field>
+        </Stack>
+      </Paper>
+
+      <Group justify="flex-end" mt="lg">
+        <Button type="submit" loading={state.isSubmitting || isPending}>
+          {mode === "create" ? "Create Education" : "Update Education"}
+        </Button>
+      </Group>
     </form>
   );
 };

@@ -13,6 +13,7 @@ export type LanguageFormMode = "create" | "edit";
 
 export type LanguageFormProps = {
   mode: LanguageFormMode;
+  cvId: number;
   initialData?: Language;
   onSuccess?: () => void;
 };

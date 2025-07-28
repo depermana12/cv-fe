@@ -27,23 +27,16 @@ import { useUpdateProject } from "../hooks/useUpdateProject";
 import type { ProjectFormProps, ProjectInsert } from "../types/project.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useCvStore } from "../../../store/cvStore";
+import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
 
 export const ProjectForm = ({
   mode,
+  cvId,
   initialData,
   onSuccess,
 }: ProjectFormProps) => {
   const { mutate: createProject, isPending: isCreating } = useCreateProject();
   const { mutate: updateProject, isPending: isUpdating } = useUpdateProject();
-
-  const { activeCvId } = useCvStore();
-
-  if (!activeCvId) {
-    throw new Error("No active CV selected");
-  }
-
-  const cvId = activeCvId;
 
   // Dynamic descriptions state
   const [descriptions, setDescriptions] = useState<string[]>(
@@ -75,7 +68,7 @@ export const ProjectForm = ({
         }
       : defaultProjectValues;
 
-  const { Field, handleSubmit, state } = useForm({
+  const projectForm = useForm({
     defaultValues: initialValues,
     onSubmit: ({ value }) => {
       const submitData = {
@@ -111,6 +104,11 @@ export const ProjectForm = ({
       },
     },
   });
+
+  // Auto-sync to form store for live preview using useFormStoreSync
+  useFormStoreSync(projectForm.store, "project", cvId);
+
+  const { Field, handleSubmit, state } = projectForm;
 
   const isPending = isCreating || isUpdating;
 

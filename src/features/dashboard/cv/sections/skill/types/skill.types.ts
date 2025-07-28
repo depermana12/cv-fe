@@ -13,6 +13,7 @@ export type SkillFormMode = "create" | "edit";
 
 export type SkillFormProps = {
   mode: SkillFormMode;
+  cvId: number;
   initialData?: Skill;
   onSuccess?: () => void;
 };

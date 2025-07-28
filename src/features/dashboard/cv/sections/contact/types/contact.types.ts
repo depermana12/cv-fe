@@ -13,6 +13,7 @@ export type ContactFormMode = "create" | "edit";
 
 export type ContactFormProps = {
   mode: ContactFormMode;
+  cvId: number;
   initialData?: Contact;
   onSuccess?: () => void;
 };

@@ -12,7 +12,6 @@ import {
   Textarea,
   ActionIcon,
   Box,
-  Text,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
@@ -27,19 +26,16 @@ import { useUpdateWork } from "../hooks/useUpdateWork";
 import type { WorkFormProps, WorkInsert } from "../types/work.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useCvStore } from "../../../store/cvStore";
+import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
 
-export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
+export const WorkForm = ({
+  mode,
+  cvId,
+  initialData,
+  onSuccess,
+}: WorkFormProps) => {
   const { mutate: createWork, isPending: isCreating } = useCreateWork();
   const { mutate: updateWork, isPending: isUpdating } = useUpdateWork();
-
-  const { activeCvId } = useCvStore();
-
-  if (!activeCvId) {
-    throw new Error("No active CV selected");
-  }
-
-  const cvId = activeCvId;
 
   // Dynamic descriptions state
   const [descriptions, setDescriptions] = useState<string[]>(
@@ -79,7 +75,7 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
         }
       : defaultWorkValues;
 
-  const { Field, handleSubmit, state } = useForm({
+  const workForm = useForm({
     defaultValues: initialValues,
     onSubmit: ({ value }) => {
       const submitData = {
@@ -116,6 +112,11 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
     },
   });
 
+  // Auto-sync to form store for live preview using useFormStoreSync
+  useFormStoreSync(workForm.store, "work", cvId);
+
+  const { Field, handleSubmit, state } = workForm;
+
   const isPending = isCreating || isUpdating;
 
   const addDescription = () => {
@@ -143,259 +144,245 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
     >
       <LoadingOverlay visible={state.isSubmitting || isPending} />
 
-      <Stack gap="xl">
-        {/* Basic Information Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Basic Information
-            </Title>
+      {/* Basic Information Section */}
+      <Paper withBorder p="md">
+        <Stack gap="md">
+          <Title order={4} size="md">
+            Basic Information
+          </Title>
 
-            <Group grow>
-              <Field
-                name="company"
-                validators={{
-                  onBlur: zFieldValidator(workSchema.shape.company),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <TextInput
-                      name={name}
-                      label="Company"
-                      placeholder="Company name"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      required
-                      autoComplete="organization"
-                    />
-                  );
-                }}
-              </Field>
-
-              <Field
-                name="position"
-                validators={{
-                  onBlur: zFieldValidator(workSchema.shape.position),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <TextInput
-                      name={name}
-                      label="Position"
-                      placeholder="Job title or position"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      required
-                      autoComplete="organization-title"
-                    />
-                  );
-                }}
-              </Field>
-            </Group>
-
-            <Group grow>
-              <Field
-                name="location"
-                validators={{
-                  onBlur: zFieldValidator(workSchema.shape.location),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <TextInput
-                      name={name}
-                      label="Location"
-                      placeholder="City, Country"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      autoComplete="address-level2"
-                    />
-                  );
-                }}
-              </Field>
-
-              <Field
-                name="url"
-                validators={{
-                  onBlur: zFieldValidator(workSchema.shape.url),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <TextInput
-                      name={name}
-                      label="Company Website"
-                      placeholder="https://company.com"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      autoComplete="url"
-                    />
-                  );
-                }}
-              </Field>
-            </Group>
-          </Stack>
-        </Paper>
-
-        {/* Employment Period Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Employment Period
-            </Title>
-
+          <Group grow>
             <Field
-              name="isCurrent"
+              name="company"
               validators={{
-                onBlur: zFieldValidator(workSchema.shape.isCurrent),
+                onBlur: zFieldValidator(workSchema.shape.company),
               }}
             >
               {({ state, name, handleChange, handleBlur }) => {
                 const errorField = useFieldError(state.meta);
                 return (
-                  <Checkbox
+                  <TextInput
                     name={name}
-                    label="I currently work here"
-                    checked={state.value}
-                    onChange={(e) => {
-                      const isChecked = e.currentTarget.checked;
-                      handleChange(isChecked);
-                      setIsCurrentWork(isChecked);
-                    }}
+                    label="Company"
+                    placeholder="Company name"
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
                     onBlur={handleBlur}
                     error={errorField}
+                    required
+                    autoComplete="organization"
                   />
                 );
               }}
             </Field>
 
-            <Group grow>
-              <Field
-                name="startDate"
-                validators={{
-                  onBlur: zFieldValidator(workSchema.shape.startDate),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <DateInput
-                      name={name}
-                      label="Start Date"
-                      placeholder="Select start date"
-                      value={state.value || null}
-                      onChange={(value) => handleChange(value as any)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      clearable
-                      maxDate={new Date()}
-                    />
-                  );
-                }}
-              </Field>
+            <Field
+              name="position"
+              validators={{
+                onBlur: zFieldValidator(workSchema.shape.position),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <TextInput
+                    name={name}
+                    label="Position"
+                    placeholder="Job title or position"
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    required
+                    autoComplete="organization-title"
+                  />
+                );
+              }}
+            </Field>
+          </Group>
 
-              <Field
-                name="endDate"
-                validators={{
-                  onBlur: zFieldValidator(workSchema.shape.endDate),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <DateInput
-                      name={name}
-                      label="End Date"
-                      placeholder="Select end date"
-                      value={state.value || null}
-                      onChange={(value) => handleChange(value as any)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      clearable
-                      maxDate={new Date()}
-                      disabled={isCurrentWork}
-                    />
-                  );
-                }}
-              </Field>
-            </Group>
+          <Group grow>
+            <Field
+              name="location"
+              validators={{
+                onBlur: zFieldValidator(workSchema.shape.location),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <TextInput
+                    name={name}
+                    label="Location"
+                    placeholder="City, Country"
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    autoComplete="address-level2"
+                  />
+                );
+              }}
+            </Field>
+
+            <Field
+              name="url"
+              validators={{
+                onBlur: zFieldValidator(workSchema.shape.url),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <TextInput
+                    name={name}
+                    label="Company Website"
+                    placeholder="https://company.com"
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    autoComplete="url"
+                  />
+                );
+              }}
+            </Field>
+          </Group>
+          {/* Employment Period Section */}
+          <Title order={4} size="md">
+            Employment Period
+          </Title>
+
+          <Field
+            name="isCurrent"
+            validators={{
+              onBlur: zFieldValidator(workSchema.shape.isCurrent),
+            }}
+          >
+            {({ state, name, handleChange, handleBlur }) => {
+              const errorField = useFieldError(state.meta);
+              return (
+                <Checkbox
+                  name={name}
+                  label="I currently work here"
+                  checked={state.value}
+                  onChange={(e) => {
+                    const isChecked = e.currentTarget.checked;
+                    handleChange(isChecked);
+                    setIsCurrentWork(isChecked);
+                  }}
+                  onBlur={handleBlur}
+                  error={errorField}
+                />
+              );
+            }}
+          </Field>
+
+          <Group grow>
+            <Field
+              name="startDate"
+              validators={{
+                onBlur: zFieldValidator(workSchema.shape.startDate),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <DateInput
+                    name={name}
+                    label="Start Date"
+                    placeholder="Select start date"
+                    value={state.value || null}
+                    onChange={(value) => handleChange(value as any)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    clearable
+                    maxDate={new Date()}
+                  />
+                );
+              }}
+            </Field>
+
+            <Field
+              name="endDate"
+              validators={{
+                onBlur: zFieldValidator(workSchema.shape.endDate),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <DateInput
+                    name={name}
+                    label="End Date"
+                    placeholder="Select end date"
+                    value={state.value || null}
+                    onChange={(value) => handleChange(value as any)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    clearable
+                    maxDate={new Date()}
+                    disabled={isCurrentWork}
+                  />
+                );
+              }}
+            </Field>
+          </Group>
+
+          {/* Job Descriptions Section */}
+          <Group justify="space-between" align="center">
+            <Title order={4} size="md">
+              Job Descriptions
+            </Title>
+            <Button
+              variant="light"
+              size="sm"
+              leftSection={<IconPlus size={16} />}
+              onClick={addDescription}
+            >
+              Add Description
+            </Button>
+          </Group>
+
+          <Stack gap="sm">
+            {descriptions.map((description, index) => (
+              <Box key={index}>
+                <Group align="flex-start" gap="sm">
+                  <Textarea
+                    placeholder={`Description ${index + 1}`}
+                    value={description}
+                    onChange={(e) => updateDescription(index, e.target.value)}
+                    autosize
+                    minRows={2}
+                    maxRows={4}
+                    style={{ flex: 1 }}
+                    description="Describe your key responsibilities, achievements, and
+              contributions in this role"
+                  />
+                  {descriptions.length > 1 && (
+                    <ActionIcon
+                      color="red"
+                      variant="light"
+                      onClick={() => removeDescription(index)}
+                      style={{ marginTop: 6 }}
+                    >
+                      <IconTrash size={16} />
+                    </ActionIcon>
+                  )}
+                </Group>
+              </Box>
+            ))}
           </Stack>
-        </Paper>
+        </Stack>
+      </Paper>
 
-        {/* Job Descriptions Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
-            <Group justify="space-between" align="center">
-              <Title order={4} size="md">
-                Job Descriptions
-              </Title>
-              <Button
-                variant="light"
-                size="sm"
-                leftSection={<IconPlus size={16} />}
-                onClick={addDescription}
-              >
-                Add Description
-              </Button>
-            </Group>
-
-            <Text size="sm" c="dimmed">
-              Describe your key responsibilities, achievements, and
-              contributions in this role
-            </Text>
-
-            <Stack gap="sm">
-              {descriptions.map((description, index) => (
-                <Box key={index}>
-                  <Group align="flex-start" gap="sm">
-                    <Textarea
-                      placeholder={`Description ${index + 1}`}
-                      value={description}
-                      onChange={(e) => updateDescription(index, e.target.value)}
-                      autosize
-                      minRows={2}
-                      maxRows={4}
-                      style={{ flex: 1 }}
-                    />
-                    {descriptions.length > 1 && (
-                      <ActionIcon
-                        color="red"
-                        variant="light"
-                        onClick={() => removeDescription(index)}
-                        style={{ marginTop: 6 }}
-                      >
-                        <IconTrash size={16} />
-                      </ActionIcon>
-                    )}
-                  </Group>
-                </Box>
-              ))}
-            </Stack>
-          </Stack>
-        </Paper>
-
-        <Group justify="flex-end" mt="lg">
-          <Button type="submit" loading={state.isSubmitting || isPending}>
-            {mode === "create"
-              ? "Create Work Experience"
-              : "Update Work Experience"}
-          </Button>
-        </Group>
-      </Stack>
+      <Group justify="flex-end" mt="lg">
+        <Button type="submit" loading={state.isSubmitting || isPending}>
+          {mode === "create"
+            ? "Create Work Experience"
+            : "Update Work Experience"}
+        </Button>
+      </Group>
     </form>
   );
 };

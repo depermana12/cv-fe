@@ -29,10 +29,11 @@ import type {
 } from "../types/organization.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useCvStore } from "../../../store/cvStore";
+import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
 
 export const OrganizationForm = ({
   mode,
+  cvId,
   initialData,
   onSuccess,
 }: OrganizationFormProps) => {
@@ -40,14 +41,6 @@ export const OrganizationForm = ({
     useCreateOrganization();
   const { mutate: updateOrganization, isPending: isUpdating } =
     useUpdateOrganization();
-
-  const { activeCvId } = useCvStore();
-
-  if (!activeCvId) {
-    throw new Error("No active CV selected");
-  }
-
-  const cvId = activeCvId;
 
   // Dynamic descriptions state
   const [descriptions, setDescriptions] = useState<string[]>(
@@ -79,7 +72,7 @@ export const OrganizationForm = ({
         }
       : defaultOrganizationValues;
 
-  const { Field, handleSubmit, state } = useForm({
+  const organizationForm = useForm({
     defaultValues: initialValues,
     onSubmit: ({ value }) => {
       const submitData = {
@@ -116,6 +109,11 @@ export const OrganizationForm = ({
       },
     },
   });
+
+  // Auto-sync to form store for live preview using useFormStoreSync
+  useFormStoreSync(organizationForm.store, "organization", cvId);
+
+  const { Field, handleSubmit, state } = organizationForm;
 
   const isPending = isCreating || isUpdating;
 

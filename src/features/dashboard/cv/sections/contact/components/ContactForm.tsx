@@ -22,23 +22,16 @@ import { useUpdateContact } from "../hooks/useUpdateContact";
 import type { ContactFormProps, ContactInsert } from "../types/contact.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useCvStore } from "../../../store/cvStore";
+import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
 
 export const ContactForm = ({
   mode,
+  cvId,
   initialData,
   onSuccess,
 }: ContactFormProps) => {
   const { mutate: createContact, isPending: isCreating } = useCreateContact();
   const { mutate: updateContact, isPending: isUpdating } = useUpdateContact();
-
-  const { activeCvId } = useCvStore();
-
-  if (!activeCvId) {
-    throw new Error("No active CV selected");
-  }
-
-  const cvId = activeCvId;
 
   const defaultContactValues: ContactInsert = {
     firstName: "",
@@ -79,7 +72,7 @@ export const ContactForm = ({
         }
       : defaultContactValues;
 
-  const { Field, handleSubmit, state } = useForm({
+  const contactForm = useForm({
     defaultValues: initialValues,
     onSubmit: ({ value }) => {
       if (mode === "create") {
@@ -109,6 +102,11 @@ export const ContactForm = ({
     },
   });
 
+  // Auto-sync to form store for live preview
+  useFormStoreSync(contactForm.store, "contact", cvId);
+
+  const { Field, handleSubmit, state } = contactForm;
+
   const isPending = isCreating || isUpdating;
 
   return (
@@ -119,11 +117,10 @@ export const ContactForm = ({
       }}
     >
       <LoadingOverlay visible={state.isSubmitting || isPending} />
-
-      <Stack gap="xl">
-        {/* Personal Information Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
+      <Paper p="md" withBorder>
+        <Stack gap="md">
+          {/* Personal Information Section */}
+          <Stack>
             <Title order={4} size="md">
               Personal Information
             </Title>
@@ -147,6 +144,7 @@ export const ContactForm = ({
                       onBlur={handleBlur}
                       error={errorField}
                       autoComplete="given-name"
+                      required
                     />
                   );
                 }}
@@ -170,6 +168,7 @@ export const ContactForm = ({
                       onBlur={handleBlur}
                       error={errorField}
                       autoComplete="family-name"
+                      required
                     />
                   );
                 }}
@@ -223,10 +222,37 @@ export const ContactForm = ({
               }}
             </Field>
           </Stack>
-        </Paper>
+          <Stack gap="md">
+            <Title order={4} size="md">
+              Professional Summary
+            </Title>
 
-        {/* Contact Information Section */}
-        <Paper withBorder p="md">
+            <Field
+              name="summary"
+              validators={{
+                onBlur: zFieldValidator(contactSchema.shape.summary),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <Textarea
+                    name={name}
+                    placeholder="Write a brief summary about yourself, your experience, and your career goals..."
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    autosize
+                    minRows={4}
+                    maxRows={8}
+                  />
+                );
+              }}
+            </Field>
+          </Stack>
+
+          {/* Contact Information Section */}
           <Stack gap="md">
             <Title order={4} size="md">
               Contact Information
@@ -281,16 +307,6 @@ export const ContactForm = ({
                 }}
               </Field>
             </Group>
-          </Stack>
-        </Paper>
-
-        {/* Location Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Location
-            </Title>
-
             <Group grow>
               <Field
                 name="city"
@@ -362,11 +378,9 @@ export const ContactForm = ({
               }}
             </Field>
           </Stack>
-        </Paper>
 
-        {/* Professional Links Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
+          {/* Professional Links Section */}
+          <Stack>
             <Title order={4} size="md">
               Professional Links
             </Title>
@@ -466,16 +480,6 @@ export const ContactForm = ({
                 }}
               </Field>
             </Group>
-          </Stack>
-        </Paper>
-
-        {/* Social Links Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Additional Social Links
-            </Title>
-
             <Field name="socialLinks">
               {({ state, handleChange }) => {
                 const socialLinks = state.value || [];
@@ -496,7 +500,7 @@ export const ContactForm = ({
                 };
 
                 return (
-                  <Stack gap="sm">
+                  <Stack>
                     {socialLinks.map((link, index) => (
                       <Group key={index} align="flex-end">
                         <TextInput
@@ -519,60 +523,26 @@ export const ContactForm = ({
                     ))}
 
                     <Button
-                      variant="light"
+                      variant="outline"
                       leftSection={<IconPlus size={16} />}
                       onClick={addSocialLink}
                       size="sm"
                     >
-                      Add Social Link
+                      Add More Links
                     </Button>
                   </Stack>
                 );
               }}
             </Field>
           </Stack>
-        </Paper>
 
-        {/* Summary Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Summary
-            </Title>
-
-            <Field
-              name="summary"
-              validators={{
-                onBlur: zFieldValidator(contactSchema.shape.summary),
-              }}
-            >
-              {({ state, name, handleChange, handleBlur }) => {
-                const errorField = useFieldError(state.meta);
-                return (
-                  <Textarea
-                    name={name}
-                    label="Professional Summary"
-                    placeholder="Write a brief summary about yourself, your experience, and your career goals..."
-                    value={state.value}
-                    onChange={(e) => handleChange(e.target.value)}
-                    onBlur={handleBlur}
-                    error={errorField}
-                    autosize
-                    minRows={4}
-                    maxRows={8}
-                  />
-                );
-              }}
-            </Field>
-          </Stack>
-        </Paper>
-
-        <Group justify="flex-end" mt="lg">
-          <Button type="submit" loading={state.isSubmitting || isPending}>
-            {mode === "create" ? "Create Contact" : "Update Contact"}
-          </Button>
-        </Group>
-      </Stack>
+          <Group justify="flex-end" mt="lg">
+            <Button type="submit" loading={state.isSubmitting || isPending}>
+              {mode === "create" ? "Create Contact" : "Update Contact"}
+            </Button>
+          </Group>
+        </Stack>
+      </Paper>
     </form>
   );
 };

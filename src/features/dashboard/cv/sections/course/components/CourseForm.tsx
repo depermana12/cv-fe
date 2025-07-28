@@ -26,23 +26,16 @@ import { useUpdateCourse } from "../hooks/useUpdateCourse";
 import type { CourseInsert, CourseFormProps } from "../types/course.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useCvStore } from "../../../store/cvStore";
+import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
 
 export const CourseForm = ({
   mode,
+  cvId,
   initialData,
   onSuccess,
 }: CourseFormProps) => {
   const { mutate: createCourse, isPending: isCreating } = useCreateCourse();
   const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
-
-  const { activeCvId } = useCvStore();
-
-  if (!activeCvId) {
-    throw new Error("No active CV selected");
-  }
-
-  const cvId = activeCvId;
 
   // Dynamic descriptions state
   const [descriptions, setDescriptions] = useState<string[]>(
@@ -72,7 +65,7 @@ export const CourseForm = ({
         }
       : defaultCourseValues;
 
-  const { Field, handleSubmit, state } = useForm({
+  const courseForm = useForm({
     defaultValues: initialValues,
     onSubmit: ({ value }) => {
       const submitData = {
@@ -107,6 +100,11 @@ export const CourseForm = ({
       },
     },
   });
+
+  // Auto-sync to form store for live preview using useFormStoreSync
+  useFormStoreSync(courseForm.store, "course", cvId);
+
+  const { Field, handleSubmit, state } = courseForm;
 
   const isPending = isCreating || isUpdating;
 

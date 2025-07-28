@@ -1,10 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { languageService } from "../services/languageService";
+import { languageQuery, languagesQuery } from "./query";
 
-export const useLanguages = (cvId: number) => {
-  return useQuery({
-    queryKey: ["languages", cvId],
-    queryFn: () => languageService.getAll(cvId),
-    enabled: !!cvId,
-  });
-};
+export const useLanguage = (cvId: number, languageId: number) =>
+  useQuery(languageQuery(cvId, languageId));
+
+export const useLanguages = (cvId: number) => useQuery(languagesQuery(cvId));

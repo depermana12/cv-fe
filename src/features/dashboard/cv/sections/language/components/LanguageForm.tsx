@@ -23,7 +23,7 @@ import type {
 } from "../types/language.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useCvStore } from "../../../store/cvStore";
+import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
 
 const fluencyOptions = [
   { value: "beginner", label: "Beginner" },
@@ -33,19 +33,12 @@ const fluencyOptions = [
 
 export const LanguageForm = ({
   mode,
+  cvId,
   initialData,
   onSuccess,
 }: LanguageFormProps) => {
   const { mutate: createLanguage, isPending: isCreating } = useCreateLanguage();
   const { mutate: updateLanguage, isPending: isUpdating } = useUpdateLanguage();
-
-  const { activeCvId } = useCvStore();
-
-  if (!activeCvId) {
-    throw new Error("No active CV selected");
-  }
-
-  const cvId = activeCvId;
 
   const defaultLanguageValues: LanguageInsert = {
     language: "",
@@ -60,7 +53,7 @@ export const LanguageForm = ({
         }
       : defaultLanguageValues;
 
-  const { Field, handleSubmit, state } = useForm({
+  const languageForm = useForm({
     defaultValues: initialValues,
     onSubmit: ({ value }) => {
       if (mode === "create") {
@@ -89,6 +82,10 @@ export const LanguageForm = ({
       },
     },
   });
+  // Auto-sync to form store for live preview using useFormStoreSync
+  useFormStoreSync(languageForm.store, "language", cvId);
+
+  const { Field, handleSubmit, state } = languageForm;
 
   const isPending = isCreating || isUpdating;
 
