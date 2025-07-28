@@ -13,7 +13,7 @@ export const OverviewQuickItems = () => {
       title: "Create New CV",
       description: "Start building a new CV from scratch",
       icon: IconPlus,
-      route: "/dashboard/cv/create",
+      route: "/dashboard/cv/library",
     },
     {
       title: "Browse Templates",

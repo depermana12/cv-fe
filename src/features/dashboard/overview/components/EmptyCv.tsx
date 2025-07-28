@@ -18,7 +18,7 @@ export const EmptyCv = () => {
           variant="outline"
           size="md"
           component={Link}
-          to="/dashboard/cv/create"
+          to="/dashboard/cv/library"
           leftSection={<IconPlus size={16} />}
         >
           Create Your First CV
