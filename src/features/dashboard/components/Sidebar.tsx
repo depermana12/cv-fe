@@ -21,7 +21,7 @@ const mainNavItems: NavItem[] = [
     route: "/dashboard/overview",
     icon: IconLayoutDashboard,
   },
-  { label: "CV Builder", route: "/dashboard/cv/create", icon: IconFileCv },
+  { label: "CV Builder", route: "/dashboard/cv/library", icon: IconFileCv },
   { label: "Templates", route: "/dashboard/templates", icon: IconTools },
   { label: "Jobs Tracker", route: "/dashboard/tracker", icon: IconMapRoute },
 ];
