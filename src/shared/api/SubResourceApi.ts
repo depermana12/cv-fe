@@ -29,7 +29,6 @@ export class SubResourceApi<T, I> implements ISubResourceApi<T, I> {
     );
     return res.data;
   }
-
   async get(cvId: number, id: number) {
     const res = await axiosClient.get<ApiResponse<T>>(
       `${this.resource}/${cvId}/${this.subResource}/${id}`,

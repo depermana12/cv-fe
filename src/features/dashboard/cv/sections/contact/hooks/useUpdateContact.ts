@@ -18,9 +18,17 @@ export const useUpdateContact = () => {
       const res = await contactService.patch(cvId, contactId, data);
       return res.data;
     },
-    onSuccess: (variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["cvs", "contacts", variables.cvId],
+        queryKey: ["cvs", variables.cvId, "contacts"],
+      });
+      notifications.show({
+        position: "top-center",
+        withCloseButton: true,
+        autoClose: 3000,
+        title: "Contact updated successfully",
+        message: `Contact has been updated.`,
+        color: "green",
       });
     },
     onError: (err) => {

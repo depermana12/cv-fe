@@ -20,6 +20,14 @@ export const useUpdateWork = () => {
     },
     onSuccess: (_updated, { cvId }) => {
       queryClient.invalidateQueries({ queryKey: ["cvs", cvId, "works"] });
+      notifications.show({
+        position: "top-center",
+        withCloseButton: true,
+        autoClose: 3000,
+        title: "Work experience updated successfully",
+        message: "Work experience has been updated successfully.",
+        color: "green",
+      });
     },
     onError: (err) => {
       notifications.show({

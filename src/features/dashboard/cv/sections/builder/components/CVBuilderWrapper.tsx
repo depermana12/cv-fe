@@ -33,7 +33,7 @@ type CVBuilderWrapperProps = {
 
 export const CVBuilderWrapper = ({ onBack }: CVBuilderWrapperProps) => {
   const [activeTab, setActiveTab] = useState<"sections" | "content" | "design">(
-    "sections",
+    "content",
   );
   const { activeCvId } = useCvStore();
   const { loadSectionsForCv } = useCVSectionStore();
@@ -71,7 +71,9 @@ export const CVBuilderWrapper = ({ onBack }: CVBuilderWrapperProps) => {
             ></Button>
           )}
 
-          <Title order={3}>{cv.title}</Title>
+          <Title order={3} size="h4">
+            {cv.title}
+          </Title>
         </Group>
 
         <Button leftSection={<IconFileText size={16} />}>Export</Button>
@@ -103,12 +105,15 @@ export const CVBuilderWrapper = ({ onBack }: CVBuilderWrapperProps) => {
           <Grid.Col span={6}>
             <Box>
               <Tabs.Panel value="sections">
+                {/* Section Manager */}
                 <CvSectionManager />
               </Tabs.Panel>
               <Tabs.Panel value="content">
+                {/* Content Editor */}
                 <CVContentEditor cvId={cv.id} />
               </Tabs.Panel>
               <Tabs.Panel value="design" p="md">
+                {/* Design Editor */}
                 <CVDesignEditor cvId={cv.id} />
               </Tabs.Panel>
             </Box>

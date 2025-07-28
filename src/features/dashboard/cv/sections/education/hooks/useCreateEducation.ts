@@ -16,9 +16,17 @@ export const useCreateEducation = () => {
       const res = await educationService.post(cvId, data);
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["cvs", "educations", data.cvId],
+        queryKey: ["cvs", variables.cvId, "educations"],
+      });
+      notifications.show({
+        position: "top-center",
+        withCloseButton: true,
+        autoClose: 3000,
+        title: "Education added successfully",
+        message: `Education has been added successfully.`,
+        color: "green",
       });
     },
     onError: (err) => {

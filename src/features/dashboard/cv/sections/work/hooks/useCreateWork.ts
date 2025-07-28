@@ -13,7 +13,15 @@ export const useCreateWork = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["cvs", "works", variables.cvId],
+        queryKey: ["cvs", variables.cvId, "works"],
+      });
+      notifications.show({
+        position: "top-center",
+        withCloseButton: true,
+        autoClose: 3000,
+        title: "Work experience added successfully",
+        message: "Work experience has been added successfully.",
+        color: "green",
       });
     },
     onError: (err) => {
