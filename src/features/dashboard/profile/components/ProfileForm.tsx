@@ -8,6 +8,7 @@ import {
   TextInput,
   Select,
   LoadingOverlay,
+  Textarea,
 } from "@mantine/core";
 import { useForm } from "@tanstack/react-form";
 import { DatePickerInput } from "@mantine/dates";
@@ -25,12 +26,10 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
     defaultValues: {
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
-      birthDate: user?.birthDate
-        ? typeof user.birthDate === "string"
-          ? new Date(user.birthDate)
-          : user.birthDate
-        : null,
-      gender: user?.gender || null,
+      birthDate: user?.birthDate ? new Date(user.birthDate) : undefined,
+      gender: user?.gender || undefined,
+      about: user?.about || "",
+      bio: user?.bio || "",
     },
     onSubmit: async ({ value }) => {
       updateProfile(value, {
@@ -109,7 +108,7 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                   placeholder="Select your birth date"
                   value={state.value}
                   onChange={(date) =>
-                    handleChange(date ? new Date(date) : null)
+                    handleChange(date ? new Date(date) : undefined)
                   }
                   onBlur={handleBlur}
                   error={isEditing ? useFieldError(state.meta) : undefined}
@@ -135,7 +134,7 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                     { value: "female", label: "Female" },
                   ]}
                   onChange={(value) =>
-                    handleChange(value as "male" | "female" | null)
+                    handleChange(value as "male" | "female" | undefined)
                   }
                   onBlur={handleBlur}
                   error={isEditing ? useFieldError(state.meta) : undefined}
@@ -145,6 +144,55 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
               )}
             </Field>
           </Group>
+          <Field
+            name="about"
+            validators={{
+              onBlur: zFieldValidator(userUpdateSchema.shape.about),
+            }}
+          >
+            {({ state, name, handleChange, handleBlur }) => {
+              const errorField = useFieldError(state.meta);
+              return (
+                <Textarea
+                  name={name}
+                  label="About"
+                  placeholder="Tell us about yourself (max 1000 characters)"
+                  value={state.value || ""}
+                  onChange={(e) => handleChange(e.target.value)}
+                  onBlur={handleBlur}
+                  error={errorField}
+                  autosize
+                  minRows={3}
+                  maxRows={6}
+                />
+              );
+            }}
+          </Field>
+
+          <Field
+            name="bio"
+            validators={{
+              onBlur: zFieldValidator(userUpdateSchema.shape.bio),
+            }}
+          >
+            {({ state, name, handleChange, handleBlur }) => {
+              const errorField = useFieldError(state.meta);
+              return (
+                <Textarea
+                  name={name}
+                  label="Bio"
+                  placeholder="Brief bio (max 255 characters)"
+                  value={state.value || ""}
+                  onChange={(e) => handleChange(e.target.value)}
+                  onBlur={handleBlur}
+                  error={errorField}
+                  autosize
+                  minRows={2}
+                  maxRows={4}
+                />
+              );
+            }}
+          </Field>
 
           <Group justify="space-between" mt="md">
             {!isEditing ? (

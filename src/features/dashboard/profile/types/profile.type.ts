@@ -21,6 +21,8 @@ export type ProfileFormProps = {
     firstName?: string | null;
     lastName?: string | null;
     birthDate?: Date | string | null;
-    gender?: "male" | "female" | null;
+    gender?: "male" | "female" | undefined;
+    about?: string | null;
+    bio?: string | null;
   };
 };
