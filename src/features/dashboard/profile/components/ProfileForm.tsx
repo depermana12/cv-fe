@@ -151,7 +151,6 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
             }}
           >
             {({ state, name, handleChange, handleBlur }) => {
-              const errorField = useFieldError(state.meta);
               return (
                 <Textarea
                   name={name}
@@ -160,8 +159,9 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                   value={state.value || ""}
                   onChange={(e) => handleChange(e.target.value)}
                   onBlur={handleBlur}
-                  error={errorField}
+                  error={isEditing ? useFieldError(state.meta) : undefined}
                   autosize
+                  disabled={!isEditing}
                   minRows={3}
                   maxRows={6}
                 />
@@ -176,7 +176,6 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
             }}
           >
             {({ state, name, handleChange, handleBlur }) => {
-              const errorField = useFieldError(state.meta);
               return (
                 <Textarea
                   name={name}
@@ -185,8 +184,9 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                   value={state.value || ""}
                   onChange={(e) => handleChange(e.target.value)}
                   onBlur={handleBlur}
-                  error={errorField}
+                  error={isEditing ? useFieldError(state.meta) : undefined}
                   autosize
+                  disabled={!isEditing}
                   minRows={2}
                   maxRows={4}
                 />

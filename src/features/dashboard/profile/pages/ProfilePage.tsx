@@ -1,6 +1,6 @@
 import { Stack, Group, Title, Text, Grid, Tabs, Skeleton } from "@mantine/core";
 import { useUser } from "@features/user/hooks/useUser";
-import { ProfilePicture } from "../components/ProfilePicture";
+import { ProfileCard } from "../components/ProfileCard";
 import { ProfileForm } from "../components/ProfileForm";
 import { AccountInformation } from "../components/AccountInformation";
 import { AccountDelete } from "../components/AccountDelete";
@@ -70,7 +70,7 @@ export const ProfilePage = () => {
 
           <Grid>
             <Grid.Col span={{ base: 12, md: 4 }}>
-              <ProfilePicture user={user} />
+              <ProfileCard user={user} />
             </Grid.Col>
 
             <Grid.Col span={{ base: 12, md: 8 }}>
