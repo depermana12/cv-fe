@@ -4,6 +4,7 @@ import { OverviewRecentCvs } from "../components/OverviewRecentCvs";
 import { OverviewQuickItems } from "../components/OverviewQuickItems";
 import { OverviewRecentActivity } from "../components/OverviewRecentActivity";
 import { ApplicationTrendsChart } from "../../analytics/components/ApplicationTrendsChart";
+import { ApplicationStatusDistributionChart } from "../../analytics/components/ApplicationStatusDistributionChart";
 
 export const DashboardOverviewPage = () => {
   return (
@@ -19,6 +20,9 @@ export const DashboardOverviewPage = () => {
       <Grid>
         <Grid.Col span={{ base: 12, lg: 8 }}>
           <ApplicationTrendsChart />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, lg: 4 }}>
+          <ApplicationStatusDistributionChart />
         </Grid.Col>
         <Grid.Col span={{ base: 12, lg: 8 }}>
           <Stack gap="lg">
