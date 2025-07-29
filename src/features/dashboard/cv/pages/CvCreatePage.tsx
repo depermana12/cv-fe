@@ -14,7 +14,6 @@ import {
   Title,
   Container,
 } from "@mantine/core";
-import { IconArrowLeft } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
@@ -78,29 +77,13 @@ export const CvCreatePage = () => {
     },
   });
 
-  const handleGoBack = () => {
-    navigate({ to: "/dashboard/cv/library" });
-  };
-
   return (
     <Container size="md">
       <Stack gap="lg">
         {/* Header */}
-        <Stack gap="xs">
-          <Group>
-            <Button
-              variant="subtle"
-              leftSection={<IconArrowLeft size={16} />}
-              onClick={handleGoBack}
-            >
-              Back to CVs
-            </Button>
-          </Group>
-
-          <Title order={1}>Create New CV</Title>
-          <Text c="dimmed">
-            Fill in the details below to create your new CV
-          </Text>
+        <Stack gap={0}>
+          <Title order={2}>Create New CV</Title>
+          <Text c="dimmed">Fill in the details below about your cv</Text>
         </Stack>
 
         {/* Form */}
@@ -348,12 +331,9 @@ export const CvCreatePage = () => {
               />
 
               {/* Actions */}
-              <Group justify="space-between">
-                <Button variant="default" onClick={handleGoBack}>
-                  Cancel
-                </Button>
-
+              <Group justify="flex start">
                 <Button
+                  size="md"
                   type="submit"
                   loading={cvform.state.isSubmitting || isPending}
                   disabled={
