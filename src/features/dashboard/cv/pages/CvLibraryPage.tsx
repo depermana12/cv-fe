@@ -77,7 +77,7 @@ export const CvLibraryPage = () => {
     offset: (currentPage - 1) * itemsPerPage,
   };
 
-  const { data: paginatedData } = useCvsPaginated(queryOptions);
+  const { data: paginatedData, isLoading } = useCvsPaginated(queryOptions);
   const cvs = paginatedData?.data || [];
   const totalItems = paginatedData?.total || 0;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -218,7 +218,7 @@ export const CvLibraryPage = () => {
         </Group>
       </Group>
 
-      {cvs.length === 0 ? (
+      {!isLoading && cvs.length === 0 && (
         <Stack align="center" justify="center" gap="md" mih={300}>
           <Avatar size="xl" color="gray" variant="light">
             <IconFileCv size={40} />
@@ -228,7 +228,9 @@ export const CvLibraryPage = () => {
             Click "Create New CV" to get started
           </Text>
         </Stack>
-      ) : viewMode === "grid" ? (
+      )}
+
+      {cvs.length > 0 && viewMode === "grid" && (
         <SimpleGrid cols={{ base: 1, sm: 2, md: 2, lg: 3 }} spacing="lg">
           {cvs.map((cv) => (
             <CvGridCard
@@ -241,7 +243,9 @@ export const CvLibraryPage = () => {
             />
           ))}
         </SimpleGrid>
-      ) : (
+      )}
+
+      {cvs.length > 0 && viewMode === "list" && (
         <Stack gap="md">
           {cvs.map((cv) => (
             <CvListItem
