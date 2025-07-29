@@ -1,8 +1,7 @@
 import { useState } from "react";
 import {
   Stack,
-  Title,
-  Card,
+  Text,
   Avatar,
   Button,
   Modal,
@@ -10,6 +9,7 @@ import {
   Group,
   Box,
   useMantineColorScheme,
+  Paper,
 } from "@mantine/core";
 import { IconCamera, IconUpload } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -17,7 +17,7 @@ import { useUpdateProfile } from "@features/user/hooks/useUpdateProfile";
 import { useUploadPP } from "@features/user/hooks/useUploadPP";
 import { ProfilePictureProps } from "../types/profile.type";
 
-export const ProfilePicture = ({ user }: ProfilePictureProps) => {
+export const ProfileCard = ({ user }: ProfilePictureProps) => {
   const { mutate: updateProfile } = useUpdateProfile();
 
   const [file, setFile] = useState<File | null>(null);
@@ -65,20 +65,18 @@ export const ProfilePicture = ({ user }: ProfilePictureProps) => {
   };
 
   const handleDeletePP = () => {
-    updateProfile({ profileImage: null });
+    updateProfile({ profileImage: undefined });
   };
 
   return (
     <>
-      <Card padding="lg" radius="md">
+      <Paper p="lg" radius="md" withBorder>
         <Stack align="center" gap="md">
-          <Title order={4}>Profile Picture</Title>
-
           <Box pos="relative">
             <Avatar
               src={previewUrl || profileImageUrl}
-              size={200}
-              radius={200}
+              size={150}
+              radius={150}
               color="blue"
               sx={(theme) => ({
                 background: isDark
@@ -101,8 +99,16 @@ export const ProfilePicture = ({ user }: ProfilePictureProps) => {
               Edit
             </Button>
           </Box>
+          <Stack gap={0}>
+            <Text ta="center" fz="lg" mt="sm">
+              {user.firstName} {user.lastName}
+            </Text>
+            <Text ta="center" c="dimmed">
+              {user.bio || "No bio available"}
+            </Text>
+          </Stack>
         </Stack>
-      </Card>
+      </Paper>
 
       <Modal
         opened={avatarModalOpened}

@@ -3,6 +3,7 @@ export type ProfilePictureProps = {
     firstName?: string | null;
     lastName?: string | null;
     username: string;
+    bio?: string | null;
     profileImage?: string | null;
   };
 };
