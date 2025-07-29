@@ -3,7 +3,7 @@ import { useUser } from "@features/user/hooks/useUser";
 import { ProfilePicture } from "../components/ProfilePicture";
 import { ProfileForm } from "../components/ProfileForm";
 import { AccountInformation } from "../components/AccountInformation";
-import { AccountSettings } from "../components/AccountSettings";
+import { AccountDelete } from "../components/AccountDelete";
 
 export const ProfilePage = () => {
   const { data: user, isLoading, error } = useUser();
@@ -55,19 +55,16 @@ export const ProfilePage = () => {
   }
 
   return (
-    <Tabs defaultValue="profile">
+    <Tabs defaultValue="profile" variant="outline">
       <Tabs.List mb="lg">
         <Tabs.Tab value="profile">Profile</Tabs.Tab>
-        <Tabs.Tab value="settings">Settings</Tabs.Tab>
+        <Tabs.Tab value="account">Account</Tabs.Tab>
       </Tabs.List>
       <Tabs.Panel value="profile">
         <Stack gap="lg">
           <Group justify="space-between">
             <Stack gap={0}>
               <Title order={2}>Profile</Title>
-              <Text c="dimmed">
-                Manage your personal information and account settings
-              </Text>
             </Stack>
           </Group>
 
@@ -78,13 +75,19 @@ export const ProfilePage = () => {
 
             <Grid.Col span={{ base: 12, md: 8 }}>
               <ProfileForm user={user} />
-              <AccountInformation user={user} />
             </Grid.Col>
           </Grid>
         </Stack>
       </Tabs.Panel>
-      <Tabs.Panel value="settings">
-        <AccountSettings />
+      <Tabs.Panel value="account">
+        <Grid>
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Stack>
+              <AccountInformation user={user} />
+              <AccountDelete user={user} />
+            </Stack>
+          </Grid.Col>
+        </Grid>
       </Tabs.Panel>
     </Tabs>
   );

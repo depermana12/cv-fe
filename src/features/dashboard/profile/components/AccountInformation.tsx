@@ -57,6 +57,7 @@ export const AccountInformation = ({ user }: AccountInformationProps) => {
             </Text>
           </Stack>
         </Group>
+        <Divider />
         <Group justify="space-between">
           <Stack gap={4}>
             <Group gap="xs">
