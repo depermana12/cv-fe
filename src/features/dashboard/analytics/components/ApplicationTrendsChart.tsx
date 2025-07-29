@@ -51,7 +51,7 @@ export const ApplicationTrendsChart = () => {
   }
 
   return (
-    <Paper withBorder p="md">
+    <Paper withBorder p="md" style={{ height: "100%" }}>
       <Stack gap="md">
         <Group justify="space-between" align="center">
           <Stack gap={0}>
@@ -75,7 +75,7 @@ export const ApplicationTrendsChart = () => {
 
           {chartData.length > 0 ? (
             <LineChart
-              h={300}
+              h={350}
               data={chartData}
               dataKey="date"
               series={[
