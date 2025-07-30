@@ -69,6 +69,17 @@ export class UserApi<T, I> extends ResourceApi<T, I> {
     return res.data;
   }
 
+  // Delete Account
+  async deleteMyAccount(
+    password: string,
+  ): Promise<ApiResponse<{ deleted: boolean }>> {
+    const res = await axiosClient.delete<ApiResponse<{ deleted: boolean }>>(
+      `${this.resource}/me`,
+      { data: { password } },
+    );
+    return res.data;
+  }
+
   /*
    * USER LOOKUP
    * This section includes methods for user lookup such as:

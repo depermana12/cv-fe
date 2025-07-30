@@ -12,12 +12,27 @@ import {
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { AccountInformationProps } from "../types/profile.type";
 import { useDisclosure } from "@mantine/hooks";
+import { useDeleteUser } from "@/features/user/hooks/useDeleteUser";
+import { useState } from "react";
 
 export const AccountDelete = (user: AccountInformationProps) => {
   const [
     deleteModalOpened,
     { open: openDeleteModal, close: closeDeleteModal },
   ] = useDisclosure(false);
+
+  const [password, setPassword] = useState("");
+
+  const { mutate: deleteAccount, isPending } = useDeleteUser();
+
+  const handleDeleteAccount = () => {
+    deleteAccount({ password });
+  };
+
+  const handleCloseDeleteModal = () => {
+    setPassword("");
+    closeDeleteModal();
+  };
 
   return (
     <Paper p="lg" bg="red.0" withBorder>
@@ -46,7 +61,7 @@ export const AccountDelete = (user: AccountInformationProps) => {
       {/* Delete Account Modal */}
       <Modal
         opened={deleteModalOpened}
-        onClose={closeDeleteModal}
+        onClose={handleCloseDeleteModal}
         title={`Delete "${user.user.username}" Account?`}
         centered
       >
@@ -58,12 +73,20 @@ export const AccountDelete = (user: AccountInformationProps) => {
           <PasswordInput
             label="Password"
             placeholder="Enter your password to confirm"
+            onChange={(e) => setPassword(e.currentTarget.value)}
           />
           <Group justify="flex-end">
-            <Button variant="default" onClick={closeDeleteModal}>
+            <Button variant="default" onClick={handleCloseDeleteModal}>
               Cancel
             </Button>
-            <Button color="red">Delete Account</Button>
+            <Button
+              color="red"
+              onClick={handleDeleteAccount}
+              disabled={!password}
+              loading={isPending}
+            >
+              Delete Account
+            </Button>
           </Group>
         </Stack>
       </Modal>
