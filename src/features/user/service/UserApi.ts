@@ -12,12 +12,19 @@ export class UserApi<T, I> extends ResourceApi<T, I> {
   constructor() {
     super("/users");
   }
+  /*
+   * USER PROFILE
+   * This section includes methods for user profile such as:
+   * getting user information, getting user stats
+   */
 
+  // Profile
   async getMe(): Promise<ApiResponse<T>> {
     const res = await axiosClient.get<ApiResponse<T>>(`${this.resource}/me`);
     return res.data;
   }
 
+  // Stats
   async getMyStats(): Promise<ApiResponse<UserStats>> {
     const res = await axiosClient.get<ApiResponse<UserStats>>(
       `${this.resource}/me/stats`,
@@ -25,6 +32,13 @@ export class UserApi<T, I> extends ResourceApi<T, I> {
     return res.data;
   }
 
+  /*
+   * USER MANAGEMENT
+   * This section includes methods for user management such as:
+   * updating profile, preferences, credentials, deleting account,
+   */
+
+  // Update Profile
   async updateMe(data: Partial<I>): Promise<ApiResponse<T>> {
     const res = await axiosClient.patch<ApiResponse<T>>(
       `${this.resource}/me`,
@@ -33,18 +47,7 @@ export class UserApi<T, I> extends ResourceApi<T, I> {
     return res.data;
   }
 
-  // Update user credentials
-  async updateMyCredentials(
-    data: UserCredentialsUpdate,
-  ): Promise<ApiResponse<T>> {
-    const res = await axiosClient.patch<ApiResponse<T>>(
-      `${this.resource}/me/credentials`,
-      data,
-    );
-    return res.data;
-  }
-
-  // Update user preferences
+  // Preferences
   async updateMyPreferences(
     data: UserPreferencesUpdate,
   ): Promise<ApiResponse<T>> {
@@ -55,7 +58,24 @@ export class UserApi<T, I> extends ResourceApi<T, I> {
     return res.data;
   }
 
-  // lookup
+  // Credentials
+  async updateMyCredentials(
+    data: UserCredentialsUpdate,
+  ): Promise<ApiResponse<T>> {
+    const res = await axiosClient.patch<ApiResponse<T>>(
+      `${this.resource}/me/credentials`,
+      data,
+    );
+    return res.data;
+  }
+
+  /*
+   * USER LOOKUP
+   * This section includes methods for user lookup such as:
+   * checking username availability, email verification status
+   */
+
+  // Lookup
   async checkUsername(username: string): Promise<ApiResponse<CheckUsername>> {
     const res = await axiosClient.get<ApiResponse<CheckUsername>>(
       `${this.resource}/check-username/${username}`,
@@ -63,6 +83,7 @@ export class UserApi<T, I> extends ResourceApi<T, I> {
     return res.data;
   }
 
+  // Email Verification
   async getMyEmailVerificationStatus(): Promise<
     ApiResponse<{ verified: boolean }>
   > {
