@@ -15,11 +15,7 @@ import {
   Skeleton,
   Grid,
 } from "@mantine/core";
-import {
-  IconInfoCircle,
-  IconAlertTriangle,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconInfoCircle, IconAlertTriangle } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useUser } from "@features/user/hooks/useUser";
 import { useSendEmailVerification } from "@features/user/hooks/useSendEmailVerification";
@@ -35,10 +31,6 @@ export const AccountSettings = () => {
   const [
     usernameModalOpened,
     { open: openUsernameModal, close: closeUsernameModal },
-  ] = useDisclosure(false);
-  const [
-    deleteModalOpened,
-    { open: openDeleteModal, close: closeDeleteModal },
   ] = useDisclosure(false);
 
   // Form states
@@ -263,31 +255,6 @@ export const AccountSettings = () => {
               </Group>
             </Stack>
           </Card>
-          {/*  */}
-          <Card padding="lg" radius="md" mb="md" bg="red.0" withBorder>
-            <Group gap="sm" mb="md">
-              <IconAlertTriangle size={20} />
-              <Title order={4}>Delete Account</Title>
-            </Group>
-
-            <Stack gap="md">
-              <Stack justify="space-between">
-                <Text size="sm">
-                  Permanently delete your account and all associated data. This
-                  action cannot be undone.
-                </Text>
-
-                <Button
-                  variant="outline"
-                  color="red.5"
-                  size="sm"
-                  onClick={openDeleteModal}
-                >
-                  Delete Account
-                </Button>
-              </Stack>
-            </Stack>
-          </Card>
         </Grid.Col>
       </Grid>
 
@@ -387,38 +354,6 @@ export const AccountSettings = () => {
               Cancel
             </Button>
             <Button>Update Password</Button>
-          </Group>
-        </Stack>
-      </Modal>
-
-      {/* Delete Account Modal */}
-      <Modal
-        opened={deleteModalOpened}
-        onClose={closeDeleteModal}
-        title="Delete Account"
-        centered
-      >
-        <Stack gap="md">
-          <Alert
-            icon={<IconAlertTriangle size={16} />}
-            color="red"
-            variant="light"
-          >
-            This action cannot be undone. This will permanently delete your
-            account and remove all associated data.
-          </Alert>
-          <TextInput label="Type 'DELETE' to confirm" placeholder="DELETE" />
-          <PasswordInput
-            label="Current Password"
-            placeholder="Enter your password to confirm"
-          />
-          <Group justify="flex-end">
-            <Button variant="light" onClick={closeDeleteModal}>
-              Cancel
-            </Button>
-            <Button color="red" leftSection={<IconTrash size={16} />}>
-              Delete Account
-            </Button>
           </Group>
         </Stack>
       </Modal>
