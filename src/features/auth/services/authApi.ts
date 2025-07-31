@@ -26,11 +26,13 @@ export class AuthApi {
     return res.data;
   }
 
-  async forgetPassword<T>(data: ForgetPassword): Promise<ApiResponse<T>> {
-    const res = await axiosClient.post<ApiResponse<T>>(
-      `${this.base}/forget-password`,
-      data,
-    );
+  async forgetPassword(
+    data: ForgetPassword,
+  ): Promise<{ success: boolean; message: string }> {
+    const res = await axiosClient.post<{
+      success: boolean;
+      message: string;
+    }>(`${this.base}/forget-password`, data);
     return res.data;
   }
 
