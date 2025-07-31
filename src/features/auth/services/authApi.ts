@@ -72,4 +72,9 @@ export class AuthApi {
     );
     return res.data;
   }
+
+  async getCurrentUser<T>(): Promise<ApiResponse<T>> {
+    const res = await axiosClient.get<ApiResponse<T>>("/users/me");
+    return res.data;
+  }
 }

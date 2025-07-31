@@ -45,6 +45,7 @@ export const useAuthStore = create<AuthState>()(
           id: user.id,
           username: user.username,
           email: user.email,
+          isEmailVerified: user.isEmailVerified,
         };
 
         set({
@@ -70,6 +71,7 @@ export const useAuthStore = create<AuthState>()(
           id: user.id,
           username: user.username,
           email: user.email,
+          isEmailVerified: user.isEmailVerified,
         };
 
         set({
@@ -108,6 +110,26 @@ export const useAuthStore = create<AuthState>()(
 
         return true;
       },
+      refreshUser: async () => {
+        try {
+          const res = await authService.getCurrentUser<UserMinimal>();
+          const user = res.data;
+
+          const safeUserData: UserSafe = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            isEmailVerified: user.isEmailVerified,
+          };
+
+          set({
+            user: safeUserData as UserMinimal,
+          });
+        } catch (error) {
+          console.error("Failed to refresh user:", error);
+          // If refresh fails, keep current state
+        }
+      },
     }),
     {
       name: "auth-storage",
@@ -117,6 +139,7 @@ export const useAuthStore = create<AuthState>()(
               id: state.user.id,
               username: state.user.username,
               email: state.user.email,
+              isEmailVerified: state.user.isEmailVerified,
             }
           : null,
         isAuthenticated: state.isAuthenticated,

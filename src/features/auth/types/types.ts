@@ -9,6 +9,7 @@ export type UserMinimal = {
   username: string;
   email: string;
   token: string;
+  isEmailVerified: boolean;
 };
 
 export type AuthState = {
@@ -19,4 +20,5 @@ export type AuthState = {
   signIn: (inputSignIn: SignIn & { rememberMe?: boolean }) => Promise<void>;
   signOut: () => void;
   checkAuthValidity: () => boolean;
+  refreshUser: () => Promise<void>;
 };

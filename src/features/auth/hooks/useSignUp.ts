@@ -12,7 +12,7 @@ export const useSignUp = () => {
   return useMutation({
     mutationFn: async (inputSignUp: SignUp) => signUp(inputSignUp),
     onSuccess: () => {
-      navigate({ to: "/dashboard/overview" });
+      navigate({ to: "/auth/verify-email" });
     },
     onError: (error) => {
       notifications.show({
