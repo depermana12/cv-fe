@@ -36,11 +36,11 @@ export class AuthApi {
     return res.data;
   }
 
-  async resetPassword<T>(
+  async resetPassword(
     token: string,
     newPassword: ResetPassword,
-  ): Promise<ApiResponse<T>> {
-    const res = await axiosClient.post<ApiResponse<T>>(
+  ): Promise<{ success: boolean; message: string }> {
+    const res = await axiosClient.post<{ success: boolean; message: string }>(
       `${this.base}/reset-password/${token}`,
       newPassword,
     );
