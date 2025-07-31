@@ -1,10 +1,11 @@
-import { TextInput, Button, Group, Box, Anchor } from "@mantine/core";
+import { TextInput, Button, Group, Box, Anchor, Center } from "@mantine/core";
 import { useForm } from "@tanstack/react-form";
 import { Link } from "@tanstack/react-router";
 
 import { forgetPasswordSchema, ForgetPassword } from "../schema/auth.schema";
 import { useForgetPassword } from "../hooks/useForgetPassword";
 import useFieldError from "@shared/hooks/useFieldError";
+import { IconArrowLeft } from "@tabler/icons-react";
 
 export const ForgetPasswordForm = () => {
   const forgetPasswordMutation = useForgetPassword();
@@ -40,7 +41,9 @@ export const ForgetPasswordForm = () => {
           {(field) => (
             <TextInput
               withAsterisk
-              label="Email"
+              label="Your email"
+              required
+              type="email"
               placeholder="your@email.com"
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
@@ -50,21 +53,22 @@ export const ForgetPasswordForm = () => {
             />
           )}
         </Field>
-
         <Group justify="space-between" mt="lg">
-          <Anchor component={Link} to="/auth/signin" size="sm">
-            Back to sign in
+          <Anchor c="dimmed" size="sm" component={Link} to="/auth/signin">
+            <Center inline>
+              <IconArrowLeft size={12} stroke={1.5} />
+              <Box ml={5}>Sign in page</Box>
+            </Center>
           </Anchor>
+          <Button
+            radius="sm"
+            size="sm"
+            type="submit"
+            loading={forgetPasswordMutation.isPending}
+          >
+            Reset password
+          </Button>
         </Group>
-
-        <Button
-          type="submit"
-          fullWidth
-          mt="xl"
-          loading={forgetPasswordMutation.isPending}
-        >
-          Send Reset Email
-        </Button>
       </form>
     </Box>
   );
