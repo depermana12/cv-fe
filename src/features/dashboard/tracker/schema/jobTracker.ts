@@ -11,11 +11,11 @@ export const jobTrackerCreateSchema = z.object({
     .nullable(),
   companyName: z
     .string()
-    .min(8, { message: "Company name must be at least 8 characters" })
+    .min(1, { message: "Company name must be at least 8 characters" })
     .max(255, { message: "Company name must be 255 characters or less" }),
   jobTitle: z
     .string()
-    .min(8, { message: "Job title must be at least 8 charachters" })
+    .min(1, { message: "Job title must be at least 8 charachters" })
     .max(255, { message: "Job title must be 255 characters or less" }),
   jobType: z.enum([
     "Full-time",
