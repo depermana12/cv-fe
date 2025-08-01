@@ -14,19 +14,30 @@ import { AccountInformationProps } from "../types/profile.type";
 import { useDisclosure } from "@mantine/hooks";
 import { useDeleteUser } from "@/features/user/hooks/useDeleteUser";
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { clearAuthToken } from "@/shared/utils/authHelpers";
 
 export const AccountDelete = (user: AccountInformationProps) => {
   const [
     deleteModalOpened,
     { open: openDeleteModal, close: closeDeleteModal },
   ] = useDisclosure(false);
-
+  const navigate = useNavigate();
   const [password, setPassword] = useState("");
 
   const { mutate: deleteAccount, isPending } = useDeleteUser();
 
   const handleDeleteAccount = () => {
-    deleteAccount({ password });
+    deleteAccount(
+      { password },
+      {
+        onSuccess: () => {
+          closeDeleteModal();
+          navigate({ to: "/auth/signin" });
+          clearAuthToken();
+        },
+      },
+    );
   };
 
   const handleCloseDeleteModal = () => {
