@@ -10,11 +10,8 @@ import {
   Button,
   Alert,
   Loader,
-  ActionIcon,
-  Tooltip,
 } from "@mantine/core";
 import {
-  IconArrowLeft,
   IconPalette,
   IconFileText,
   IconPencil,
@@ -28,7 +25,7 @@ import { CVContentEditor } from "@features/dashboard/cv/sections/builder/compone
 import { CVDesignEditor } from "@features/dashboard/cv/sections/builder/components/CVDesignEditor";
 import { CVLivePreviewA4 } from "@features/dashboard/cv/components/CVLivePreviewA4";
 import { CvSectionManager } from "@features/dashboard/cv/sections/builder/components/CvSectionManager";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useParams } from "@tanstack/react-router";
 
 export const CvBuilderPage = () => {
   const [activeTab, setActiveTab] = useState<
@@ -40,7 +37,6 @@ export const CvBuilderPage = () => {
 
   const { cvId } = useParams({ from: "/dashboard/cv/library/$cvId" });
   const cvIdNumber = +cvId;
-  const navigate = useNavigate();
 
   const { data: cv, isLoading } = useQuery(cvQuery(cvIdNumber));
 
@@ -52,11 +48,6 @@ export const CvBuilderPage = () => {
     }
   }, [cvIdNumber, setActiveCvId, loadSectionsForCv]);
 
-  const handleBackToLibrary = () => {
-    navigate({
-      to: "/dashboard/cv/library",
-    });
-  };
   if (isLoading) {
     return <Loader color="blue" type="dots" />;
   }
@@ -72,22 +63,10 @@ export const CvBuilderPage = () => {
   return (
     <Stack gap="md">
       {/* Header */}
-      <Group justify="space-between" pt="md">
-        <Group gap="md">
-          <Tooltip label="Back to Library">
-            <ActionIcon
-              variant="subtle"
-              size="lg"
-              onClick={handleBackToLibrary}
-            >
-              <IconArrowLeft size={24} />
-            </ActionIcon>
-          </Tooltip>
-
-          <Title order={3} size="h4">
-            {cv.title}
-          </Title>
-        </Group>
+      <Group justify="space-between">
+        <Title order={2} size="h3">
+          {cv.title}
+        </Title>
 
         <Button leftSection={<IconFileText size={16} />}>Export</Button>
       </Group>
