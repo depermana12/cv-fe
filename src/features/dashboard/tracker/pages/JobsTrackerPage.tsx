@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container, Group, Title, Button, Stack, Text } from "@mantine/core";
+import { Group, Title, Button, Stack } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 
@@ -86,25 +86,20 @@ export const JobsTrackerPage = () => {
   }
 
   return (
-    <Container size="xl" py="md">
-      <Stack gap="lg">
-        <Group justify="space-between">
-          <Stack gap={1}>
-            <Title order={1} size="h2">
-              Jobs Tracker
-            </Title>
-            <Text c="dimmed" size="sm">
-              Track your job applications and manage your job search
-            </Text>
-          </Stack>
-          <Button
-            variant="outline"
-            leftSection={<IconPlus size={16} />}
-            onClick={openCreate}
-          >
-            Add Application
-          </Button>
-        </Group>
+    <Stack gap="md">
+      <Group justify="space-between">
+        <Title order={2} size="h3">
+          Jobs Tracker
+        </Title>
+        <Button
+          variant="filled"
+          leftSection={<IconPlus size={16} />}
+          onClick={openCreate}
+        >
+          Add Application
+        </Button>
+      </Group>
+      <Stack gap="md">
         <JobApplicationsTable
           applications={applications}
           loading={isFetching}
@@ -141,6 +136,6 @@ export const JobsTrackerPage = () => {
         onClose={closeDelete}
         application={selectedApplication}
       />
-    </Container>
+    </Stack>
   );
 };

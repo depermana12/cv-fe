@@ -1,4 +1,4 @@
-import { Stack, Title, Text, Box, Grid } from "@mantine/core";
+import { Stack, Title, Grid } from "@mantine/core";
 import { OverviewStatsCards } from "../components/OverviewStatsCards";
 import { OverviewRecentCvs } from "../components/OverviewRecentCvs";
 import { OverviewQuickItems } from "../components/OverviewQuickItems";
@@ -8,13 +8,10 @@ import { ApplicationStatusDistributionChart } from "../../analytics/components/A
 
 export const DashboardOverviewPage = () => {
   return (
-    <Stack gap="lg">
-      <Box>
-        <Title order={2}>Dashboard Overview</Title>
-        <Text c="dimmed" size="sm">
-          Welcome back! Here's what's happening with your CVs.
-        </Text>
-      </Box>
+    <Stack gap="md">
+      <Title order={2} size="h3">
+        Dashboard Overview
+      </Title>
 
       <OverviewStatsCards />
       <Grid>

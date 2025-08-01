@@ -145,14 +145,13 @@ export const CvLibraryPage = () => {
   }, [debouncedSearch, sortField, sortOrder, viewMode]);
 
   return (
-    <Stack gap="lg">
+    <Stack gap="md">
       <Group justify="space-between">
-        <Stack gap={0}>
-          <Title order={2}>Your CVs</Title>
-          <Text c="dimmed">Manage and edit your CVs</Text>
-        </Stack>
+        <Title order={2} size="h3">
+          Your CVs
+        </Title>
         <Button
-          variant="outline"
+          variant="filled"
           leftSection={<IconPlus size={16} />}
           onClick={handleCreateNewCv}
         >

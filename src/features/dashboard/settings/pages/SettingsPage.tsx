@@ -43,14 +43,11 @@ export const SettingsPage = () => {
   };
 
   return (
-    <Stack gap="lg">
+    <Stack gap="md">
       {/* Header */}
-      <div>
-        <Title order={2}>App Settings</Title>
-        <Text c="dimmed">
-          Customize your CV builder experience and set default preferences
-        </Text>
-      </div>
+      <Title order={2} size="h3">
+        App Settings
+      </Title>
 
       {/* Appearance Settings */}
       <Card padding="lg" radius="md" withBorder>

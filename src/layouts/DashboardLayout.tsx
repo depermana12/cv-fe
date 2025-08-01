@@ -3,7 +3,6 @@ import {
   Anchor,
   AppShell,
   Burger,
-  Container,
   Group,
   Title,
   Tooltip,
@@ -11,19 +10,16 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure, useLocalStorage, useMediaQuery } from "@mantine/hooks";
-import { Outlet, Link, useMatches } from "@tanstack/react-router";
+import { Outlet, Link } from "@tanstack/react-router";
 import { IconFile } from "@tabler/icons-react";
 
 import { Sidebar } from "@features/dashboard/components/Sidebar";
 import DashboardHeaderNav from "@features/dashboard/components/DashboardHeaderNav";
-import { useBreadcrumbItems } from "@shared/hooks/useBreadcrumbItems";
-import { HeaderSection } from "@features/dashboard/components/HeaderSection";
 
 export type SidebarState = "collapsed" | "expanded";
 
 export const DashboardLayout = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const isTablet = useMediaQuery("(max-width: 1024px)");
 
   const { colorScheme } = useMantineColorScheme();
   const theme = useMantineTheme();
@@ -37,13 +33,6 @@ export const DashboardLayout = () => {
     defaultValue: "expanded",
     getInitialValueInEffect: true,
   });
-
-  const matches = useMatches();
-  const isCvBuilder = matches.some((m) =>
-    m.pathname?.startsWith("/dashboard/cv"),
-  );
-
-  const breadcrumbItems = useBreadcrumbItems();
 
   useEffect(() => {
     if (!isMobile) {
@@ -63,9 +52,9 @@ export const DashboardLayout = () => {
 
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: 55 }}
       navbar={{
-        width: 250,
+        width: 220,
         breakpoint: "sm",
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
@@ -73,12 +62,7 @@ export const DashboardLayout = () => {
       layout="alt"
       transitionDuration={300}
     >
-      <AppShell.Header
-        px="md"
-        style={{
-          boxShadow: isTablet ? theme.shadows.md : theme.shadows.sm,
-        }}
-      >
+      <AppShell.Header px="md">
         <Group h="100%" justify="space-between" wrap="nowrap">
           <Group gap="sm">
             <Tooltip
@@ -126,18 +110,7 @@ export const DashboardLayout = () => {
         <Sidebar />
       </AppShell.Navbar>
       <AppShell.Main>
-        <HeaderSection breadcrumbItems={breadcrumbItems} />
-        {isCvBuilder ? (
-          <Outlet />
-        ) : (
-          <Container
-            size={isTablet ? "100%" : "xl"}
-            px={isTablet ? "sm" : "md"}
-            py="sm"
-          >
-            <Outlet />
-          </Container>
-        )}
+        <Outlet />
       </AppShell.Main>
     </AppShell>
   );
