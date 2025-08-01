@@ -277,9 +277,8 @@ export const createColumns = ({
           <Modal
             opened={modalOpened}
             onClose={closeModal}
-            withCloseButton={false}
+            withCloseButton={true}
             size="sm"
-            styles={{ content: { background: "#f8f9fa" } }}
           >
             <StatusHistoryTimeline
               applicationId={application.id}
