@@ -132,12 +132,10 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
           handleSubmit();
         }}
       >
-        <Stack gap="lg">
+        <Stack gap="xs">
           <Paper p="md" radius="md" withBorder>
-            <Text size="sm" fw={600} mb="md">
-              Job Information
-            </Text>
-            <Stack gap="md">
+            <Text fw="bold">Job Information</Text>
+            <Stack gap="xs">
               <Group grow>
                 <Field
                   name="companyName"
@@ -283,9 +281,7 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
 
           {/* Application Status & Dates */}
           <Paper p="md" radius="md" withBorder>
-            <Text size="sm" fw={600} mb="md">
-              Application Status & Timeline
-            </Text>
+            <Text fw="bold">Application Status & Timeline</Text>
             <Stack gap="md">
               <Group grow>
                 <Field name="appliedAt">
@@ -366,10 +362,8 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
 
           {/* Source & Resources */}
           <Paper p="md" radius="md" withBorder>
-            <Text size="sm" fw={600} mb="md">
-              Source & Resources
-            </Text>
-            <Stack gap="sm">
+            <Text fw="bold">Source & Resources</Text>
+            <Stack gap="xs">
               <Grid>
                 <Grid.Col span={4}>
                   <Field
@@ -430,14 +424,11 @@ export const JobApplicationForm = (props: JobApplicationFormProps) => {
           </Paper>
 
           {/* Notes */}
-          <Paper p="md" radius="md" withBorder bg="var(--mantine-color-gray-0)">
-            <Text size="sm" fw={600} mb="md">
-              Additional Notes
-            </Text>
+          <Paper p="md" radius="md" withBorder>
+            <Text fw="bold">Additional Notes</Text>
             <Field name="notes">
               {({ state, handleChange, handleBlur }) => (
                 <Textarea
-                  label="Notes"
                   value={state.value || ""}
                   onChange={(e) => handleChange(e.target.value)}
                   onBlur={handleBlur}
