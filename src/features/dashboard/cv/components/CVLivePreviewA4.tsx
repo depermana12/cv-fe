@@ -32,18 +32,54 @@ import { useLanguages } from "../sections/language/hooks/useLanguages";
  * - Automatically updates when queries refetch after mutations
  * - Simple and performant: single source of truth from server
  */
-export const CVLivePreviewA4 = () => {
-  const { activeCvId } = useCvStore();
 
-  // Direct query consumption - single source of truth
-  const { data: contacts = [] } = useContacts(activeCvId || 0);
-  const { data: educations = [] } = useEducations(activeCvId || 0);
-  const { data: works = [] } = useWorks(activeCvId || 0);
-  const { data: skills = [] } = useSkills(activeCvId || 0);
-  const { data: projects = [] } = useProjects(activeCvId || 0);
-  const { data: organizations = [] } = useOrganizations(activeCvId || 0);
-  const { data: courses = [] } = useCourses(activeCvId || 0);
-  const { data: languages = [] } = useLanguages(activeCvId || 0);
+interface CVLivePreviewA4Props {
+  cvId?: number;
+}
+
+export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
+  // Use provided cvId or fall back to store
+  const { activeCvId } = useCvStore();
+  const actualCvId = cvId || activeCvId;
+
+  // Always call hooks in the same order, regardless of activeCvId state
+  // This prevents "Rendered more hooks than during the previous render" errors
+  const contactsQuery = useContacts(actualCvId || 0);
+  const educationsQuery = useEducations(actualCvId || 0);
+  const worksQuery = useWorks(actualCvId || 0);
+  const skillsQuery = useSkills(actualCvId || 0);
+  const projectsQuery = useProjects(actualCvId || 0);
+  const organizationsQuery = useOrganizations(actualCvId || 0);
+  const coursesQuery = useCourses(actualCvId || 0);
+  const languagesQuery = useLanguages(actualCvId || 0);
+
+  // Early return after all hooks are called
+  if (!actualCvId) {
+    return (
+      <CvA4Preview>
+        <CvPaper>
+          <Stack
+            gap="lg"
+            align="center"
+            justify="center"
+            style={{ minHeight: "200px" }}
+          >
+            <Text c="dimmed">No CV selected</Text>
+          </Stack>
+        </CvPaper>
+      </CvA4Preview>
+    );
+  }
+
+  // Extract data from queries
+  const contacts = contactsQuery.data || [];
+  const educations = educationsQuery.data || [];
+  const works = worksQuery.data || [];
+  const skills = skillsQuery.data || [];
+  const projects = projectsQuery.data || [];
+  const organizations = organizationsQuery.data || [];
+  const courses = coursesQuery.data || [];
+  const languages = languagesQuery.data || [];
 
   // Get contact data (single item)
   const contact = contacts.length > 0 ? contacts[0] : null;
@@ -77,8 +113,8 @@ export const CVLivePreviewA4 = () => {
 
   // Get section titles using the store, fallback to defaults if no active CV
   const getTitle = (sectionType: string) => {
-    if (!activeCvId) return sectionType; // fallback
-    return getSectionTitle(activeCvId, sectionType as any);
+    if (!actualCvId) return sectionType; // fallback
+    return getSectionTitle(actualCvId, sectionType as any);
   };
 
   // Create section components mapping

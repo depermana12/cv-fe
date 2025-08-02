@@ -33,7 +33,6 @@ import { LanguageForm } from "../../language/components/LanguageForm";
 import { ContactForm } from "../../contact/components/ContactForm";
 import { EducationForm } from "../../education/components/EducationForm";
 import { useCVSectionStore } from "@features/dashboard/cv/store/cvSectionStore";
-import { useCvStore } from "@features/dashboard/cv/store/cvStore";
 import { SectionType } from "../../../types/types";
 
 import { useEducations } from "../../education/hooks/useEducations";
@@ -55,8 +54,12 @@ interface SectionConfig {
   }>;
 }
 
+interface CVContentEditorProps {
+  cvId: number;
+}
+
 // Enhanced wrapper components that handle submit + next flow
-const ContactFormWrapper = () => {
+const ContactFormWrapper = ({ cvId: _ }: { cvId: number }) => {
   return (
     <Stack gap="md">
       <Title order={4}>Contact Information</Title>
@@ -65,9 +68,8 @@ const ContactFormWrapper = () => {
   );
 };
 
-const EducationFormWrapper = () => {
-  const { activeCvId: cvId } = useCvStore();
-  const { data: educations = [] } = useEducations(cvId!);
+const EducationFormWrapper = ({ cvId }: { cvId: number }) => {
+  const { data: educations = [] } = useEducations(cvId);
 
   return (
     <CVMultiItemSection
@@ -79,9 +81,8 @@ const EducationFormWrapper = () => {
   );
 };
 
-const WorkFormWrapper = () => {
-  const { activeCvId: cvId } = useCvStore();
-  const { data: works = [] } = useWorks(cvId!);
+const WorkFormWrapper = ({ cvId }: { cvId: number }) => {
+  const { data: works = [] } = useWorks(cvId);
 
   return (
     <CVMultiItemSection
@@ -93,9 +94,8 @@ const WorkFormWrapper = () => {
   );
 };
 
-const SkillFormWrapper = () => {
-  const { activeCvId: cvId } = useCvStore();
-  const { data: skills = [] } = useSkills(cvId!);
+const SkillFormWrapper = ({ cvId }: { cvId: number }) => {
+  const { data: skills = [] } = useSkills(cvId);
 
   return (
     <CVMultiItemSection
@@ -107,9 +107,8 @@ const SkillFormWrapper = () => {
   );
 };
 
-const ProjectFormWrapper = () => {
-  const { activeCvId: cvId } = useCvStore();
-  const { data: projects = [] } = useProjects(cvId!);
+const ProjectFormWrapper = ({ cvId }: { cvId: number }) => {
+  const { data: projects = [] } = useProjects(cvId);
 
   return (
     <CVMultiItemSection
@@ -121,9 +120,8 @@ const ProjectFormWrapper = () => {
   );
 };
 
-const OrganizationFormWrapper = () => {
-  const { activeCvId: cvId } = useCvStore();
-  const { data: organizations = [] } = useOrganizations(cvId!);
+const OrganizationFormWrapper = ({ cvId }: { cvId: number }) => {
+  const { data: organizations = [] } = useOrganizations(cvId);
 
   return (
     <CVMultiItemSection
@@ -135,9 +133,8 @@ const OrganizationFormWrapper = () => {
   );
 };
 
-const CourseFormWrapper = () => {
-  const { activeCvId: cvId } = useCvStore();
-  const { data: courses = [] } = useCourses(cvId!);
+const CourseFormWrapper = ({ cvId }: { cvId: number }) => {
+  const { data: courses = [] } = useCourses(cvId);
 
   return (
     <CVMultiItemSection
@@ -149,9 +146,8 @@ const CourseFormWrapper = () => {
   );
 };
 
-const LanguageFormWrapper = () => {
-  const { activeCvId: cvId } = useCvStore();
-  const { data: languages = [] } = useLanguages(cvId!);
+const LanguageFormWrapper = ({ cvId }: { cvId: number }) => {
+  const { data: languages = [] } = useLanguages(cvId);
 
   return (
     <CVMultiItemSection
@@ -214,7 +210,7 @@ const SECTION_CONFIG: Record<SectionType, SectionConfig> = {
   },
 };
 
-export const CVContentEditor = () => {
+export const CVContentEditor = ({ cvId }: CVContentEditorProps) => {
   const [activeStep, setActiveStep] = useState(0);
   const { selectedSections } = useCVSectionStore();
 
@@ -294,7 +290,8 @@ export const CVContentEditor = () => {
           </Paper>
         ) : (
           <div key={`step-${activeStep}`}>
-            {currentSection && React.createElement(currentSection.component)}
+            {currentSection &&
+              React.createElement(currentSection.component, { cvId })}
           </div>
         )}
       </Box>

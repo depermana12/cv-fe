@@ -1,11 +1,10 @@
 import { Box, Text, Stack, Title } from "@mantine/core";
 import { CvThemeSelector } from "@features/dashboard/cv/components/CvThemeSelector";
+import { useCvStore } from "../../../store/cvStore";
 
-interface CVDesignEditorProps {
-  cvId: number;
-}
-
-export const CVDesignEditor = ({ cvId }: CVDesignEditorProps) => {
+export const CVDesignEditor = () => {
+  const { activeCvId } = useCvStore();
+  const cvId = activeCvId!;
   return (
     <Box p="md" style={{ height: "100%", overflow: "auto" }}>
       <Stack gap="md">

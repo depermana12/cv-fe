@@ -100,10 +100,10 @@ export const CvBuilderPage = () => {
                 <CvSectionManager />
               </Tabs.Panel>
               <Tabs.Panel value="content">
-                <CVContentEditor />
+                <CVContentEditor cvId={cvIdNumber} />
               </Tabs.Panel>
               <Tabs.Panel value="design" p="md">
-                <CVDesignEditor cvId={cvIdNumber} />
+                <CVDesignEditor />
               </Tabs.Panel>
             </Box>
           </Grid.Col>
@@ -120,7 +120,7 @@ export const CvBuilderPage = () => {
               </Title>
 
               <Box>
-                <CVLivePreviewA4 />
+                <CVLivePreviewA4 cvId={cvIdNumber} />
               </Box>
             </Stack>
           </Grid.Col>
