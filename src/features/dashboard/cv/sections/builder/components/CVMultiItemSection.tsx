@@ -34,8 +34,8 @@ export const CVMultiItemSection = <T = any,>({
   const [formAccordions, setFormAccordions] = useState<string[]>([]);
 
   const handleAddMore = () => {
-    // Add a new form accordion
-    const newFormId = `form-${Date.now()}`;
+    // Add a new form accordion with guaranteed unique ID
+    const newFormId = `form-${crypto.randomUUID()}`;
     setFormAccordions((prev) => [...prev, newFormId]);
   };
 
@@ -66,6 +66,13 @@ export const CVMultiItemSection = <T = any,>({
         </Tooltip>
       </Group>
 
+      {/* Empty state message */}
+      {items.length === 0 && formAccordions.length === 0 && (
+        <Text c="dimmed" size="sm">
+          No {sectionTitle.toLowerCase()} added yet.
+        </Text>
+      )}
+
       {/* Existing items list */}
       {items.map((item, index) => {
         const itemKey = `${sectionType}-${(item as any).id}`;
@@ -95,13 +102,11 @@ export const CVMultiItemSection = <T = any,>({
                 </Group>
               </Accordion.Control>
               <Accordion.Panel>
-                <Stack gap="md">
-                  <FormComponent
-                    mode="edit"
-                    initialData={item}
-                    key={`existing-${(item as any).id}`}
-                  />
-                </Stack>
+                <FormComponent
+                  mode="edit"
+                  initialData={item}
+                  key={`existing-${(item as any).id}`}
+                />
               </Accordion.Panel>
             </Accordion.Item>
           </Accordion>

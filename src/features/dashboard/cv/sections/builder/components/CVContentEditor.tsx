@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Stepper,
@@ -24,7 +24,6 @@ import {
   IconArrowRight,
 } from "@tabler/icons-react";
 
-// Import all form components
 import { WorkForm } from "../../work/components/WorkForm";
 import { SkillForm } from "../../skill/components/SkillForm";
 import { ProjectForm } from "../../project/components/ProjectForm";
@@ -37,10 +36,6 @@ import { useCVSectionStore } from "@features/dashboard/cv/store/cvSectionStore";
 import { useCvStore } from "@features/dashboard/cv/store/cvStore";
 import { SectionType } from "../../../types/types";
 
-interface CVContentEditorProps {
-  // No props needed since we use cvStore internally
-}
-
 import { useEducations } from "../../education/hooks/useEducations";
 import { useWorks } from "../../work/hooks/useWorks";
 import { useSkills } from "../../skill/hooks/useSkills";
@@ -48,11 +43,8 @@ import { useProjects } from "../../project/hooks/useProjects";
 import { useOrganizations } from "../../organization/hooks/useOrganizations";
 import { useCourses } from "../../course/hooks/useCourses";
 import { useLanguages } from "../../language/hooks/useLanguages";
-import { useContacts } from "../../contact/hooks/useContact";
 
-// Import multi-item section component
 import { CVMultiItemSection } from "./CVMultiItemSection";
-import { useCvStore } from "../../../store/cvStore";
 
 interface SectionConfig {
   id: SectionType;
@@ -65,25 +57,10 @@ interface SectionConfig {
 
 // Enhanced wrapper components that handle submit + next flow
 const ContactFormWrapper = () => {
-  const { activeCvId } = useCvStore();
-  const cvId = activeCvId!;
-  const { data: contacts = [], isLoading } = useContacts(cvId);
-  const { getSectionTitle } = useCVSectionStore();
-  const existingContact = contacts.length > 0 ? contacts[0] : undefined;
-  const sectionTitle = getSectionTitle(cvId, "contact");
-
-  if (isLoading) {
-    return <Text>Loading contact information...</Text>;
-  }
-
   return (
     <Stack gap="md">
-      <Title order={4}>{sectionTitle}</Title>
-      <ContactForm
-        mode={existingContact ? "edit" : "create"}
-        cvId={cvId}
-        initialData={existingContact}
-      />
+      <Title order={4}>Contact Information</Title>
+      <ContactForm />
     </Stack>
   );
 };
@@ -94,6 +71,7 @@ const EducationFormWrapper = () => {
 
   return (
     <CVMultiItemSection
+      sectionType="education"
       sectionTitle="Education"
       items={educations}
       FormComponent={EducationForm}
@@ -107,6 +85,7 @@ const WorkFormWrapper = () => {
 
   return (
     <CVMultiItemSection
+      sectionType="work"
       sectionTitle="Work Experience"
       items={works}
       FormComponent={WorkForm}
@@ -120,6 +99,7 @@ const SkillFormWrapper = () => {
 
   return (
     <CVMultiItemSection
+      sectionType="skill"
       sectionTitle="Skills"
       items={skills}
       FormComponent={SkillForm}
@@ -133,6 +113,7 @@ const ProjectFormWrapper = () => {
 
   return (
     <CVMultiItemSection
+      sectionType="project"
       sectionTitle="Projects"
       items={projects}
       FormComponent={ProjectForm}
@@ -146,6 +127,7 @@ const OrganizationFormWrapper = () => {
 
   return (
     <CVMultiItemSection
+      sectionType="organization"
       sectionTitle="Organizations"
       items={organizations}
       FormComponent={OrganizationForm}
@@ -159,6 +141,7 @@ const CourseFormWrapper = () => {
 
   return (
     <CVMultiItemSection
+      sectionType="course"
       sectionTitle="Courses"
       items={courses}
       FormComponent={CourseForm}
@@ -172,6 +155,7 @@ const LanguageFormWrapper = () => {
 
   return (
     <CVMultiItemSection
+      sectionType="language"
       sectionTitle="Languages"
       items={languages}
       FormComponent={LanguageForm}
@@ -230,9 +214,7 @@ const SECTION_CONFIG: Record<SectionType, SectionConfig> = {
   },
 };
 
-export const CVContentEditor = ({}: CVContentEditorProps) => {
-  const { activeCvId } = useCvStore();
-  const cvId = activeCvId!;
+export const CVContentEditor = () => {
   const [activeStep, setActiveStep] = useState(0);
   const { selectedSections } = useCVSectionStore();
 
@@ -317,7 +299,6 @@ export const CVContentEditor = ({}: CVContentEditorProps) => {
         )}
       </Box>
 
-      {/* Simplified Navigation - Remove separate navigation since forms handle it */}
       <Group justify="space-between" pt="md">
         <Button
           variant="default"
