@@ -36,6 +36,10 @@ import { EducationForm } from "../../education/components/EducationForm";
 import { useCVSectionStore } from "@features/dashboard/cv/store/cvSectionStore";
 import { SectionType } from "../../../types/types";
 
+interface CVContentEditorProps {
+  // No props needed since we use cvStore internally
+}
+
 import { useEducations } from "../../education/hooks/useEducations";
 import { useWorks } from "../../work/hooks/useWorks";
 import { useSkills } from "../../skill/hooks/useSkills";
@@ -45,20 +49,9 @@ import { useCourses } from "../../course/hooks/useCourses";
 import { useLanguages } from "../../language/hooks/useLanguages";
 import { useContacts } from "../../contact/hooks/useContact";
 
-import { useDeleteEducation } from "../../education/hooks/useDeleteEducation";
-import { useDeleteWork } from "../../work/hooks/useDeleteWork";
-import { useDeleteSkill } from "../../skill/hooks/useDeleteSkill";
-import { useDeleteProject } from "../../project/hooks/useDeleteProject";
-import { useDeleteOrganization } from "../../organization/hooks/useDeleteOrganization";
-import { useDeleteCourse } from "../../course/hooks/useDeleteCourse";
-import { useDeleteLanguage } from "../../language/hooks/useDeleteLanguage";
-
 // Import multi-item section component
 import { CVMultiItemSection } from "./CVMultiItemSection";
-
-interface CVContentEditorProps {
-  cvId: number;
-}
+import { useCvStore } from "../../../store/cvStore";
 
 interface SectionConfig {
   id: SectionType;
@@ -70,7 +63,9 @@ interface SectionConfig {
 }
 
 // Enhanced wrapper components that handle submit + next flow
-const ContactFormWrapper = ({ cvId }: { cvId: number }) => {
+const ContactFormWrapper = () => {
+  const { activeCvId } = useCvStore();
+  const cvId = activeCvId!;
   const { data: contacts = [], isLoading } = useContacts(cvId);
   const { getSectionTitle } = useCVSectionStore();
   const existingContact = contacts.length > 0 ? contacts[0] : undefined;
@@ -87,121 +82,97 @@ const ContactFormWrapper = ({ cvId }: { cvId: number }) => {
         mode={existingContact ? "edit" : "create"}
         cvId={cvId}
         initialData={existingContact}
-        onSuccess={() => {
-          console.log("Contact saved");
-        }}
       />
     </Stack>
   );
 };
 
-const EducationFormWrapper = ({ cvId }: { cvId: number }) => {
-  const { data: educations = [], isLoading } = useEducations(cvId);
-  const deleteEducationHook = useDeleteEducation();
+const EducationFormWrapper = () => {
+  const { activeCvId: cvId } = useCvStore();
+  const { data: educations = [] } = useEducations(cvId!);
 
   return (
     <CVMultiItemSection
-      sectionType="education"
+      sectionTitle="Education"
       items={educations}
-      isLoading={isLoading}
-      useDeleteHook={deleteEducationHook}
-      cvId={cvId}
       FormComponent={EducationForm}
     />
   );
 };
 
-const WorkFormWrapper = ({ cvId }: { cvId: number }) => {
-  const { data: works = [], isLoading } = useWorks(cvId);
-  const deleteWorkHook = useDeleteWork();
+const WorkFormWrapper = () => {
+  const { activeCvId: cvId } = useCvStore();
+  const { data: works = [] } = useWorks(cvId!);
 
   return (
     <CVMultiItemSection
-      sectionType="work"
+      sectionTitle="Work Experience"
       items={works}
-      isLoading={isLoading}
-      useDeleteHook={deleteWorkHook}
-      cvId={cvId}
       FormComponent={WorkForm}
     />
   );
 };
 
-const SkillFormWrapper = ({ cvId }: { cvId: number }) => {
-  const { data: skills = [], isLoading } = useSkills(cvId);
-  const deleteSkillHook = useDeleteSkill();
+const SkillFormWrapper = () => {
+  const { activeCvId: cvId } = useCvStore();
+  const { data: skills = [] } = useSkills(cvId!);
 
   return (
     <CVMultiItemSection
-      sectionType="skill"
+      sectionTitle="Skills"
       items={skills}
-      isLoading={isLoading}
-      useDeleteHook={deleteSkillHook}
-      cvId={cvId}
       FormComponent={SkillForm}
     />
   );
 };
 
-const ProjectFormWrapper = ({ cvId }: { cvId: number }) => {
-  const { data: projects = [], isLoading } = useProjects(cvId);
-  const deleteProjectHook = useDeleteProject();
+const ProjectFormWrapper = () => {
+  const { activeCvId: cvId } = useCvStore();
+  const { data: projects = [] } = useProjects(cvId!);
 
   return (
     <CVMultiItemSection
-      sectionType="project"
+      sectionTitle="Projects"
       items={projects}
-      isLoading={isLoading}
-      useDeleteHook={deleteProjectHook}
-      cvId={cvId}
       FormComponent={ProjectForm}
     />
   );
 };
 
-const OrganizationFormWrapper = ({ cvId }: { cvId: number }) => {
-  const { data: organizations = [], isLoading } = useOrganizations(cvId);
-  const deleteOrganizationHook = useDeleteOrganization();
+const OrganizationFormWrapper = () => {
+  const { activeCvId: cvId } = useCvStore();
+  const { data: organizations = [] } = useOrganizations(cvId!);
 
   return (
     <CVMultiItemSection
-      sectionType="organization"
+      sectionTitle="Organizations"
       items={organizations}
-      isLoading={isLoading}
-      useDeleteHook={deleteOrganizationHook}
-      cvId={cvId}
       FormComponent={OrganizationForm}
     />
   );
 };
 
-const CourseFormWrapper = ({ cvId }: { cvId: number }) => {
-  const { data: courses = [], isLoading } = useCourses(cvId);
-  const deleteCourseHook = useDeleteCourse();
+const CourseFormWrapper = () => {
+  const { activeCvId: cvId } = useCvStore();
+  const { data: courses = [] } = useCourses(cvId!);
 
   return (
     <CVMultiItemSection
-      sectionType="course"
+      sectionTitle="Courses"
       items={courses}
-      isLoading={isLoading}
-      useDeleteHook={deleteCourseHook}
-      cvId={cvId}
       FormComponent={CourseForm}
     />
   );
 };
 
-const LanguageFormWrapper = ({ cvId }: { cvId: number }) => {
-  const { data: languages = [], isLoading } = useLanguages(cvId);
-  const deleteLanguageHook = useDeleteLanguage();
+const LanguageFormWrapper = () => {
+  const { activeCvId: cvId } = useCvStore();
+  const { data: languages = [] } = useLanguages(cvId!);
 
   return (
     <CVMultiItemSection
-      sectionType="language"
+      sectionTitle="Languages"
       items={languages}
-      isLoading={isLoading}
-      useDeleteHook={deleteLanguageHook}
-      cvId={cvId}
       FormComponent={LanguageForm}
     />
   );
@@ -258,7 +229,9 @@ const SECTION_CONFIG: Record<SectionType, SectionConfig> = {
   },
 };
 
-export const CVContentEditor = ({ cvId }: CVContentEditorProps) => {
+export const CVContentEditor = ({}: CVContentEditorProps) => {
+  const { activeCvId } = useCvStore();
+  const cvId = activeCvId!;
   const [activeStep, setActiveStep] = useState(0);
   const { selectedSections } = useCVSectionStore();
 

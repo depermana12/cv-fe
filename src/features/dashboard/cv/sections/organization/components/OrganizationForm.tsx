@@ -29,14 +29,15 @@ import type {
 } from "../types/organization.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
+import { useCvStore } from "../../../store/cvStore";
 
 export const OrganizationForm = ({
   mode,
-  cvId,
   initialData,
   onSuccess,
 }: OrganizationFormProps) => {
+  const { activeCvId } = useCvStore();
+  const cvId = activeCvId!;
   const { mutate: createOrganization, isPending: isCreating } =
     useCreateOrganization();
   const { mutate: updateOrganization, isPending: isUpdating } =
@@ -109,9 +110,6 @@ export const OrganizationForm = ({
       },
     },
   });
-
-  // Auto-sync to form store for live preview using useFormStoreSync
-  useFormStoreSync(organizationForm.store, "organization", cvId);
 
   const { Field, handleSubmit, state } = organizationForm;
 

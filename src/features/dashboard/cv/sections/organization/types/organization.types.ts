@@ -13,7 +13,6 @@ export type OrganizationFormMode = "create" | "edit";
 
 export type OrganizationFormProps = {
   mode: OrganizationFormMode;
-  cvId: number;
   initialData?: Organization;
   onSuccess?: () => void;
 };

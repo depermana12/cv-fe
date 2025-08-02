@@ -26,14 +26,15 @@ import { useUpdateCourse } from "../hooks/useUpdateCourse";
 import type { CourseInsert, CourseFormProps } from "../types/course.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
+import { useCvStore } from "../../../store/cvStore";
 
 export const CourseForm = ({
   mode,
-  cvId,
   initialData,
   onSuccess,
 }: CourseFormProps) => {
+  const { activeCvId } = useCvStore();
+  const cvId = activeCvId!;
   const { mutate: createCourse, isPending: isCreating } = useCreateCourse();
   const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
 
@@ -100,9 +101,6 @@ export const CourseForm = ({
       },
     },
   });
-
-  // Auto-sync to form store for live preview using useFormStoreSync
-  useFormStoreSync(courseForm.store, "course", cvId);
 
   const { Field, handleSubmit, state } = courseForm;
 

@@ -26,7 +26,6 @@ import { useUpdateWork } from "../hooks/useUpdateWork";
 import type { WorkFormProps, WorkInsert } from "../types/work.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
 
 export const WorkForm = ({
   mode,
@@ -113,7 +112,6 @@ export const WorkForm = ({
   });
 
   // Auto-sync to form store for live preview using useFormStoreSync
-  useFormStoreSync(workForm.store, "work", cvId);
 
   const { Field, handleSubmit, state } = workForm;
 

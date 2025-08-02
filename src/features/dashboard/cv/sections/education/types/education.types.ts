@@ -13,7 +13,6 @@ export type EducationFormMode = "create" | "edit";
 
 export type EducationFormProps = {
   mode: EducationFormMode;
-  cvId: number;
   initialData?: Education;
   onSuccess?: () => void;
 };

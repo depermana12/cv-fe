@@ -27,7 +27,6 @@ import { useUpdateProject } from "../hooks/useUpdateProject";
 import type { ProjectFormProps, ProjectInsert } from "../types/project.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
 
 export const ProjectForm = ({
   mode,
@@ -106,7 +105,6 @@ export const ProjectForm = ({
   });
 
   // Auto-sync to form store for live preview using useFormStoreSync
-  useFormStoreSync(projectForm.store, "project", cvId);
 
   const { Field, handleSubmit, state } = projectForm;
 

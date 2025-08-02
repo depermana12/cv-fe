@@ -22,7 +22,6 @@ import { useUpdateSkill } from "../hooks/useUpdateSkill";
 import type { SkillFormProps, SkillInsert } from "../types/skill.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
 
 const skillTypes = [
   { value: "technical", label: "Technical" },
@@ -120,7 +119,6 @@ export const SkillForm = ({
   });
 
   // Auto-sync to form store for live preview using useFormStoreSync
-  useFormStoreSync(skillForm.store, "skill", cvId);
 
   const { Field, handleSubmit, state } = skillForm;
 

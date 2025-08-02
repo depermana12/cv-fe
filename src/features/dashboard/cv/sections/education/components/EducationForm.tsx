@@ -33,6 +33,7 @@ import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { useCvStore } from "../../../store/cvStore";
 
 const degreeOptions = [
   { value: "high_school", label: "High School" },
@@ -44,7 +45,6 @@ const degreeOptions = [
 
 export const EducationForm = ({
   mode,
-  cvId,
   initialData,
   onSuccess,
 }: EducationFormProps) => {
@@ -57,6 +57,9 @@ export const EducationForm = ({
     useUpdateEducation();
   const { mutate: deleteEducation, isPending: isDeleting } =
     useDeleteEducation();
+
+  const { activeCvId } = useCvStore();
+  const cvId = activeCvId!;
 
   const defaultEducationValues: EducationInsert = {
     institution: "",
