@@ -2,45 +2,36 @@ import { useState } from "react";
 import {
   Stack,
   Group,
-  Button,
+  Tooltip,
   Text,
   Accordion,
   Title,
   Badge,
+  ActionIcon,
 } from "@mantine/core";
-import { IconPlus } from "@tabler/icons-react";
-import { useCvStore } from "../../../store/cvStore";
+import { IconPlus, IconX } from "@tabler/icons-react";
 
 interface CVMultiItemSectionProps<T = any> {
+  sectionType: string;
   sectionTitle: string;
   items: T[];
   FormComponent: React.ComponentType<{
     mode: "create" | "edit";
-    cvId: number;
     initialData?: T;
     onSuccess?: () => void;
   }>;
 }
 
 export const CVMultiItemSection = <T = any,>({
+  sectionType,
   sectionTitle,
   items,
   FormComponent,
 }: CVMultiItemSectionProps<T>) => {
-  const { activeCvId } = useCvStore();
-  const cvId = activeCvId!;
-
   // Track which accordions are open (for existing items)
   const [openAccordions, setOpenAccordions] = useState<Set<string>>(new Set());
   // Track form accordions (for new items being added)
-  const [formAccordions, setFormAccordions] = useState<string[]>(
-    items.length === 0 ? ["form-0"] : [],
-  );
-
-  const handleFormSubmitted = (formId: string) => {
-    // Remove the form accordion after successful submission
-    setFormAccordions((prev) => prev.filter((id) => id !== formId));
-  };
+  const [formAccordions, setFormAccordions] = useState<string[]>([]);
 
   const handleAddMore = () => {
     // Add a new form accordion
@@ -63,22 +54,21 @@ export const CVMultiItemSection = <T = any,>({
   return (
     <Stack gap="md">
       {/* Header with section title */}
+      {/* Simple header */}
       <Group justify="space-between" align="center">
         <Title order={4}>
           {sectionTitle} {items.length > 0 && `(${items.length})`}
         </Title>
-        <Button
-          leftSection={<IconPlus size={16} />}
-          variant="light"
-          onClick={handleAddMore}
-        >
-          Add More
-        </Button>
+        <Tooltip label={`Add new ${sectionTitle.toLowerCase()}`}>
+          <ActionIcon variant="filled" onClick={handleAddMore}>
+            <IconPlus size={16} />
+          </ActionIcon>
+        </Tooltip>
       </Group>
 
-      {/* Existing items accordions */}
+      {/* Existing items list */}
       {items.map((item, index) => {
-        const itemKey = `item-${(item as any).id}`; // Use item ID for stable keys
+        const itemKey = `${sectionType}-${(item as any).id}`;
         const isOpen = openAccordions.has(itemKey);
 
         return (
@@ -86,40 +76,85 @@ export const CVMultiItemSection = <T = any,>({
             key={itemKey}
             value={isOpen ? itemKey : null}
             onChange={() => toggleItemAccordion(itemKey)}
-            variant="separated"
+            variant="default"
+            chevronPosition="left"
+            styles={{
+              content: {
+                paddingLeft: "0px",
+                paddingRight: "0px",
+              },
+            }}
           >
             <Accordion.Item value={itemKey}>
               <Accordion.Control>
-                <Group justify="space-between" w="100%">
-                  <Text fw={500} size="sm">
-                    {sectionTitle} #{index + 1}
-                  </Text>
-                  <Badge variant="light" size="sm">
+                <Group>
+                  <Text size="sm">{sectionTitle}</Text>
+                  <Badge variant="outline" size="md">
                     #{index + 1}
                   </Badge>
                 </Group>
               </Accordion.Control>
               <Accordion.Panel>
-                <FormComponent mode="edit" cvId={cvId} initialData={item} />
+                <Stack gap="md">
+                  <FormComponent
+                    mode="edit"
+                    initialData={item}
+                    key={`existing-${(item as any).id}`}
+                  />
+                </Stack>
               </Accordion.Panel>
             </Accordion.Item>
           </Accordion>
         );
       })}
+
       {/* Form accordions for new items */}
       {formAccordions.map((formId, index) => (
-        <Accordion key={formId} defaultValue={formId} variant="separated">
+        <Accordion
+          key={formId}
+          defaultValue={formId}
+          variant="default"
+          chevronPosition="left"
+          styles={{
+            content: {
+              paddingLeft: "0px",
+              paddingRight: "0px",
+            },
+          }}
+        >
           <Accordion.Item value={formId}>
-            <Accordion.Control>
-              <Text>
-                {sectionTitle} #{items.length + index + 1}
-              </Text>
-            </Accordion.Control>
+            <Group gap={0}>
+              <Accordion.Control style={{ flex: 1 }}>
+                <Group>
+                  <Text size="sm">{sectionTitle}</Text>
+                  <Badge variant="outline" size="md">
+                    #{items.length + index + 1}
+                  </Badge>
+                </Group>
+              </Accordion.Control>
+              <ActionIcon
+                size="lg"
+                variant="subtle"
+                color="red"
+                onClick={() => {
+                  setFormAccordions((prev) =>
+                    prev.filter((id) => id !== formId),
+                  );
+                }}
+                title="Remove"
+              >
+                <IconX size={16} />
+              </ActionIcon>
+            </Group>
             <Accordion.Panel>
               <FormComponent
                 mode="create"
-                cvId={cvId}
-                onSuccess={() => handleFormSubmitted(formId)}
+                onSuccess={() => {
+                  // Remove this form accordion after successful creation
+                  setFormAccordions((prev) =>
+                    prev.filter((id) => id !== formId),
+                  );
+                }}
               />
             </Accordion.Panel>
           </Accordion.Item>

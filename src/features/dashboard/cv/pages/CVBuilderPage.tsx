@@ -21,10 +21,10 @@ import { useCvStore } from "@features/dashboard/cv/store/cvStore";
 import { useCVSectionStore } from "@features/dashboard/cv/store/cvSectionStore";
 import { useQuery } from "@tanstack/react-query";
 import { cvQuery } from "@features/dashboard/cv/hooks/query";
-import { CVContentEditor } from "@features/dashboard/cv/sections/builder/components/CVContentEditor";
 import { CVDesignEditor } from "@features/dashboard/cv/sections/builder/components/CVDesignEditor";
 import { CVLivePreviewA4 } from "@features/dashboard/cv/components/CVLivePreviewA4";
 import { CvSectionManager } from "@features/dashboard/cv/sections/builder/components/CvSectionManager";
+import { CVContentEditor } from "@features/dashboard/cv/sections/builder/components/CVContentEditor";
 import { useParams } from "@tanstack/react-router";
 
 export const CvBuilderPage = () => {

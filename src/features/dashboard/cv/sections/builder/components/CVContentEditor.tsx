@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Box,
   Stepper,
@@ -34,6 +34,7 @@ import { LanguageForm } from "../../language/components/LanguageForm";
 import { ContactForm } from "../../contact/components/ContactForm";
 import { EducationForm } from "../../education/components/EducationForm";
 import { useCVSectionStore } from "@features/dashboard/cv/store/cvSectionStore";
+import { useCvStore } from "@features/dashboard/cv/store/cvStore";
 import { SectionType } from "../../../types/types";
 
 interface CVContentEditorProps {
@@ -239,11 +240,17 @@ export const CVContentEditor = ({}: CVContentEditorProps) => {
   const steps = selectedSections
     .map((sectionId: SectionType) => SECTION_CONFIG[sectionId])
     .filter(Boolean);
+
+  // Reset activeStep when sections change to prevent out-of-bounds access
+  useEffect(() => {
+    if (activeStep >= steps.length && steps.length > 0) {
+      setActiveStep(0);
+    }
+  }, [steps.length, activeStep]);
+
   const currentSection = steps[activeStep];
 
   const prevStep = () => setActiveStep((current) => Math.max(current - 1, 0));
-
-  const CurrentFormComponent = currentSection?.component;
 
   return (
     <Stack gap="md" p="md">
@@ -297,14 +304,16 @@ export const CVContentEditor = ({}: CVContentEditorProps) => {
 
       {/* Current Form */}
       <Box style={{ flex: 1, overflow: "auto" }}>
-        {CurrentFormComponent ? (
-          <CurrentFormComponent cvId={cvId} />
-        ) : (
+        {steps.length === 0 ? (
           <Paper p="xl" withBorder>
             <Center>
               <Text c="dimmed">No sections selected</Text>
             </Center>
           </Paper>
+        ) : (
+          <div key={`step-${activeStep}`}>
+            {currentSection && React.createElement(currentSection.component)}
+          </div>
         )}
       </Box>
 

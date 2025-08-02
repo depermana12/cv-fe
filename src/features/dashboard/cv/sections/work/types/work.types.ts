@@ -13,7 +13,6 @@ export type WorkFormMode = "create" | "edit";
 
 export type WorkFormProps = {
   mode: WorkFormMode;
-  cvId: number;
   initialData?: Work;
   onSuccess?: () => void;
 };

@@ -15,12 +15,12 @@ export const projectSchema = z.object({
     .date({ invalid_type_error: "Invalid end date format" })
     .optional(),
   url: z
-    .string()
-    .url({ message: "Please provide a valid URL" })
-    .max(255, { message: "URL must be 255 characters or fewer" })
+    .union([
+      z.literal(""),
+      z.string().url({ message: "Please provide a valid URL" }),
+    ])
     .optional(),
   descriptions: z.array(z.string()).optional(),
-  technologies: z.array(z.string()).optional(),
 });
 
 export const projectCreateSchema = projectSchema.omit({

@@ -8,7 +8,14 @@ import {
   Title,
   Paper,
   Select,
+  Text,
+  Tooltip,
+  Modal,
+  ActionIcon,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { IconTrash, IconCheck } from "@tabler/icons-react";
 
 import {
   languageInsertSchema,
@@ -17,13 +24,14 @@ import {
 } from "../schema/languageSchema";
 import { useCreateLanguage } from "../hooks/useCreateLanguage";
 import { useUpdateLanguage } from "../hooks/useUpdateLanguage";
+import { useDeleteLanguage } from "../hooks/useDeleteLanguage";
 import type {
   LanguageInsert,
   LanguageFormProps,
 } from "../types/language.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useCvStore } from "../../../store/cvStore";
+import { useCvStore } from "@features/dashboard/cv/store/cvStore";
 
 const fluencyOptions = [
   { value: "beginner", label: "Beginner" },
@@ -37,9 +45,37 @@ export const LanguageForm = ({
   onSuccess,
 }: LanguageFormProps) => {
   const { activeCvId } = useCvStore();
-  const cvId = activeCvId!;
+
+  const [opened, { open: openDeleteModal, close: closeDeleteModal }] =
+    useDisclosure(false);
+
   const { mutate: createLanguage, isPending: isCreating } = useCreateLanguage();
   const { mutate: updateLanguage, isPending: isUpdating } = useUpdateLanguage();
+  const { mutate: deleteLanguage, isPending: isDeleting } = useDeleteLanguage();
+
+  if (!activeCvId) {
+    return <Text>No CV selected</Text>;
+  }
+
+  const handleDelete = () => {
+    if (!initialData?.id) return;
+
+    deleteLanguage(
+      { languageId: initialData.id, cvId: activeCvId },
+      {
+        onSuccess: () => {
+          notifications.show({
+            title: "Success",
+            message: "Language deleted successfully",
+            color: "green",
+            icon: <IconCheck size={16} />,
+          });
+          closeDeleteModal();
+          onSuccess?.();
+        },
+      },
+    );
+  };
 
   const defaultLanguageValues: LanguageInsert = {
     language: "",
@@ -59,14 +95,14 @@ export const LanguageForm = ({
     onSubmit: ({ value }) => {
       if (mode === "create") {
         createLanguage(
-          { cvId, data: value },
+          { cvId: activeCvId, data: value },
           {
             onSuccess: () => onSuccess?.(),
           },
         );
       } else if (mode === "edit" && initialData) {
         updateLanguage(
-          { cvId, languageId: initialData.id, data: value },
+          { cvId: activeCvId, languageId: initialData.id, data: value },
           { onSuccess: () => onSuccess?.() },
         );
       }
@@ -89,80 +125,122 @@ export const LanguageForm = ({
   const isPending = isCreating || isUpdating;
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSubmit();
-      }}
-    >
-      <LoadingOverlay visible={state.isSubmitting || isPending} />
+    <>
+      {/* Header with delete action for edit mode */}
+      {mode === "edit" && initialData && (
+        <Group justify="space-between" align="center" mb="md">
+          <Title order={3} size="lg">
+            Edit Language
+          </Title>
+          <Tooltip label="Delete language">
+            <ActionIcon
+              color="red"
+              variant="light"
+              onClick={openDeleteModal}
+              size="lg"
+            >
+              <IconTrash size={18} />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+      )}
 
-      <Stack gap="xl">
-        {/* Language Information Section */}
-        <Paper withBorder p="md">
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Language Information
-            </Title>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+      >
+        <LoadingOverlay visible={state.isSubmitting || isPending} />
 
-            <Group grow>
-              <Field
-                name="language"
-                validators={{
-                  onBlur: zFieldValidator(languageSchema.shape.language),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <TextInput
-                      name={name}
-                      label="Language"
-                      placeholder="Enter language name (e.g., English, Spanish, French)"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      required
-                      autoComplete="language"
-                    />
-                  );
-                }}
-              </Field>
+        <Stack gap="xl">
+          {/* Language Information Section */}
+          <Paper withBorder p="md">
+            <Stack gap="md">
+              <Title order={4} size="md">
+                Language Information
+              </Title>
 
-              <Field
-                name="fluency"
-                validators={{
-                  onBlur: zFieldValidator(languageSchema.shape.fluency),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <Select
-                      name={name}
-                      label="Fluency Level"
-                      placeholder="Select your fluency level"
-                      data={fluencyOptions}
-                      value={state.value || null}
-                      onChange={(value) => handleChange(value as any)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      clearable
-                    />
-                  );
-                }}
-              </Field>
-            </Group>
-          </Stack>
-        </Paper>
+              <Group grow>
+                <Field
+                  name="language"
+                  validators={{
+                    onBlur: zFieldValidator(languageSchema.shape.language),
+                  }}
+                >
+                  {({ state, name, handleChange, handleBlur }) => {
+                    const errorField = useFieldError(state.meta);
+                    return (
+                      <TextInput
+                        name={name}
+                        label="Language"
+                        placeholder="Enter language name (e.g., English, Spanish, French)"
+                        value={state.value}
+                        onChange={(e) => handleChange(e.target.value)}
+                        onBlur={handleBlur}
+                        error={errorField}
+                        required
+                        autoComplete="language"
+                      />
+                    );
+                  }}
+                </Field>
 
-        <Group justify="flex-end" mt="lg">
-          <Button type="submit" loading={state.isSubmitting || isPending}>
-            {mode === "create" ? "Create Language" : "Update Language"}
+                <Field
+                  name="fluency"
+                  validators={{
+                    onBlur: zFieldValidator(languageSchema.shape.fluency),
+                  }}
+                >
+                  {({ state, name, handleChange, handleBlur }) => {
+                    const errorField = useFieldError(state.meta);
+                    return (
+                      <Select
+                        name={name}
+                        label="Fluency Level"
+                        placeholder="Select your fluency level"
+                        data={fluencyOptions}
+                        value={state.value || null}
+                        onChange={(value) => handleChange(value as any)}
+                        onBlur={handleBlur}
+                        error={errorField}
+                        clearable
+                      />
+                    );
+                  }}
+                </Field>
+              </Group>
+            </Stack>
+          </Paper>
+
+          <Group justify="flex-end" mt="lg">
+            <Button type="submit" loading={state.isSubmitting || isPending}>
+              {mode === "create" ? "Create Language" : "Update Language"}
+            </Button>
+          </Group>
+        </Stack>
+      </form>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        opened={opened}
+        onClose={closeDeleteModal}
+        title="Delete Language"
+        centered
+      >
+        <Text mb="md">
+          Are you sure you want to delete this language? This action cannot be
+          undone.
+        </Text>
+        <Group justify="flex-end">
+          <Button variant="light" onClick={closeDeleteModal}>
+            Cancel
+          </Button>
+          <Button color="red" onClick={handleDelete} loading={isDeleting}>
+            Delete
           </Button>
         </Group>
-      </Stack>
-    </form>
+      </Modal>
+    </>
   );
 };

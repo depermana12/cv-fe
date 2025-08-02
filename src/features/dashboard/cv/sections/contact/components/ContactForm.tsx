@@ -19,19 +19,36 @@ import { contactSchema } from "../schema/contactSchema";
 import { useCreateContact } from "../hooks/useCreateContact";
 import { useUpdateContact } from "../hooks/useUpdateContact";
 import { useDeleteContact } from "../hooks/useDeleteContact";
-import type { ContactFormProps, ContactInsert } from "../types/contact.types";
+import { useContacts } from "../hooks/useContact";
+import type { ContactInsert } from "../types/contact.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { useCvStore } from "@features/dashboard/cv/store/cvStore";
 
-export const ContactForm = ({ mode, cvId, initialData }: ContactFormProps) => {
+export const ContactForm = () => {
+  const { activeCvId } = useCvStore();
+
+  // Query contacts and determine mode and initial data
+  const { data: contacts = [], isLoading } = useContacts(activeCvId!);
+  const existingContact = contacts.length > 0 ? contacts[0] : undefined;
+  const mode = existingContact ? "edit" : "create";
+
   const [opened, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
 
   const { mutate: createContact, isPending: isCreating } = useCreateContact();
   const { mutate: updateContact, isPending: isUpdating } = useUpdateContact();
   const { mutate: deleteContact, isPending: isDeleting } = useDeleteContact();
+
+  if (!activeCvId) {
+    return <Text>No CV selected</Text>;
+  }
+
+  if (isLoading) {
+    return <Text>Loading contact information...</Text>;
+  }
 
   const defaultContactValues: ContactInsert = {
     firstName: "",
@@ -46,14 +63,15 @@ export const ContactForm = ({ mode, cvId, initialData }: ContactFormProps) => {
     profileImage: "",
   };
 
-  const initialValues = mode === "edit" ? initialData : defaultContactValues;
+  const initialValues =
+    mode === "edit" ? existingContact : defaultContactValues;
 
   const contactForm = useForm({
     defaultValues: initialValues,
     onSubmit: ({ value }) => {
       if (mode === "create") {
         createContact(
-          { cvId, data: value },
+          { cvId: activeCvId, data: value },
           {
             onSuccess: () => {
               notifications.show({
@@ -66,9 +84,9 @@ export const ContactForm = ({ mode, cvId, initialData }: ContactFormProps) => {
             },
           },
         );
-      } else if (mode === "edit" && initialData) {
+      } else if (mode === "edit" && existingContact) {
         updateContact(
-          { cvId, contactId: initialData.id, data: value },
+          { cvId: activeCvId, contactId: existingContact.id, data: value },
           {
             onSuccess: () => {
               notifications.show({
@@ -90,10 +108,10 @@ export const ContactForm = ({ mode, cvId, initialData }: ContactFormProps) => {
   const isPending = isCreating || isUpdating || isDeleting;
 
   const handleDelete = () => {
-    if (!initialData?.id) return;
+    if (!existingContact?.id) return;
 
     deleteContact(
-      { cvId, contactId: initialData.id },
+      { cvId: activeCvId, contactId: existingContact.id },
       {
         onSuccess: () => {
           reset();
@@ -371,7 +389,7 @@ export const ContactForm = ({ mode, cvId, initialData }: ContactFormProps) => {
             </Group>
 
             <Group justify="flex-end" mt="lg">
-              {mode === "edit" && initialData && (
+              {mode === "edit" && existingContact && (
                 <Tooltip label="Delete this contact">
                   <ActionIcon
                     color="red"

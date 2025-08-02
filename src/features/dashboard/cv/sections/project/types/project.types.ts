@@ -13,7 +13,6 @@ export type ProjectFormMode = "create" | "edit";
 
 export type ProjectFormProps = {
   mode: ProjectFormMode;
-  cvId: number;
   initialData?: Project;
   onSuccess?: () => void;
 };
