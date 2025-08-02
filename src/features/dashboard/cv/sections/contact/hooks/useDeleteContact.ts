@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { contactService } from "../services/contactService";
-import { queryClient } from "@/shared/lib/queryClient";
+import { queryClient } from "@shared/lib/queryClient";
 import { notifications } from "@mantine/notifications";
 
 export const useDeleteContact = () => {
@@ -17,14 +17,12 @@ export const useDeleteContact = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["cvs", "contacts", variables.cvId],
+        queryKey: ["cvs", variables.cvId, "contacts"],
       });
     },
     onError: (err) => {
       notifications.show({
-        position: "top-right",
         withCloseButton: true,
-        autoClose: 3000,
         title: "Failed to delete contact",
         message: "There was an error deleting your contact.",
         color: "red",

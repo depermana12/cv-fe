@@ -35,7 +35,7 @@ const AppProviders = () => {
   return (
     <MantineProvider theme={myTheme} stylesTransform={emotionTransform}>
       <MantineEmotionProvider>
-        <Notifications />
+        <Notifications autoClose={5000} position="top-right" />
         <QueryClientProvider client={queryClient}>
           <RouterProvider
             router={router}

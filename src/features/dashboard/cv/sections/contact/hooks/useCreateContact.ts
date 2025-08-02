@@ -20,20 +20,10 @@ export const useCreateContact = () => {
       queryClient.invalidateQueries({
         queryKey: ["cvs", variables.cvId, "contacts"],
       });
-      notifications.show({
-        position: "top-center",
-        withCloseButton: true,
-        autoClose: 3000,
-        title: "Contact created successfully",
-        message: `Contact ${variables.data.firstName} ${variables.data.lastName} has been added.`,
-        color: "green",
-      });
     },
     onError: (err) => {
       notifications.show({
-        position: "top-center",
         withCloseButton: true,
-        autoClose: 3000,
         title: "Failed to create contact",
         message: "There was an error creating your contact.",
         color: "red",

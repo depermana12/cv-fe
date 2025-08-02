@@ -22,20 +22,10 @@ export const useUpdateContact = () => {
       queryClient.invalidateQueries({
         queryKey: ["cvs", variables.cvId, "contacts"],
       });
-      notifications.show({
-        position: "top-center",
-        withCloseButton: true,
-        autoClose: 3000,
-        title: "Contact updated successfully",
-        message: `Contact has been updated.`,
-        color: "green",
-      });
     },
     onError: (err) => {
       notifications.show({
-        position: "top-right",
         withCloseButton: true,
-        autoClose: 3000,
         title: "Failed to update contact",
         message: "There was an error updating your contact.",
         color: "red",
