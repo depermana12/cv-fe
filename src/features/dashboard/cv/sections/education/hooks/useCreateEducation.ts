@@ -20,20 +20,10 @@ export const useCreateEducation = () => {
       queryClient.invalidateQueries({
         queryKey: ["cvs", variables.cvId, "educations"],
       });
-      notifications.show({
-        position: "top-center",
-        withCloseButton: true,
-        autoClose: 3000,
-        title: "Education added successfully",
-        message: `Education has been added successfully.`,
-        color: "green",
-      });
     },
     onError: (err) => {
       notifications.show({
-        position: "top-right",
         withCloseButton: true,
-        autoClose: 3000,
         title: "Failed to add education",
         message: "There was an error adding your education.",
         color: "red",

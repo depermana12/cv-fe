@@ -20,20 +20,10 @@ export const useUpdateEducation = () => {
     },
     onSuccess: (_data, { cvId }) => {
       queryClient.invalidateQueries({ queryKey: ["cvs", cvId, "educations"] });
-      notifications.show({
-        position: "top-center",
-        withCloseButton: true,
-        autoClose: 3000,
-        title: "Education updated successfully",
-        message: "Education has been updated successfully.",
-        color: "green",
-      });
     },
     onError: (err) => {
       notifications.show({
-        position: "top-right",
         withCloseButton: true,
-        autoClose: 3000,
         title: "Failed to update education",
         message: "There was an error updating the education.",
         color: "red",

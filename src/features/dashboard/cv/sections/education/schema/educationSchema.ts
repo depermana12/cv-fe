@@ -4,8 +4,9 @@ export const educationSchema = z.object({
   id: z.number().int().positive(),
   cvId: z.number().int().positive(),
   institution: z
-    .string()
-    .max(100, { message: "Must be 100 characters or fewer" }),
+    .string({ required_error: "Institution is required" })
+    .min(1, { message: "Institution is required" })
+    .max(100, { message: "Institution must be 100 characters or fewer" }),
   degree: z.enum(
     ["high_school", "diploma", "bachelor", "master", "doctorate"],
     {
@@ -13,12 +14,13 @@ export const educationSchema = z.object({
     },
   ),
   fieldOfStudy: z
-    .string()
-    .max(100, { message: "Field of study must be 100 characters or fewer" })
-    .optional(),
-  startDate: z.coerce
-    .date({ invalid_type_error: "Invalid start date format" })
-    .optional(),
+    .string({ required_error: "Field of study is required" })
+    .min(1, { message: "Field of study is required" })
+    .max(100, { message: "Field of study must be 100 characters or fewer" }),
+  startDate: z.coerce.date({
+    required_error: "Start date is required",
+    invalid_type_error: "Invalid start date format",
+  }),
   endDate: z.coerce
     .date({ invalid_type_error: "Invalid end date format" })
     .optional(),
@@ -28,16 +30,14 @@ export const educationSchema = z.object({
       message: "GPA must be a decimal with up to 2 decimal places",
     })
     .optional(),
-  url: z
-    .string()
-    .url({ message: "Please provide a valid URL" })
-    .max(255, { message: "URL must be 255 characters or fewer" })
-    .optional(),
   location: z
+    .string({ required_error: "Location is required" })
+    .min(1, { message: "Location is required" })
+    .max(100, { message: "Location must be 100 characters or fewer" }),
+  description: z
     .string()
-    .max(100, { message: "Location must be 100 characters or fewer" })
+    .max(1000, { message: "Description must be 1000 characters or fewer" })
     .optional(),
-  description: z.array(z.string()).optional(),
 });
 
 export const educationCreateSchema = educationSchema.omit({

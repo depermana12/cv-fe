@@ -20,9 +20,7 @@ export const useDeleteEducation = () => {
     },
     onError: (err) => {
       notifications.show({
-        position: "top-right",
         withCloseButton: true,
-        autoClose: 3000,
         title: "Failed to delete education",
         message: "There was an error deleting the education.",
         color: "red",
