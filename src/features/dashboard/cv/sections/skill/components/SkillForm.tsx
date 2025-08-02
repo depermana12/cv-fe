@@ -5,7 +5,6 @@ import {
   Stack,
   TextInput,
   Group,
-  Title,
   Paper,
   Select,
   Textarea,
@@ -14,6 +13,7 @@ import {
   Tooltip,
   Modal,
   ActionIcon,
+  Box,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -81,14 +81,7 @@ export const SkillForm = ({ mode, initialData, onSuccess }: SkillFormProps) => {
       { skillId: initialData.id, cvId: activeCvId },
       {
         onSuccess: () => {
-          notifications.show({
-            title: "Success",
-            message: "Skill deleted successfully",
-            color: "green",
-            icon: <IconCheck size={16} />,
-          });
           closeDeleteModal();
-          onSuccess?.();
         },
       },
     );
@@ -129,13 +122,32 @@ export const SkillForm = ({ mode, initialData, onSuccess }: SkillFormProps) => {
         createSkill(
           { cvId: activeCvId, data: submitData },
           {
-            onSuccess: () => onSuccess?.(),
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                icon: <IconCheck size={16} />,
+                message: `Skill "${value.name}" has been added.`,
+                color: "green",
+                withBorder: true,
+              });
+              onSuccess?.();
+            },
           },
         );
       } else if (mode === "edit" && initialData) {
         updateSkill(
           { cvId: activeCvId, skillId: initialData.id, data: submitData },
-          { onSuccess: () => onSuccess?.() },
+          {
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                icon: <IconCheck size={16} />,
+                message: `Skill has been updated.`,
+                color: "green",
+                withBorder: true,
+              });
+            },
+          },
         );
       }
     },
@@ -154,171 +166,117 @@ export const SkillForm = ({ mode, initialData, onSuccess }: SkillFormProps) => {
 
   const { Field, handleSubmit, state } = skillForm;
 
-  const isPending = isCreating || isUpdating;
+  const isPending = isCreating || isUpdating || isDeleting;
 
   return (
-    <>
-      {/* Header with delete action for edit mode */}
-      {mode === "edit" && initialData && (
-        <Group justify="space-between" align="center" mb="md">
-          <Title order={3} size="lg">
-            Edit Skill
-          </Title>
-          <Tooltip label="Delete skill">
-            <ActionIcon
-              color="red"
-              variant="light"
-              onClick={openDeleteModal}
-              size="lg"
-            >
-              <IconTrash size={18} />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
-      )}
-
+    <Box pos="relative">
+      <LoadingOverlay visible={state.isSubmitting || isPending} />
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
       >
-        <LoadingOverlay visible={state.isSubmitting || isPending} />
+        <Paper p="md" withBorder>
+          <Stack gap="xs">
+            {/* Skill Classification Section */}
+            <Text fw="bold">Skill Classification</Text>
 
-        <Stack gap="xl">
-          {/* Skill Type and Category Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Title order={4} size="md">
-                Skill Classification
-              </Title>
-
-              <Group grow>
-                <Field
-                  name="type"
-                  validators={{
-                    onBlur: zFieldValidator(skillSchema.shape.type),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <Select
-                        name={name}
-                        label="Skill Type"
-                        placeholder="Select skill type"
-                        data={skillTypes}
-                        value={state.value}
-                        onChange={(value) => handleChange(value as any)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        required
-                      />
-                    );
-                  }}
-                </Field>
-
-                <Field
-                  name="category"
-                  validators={{
-                    onBlur: zFieldValidator(skillSchema.shape.category),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <Select
-                        name={name}
-                        label="Category"
-                        placeholder="Select or type category"
-                        data={skillCategories}
-                        value={state.value}
-                        onChange={(value) => handleChange(value as any)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        required
-                        searchable
-                      />
-                    );
-                  }}
-                </Field>
-              </Group>
-            </Stack>
-          </Paper>
-
-          {/* Skill Details Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Title order={4} size="md">
-                Skill Details
-              </Title>
-
-              <Group grow>
-                <Field
-                  name="name"
-                  validators={{
-                    onBlur: zFieldValidator(skillSchema.shape.name),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <TextInput
-                        name={name}
-                        label="Skill Name"
-                        placeholder="e.g. React, JavaScript, Project Management"
-                        value={state.value}
-                        onChange={(e) => handleChange(e.target.value)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        required
-                        autoComplete="off"
-                      />
-                    );
-                  }}
-                </Field>
-
-                <Field
-                  name="proficiency"
-                  validators={{
-                    onBlur: zFieldValidator(skillSchema.shape.proficiency),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <Select
-                        name={name}
-                        label="Proficiency Level"
-                        placeholder="Select proficiency level"
-                        data={proficiencyLevels}
-                        value={state.value || ""}
-                        onChange={(value) => handleChange(value as any)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        clearable
-                      />
-                    );
-                  }}
-                </Field>
-              </Group>
-
+            <Group grow>
               <Field
-                name="keywords"
+                name="type"
                 validators={{
-                  onBlur: zFieldValidator(skillSchema.shape.keywords),
+                  onBlur: zFieldValidator(skillSchema.shape.type),
                 }}
               >
                 {({ state, name, handleChange, handleBlur }) => {
                   const errorField = useFieldError(state.meta);
                   return (
-                    <TagsInput
+                    <Select
                       name={name}
-                      label="Keywords"
-                      description="Add relevant keywords or technologies related to this skill"
-                      placeholder="Type and press Enter to add keywords"
+                      label="Skill Type"
+                      placeholder="Select skill type"
+                      data={skillTypes}
                       value={state.value}
-                      onChange={handleChange}
+                      onChange={(value) => handleChange(value as any)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      required
+                    />
+                  );
+                }}
+              </Field>
+
+              <Field
+                name="category"
+                validators={{
+                  onBlur: zFieldValidator(skillSchema.shape.category),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <Select
+                      name={name}
+                      label="Category"
+                      placeholder="Select or type category"
+                      data={skillCategories}
+                      value={state.value}
+                      onChange={(value) => handleChange(value as any)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      required
+                      searchable
+                    />
+                  );
+                }}
+              </Field>
+            </Group>
+
+            {/* Skill Details Section */}
+            <Text fw="bold">Skill Details</Text>
+
+            <Group grow>
+              <Field
+                name="name"
+                validators={{
+                  onBlur: zFieldValidator(skillSchema.shape.name),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <TextInput
+                      name={name}
+                      label="Skill Name"
+                      placeholder="e.g. React, JavaScript, Project Management"
+                      value={state.value}
+                      onChange={(e) => handleChange(e.target.value)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      required
+                      autoComplete="off"
+                    />
+                  );
+                }}
+              </Field>
+
+              <Field
+                name="proficiency"
+                validators={{
+                  onBlur: zFieldValidator(skillSchema.shape.proficiency),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <Select
+                      name={name}
+                      label="Proficiency Level"
+                      placeholder="Select proficiency level"
+                      data={proficiencyLevels}
+                      value={state.value || ""}
+                      onChange={(value) => handleChange(value as any)}
                       onBlur={handleBlur}
                       error={errorField}
                       clearable
@@ -326,63 +284,103 @@ export const SkillForm = ({ mode, initialData, onSuccess }: SkillFormProps) => {
                   );
                 }}
               </Field>
+            </Group>
 
-              <Field
-                name="description"
-                validators={{
-                  onBlur: zFieldValidator(skillSchema.shape.description),
-                }}
+            <Field
+              name="keywords"
+              validators={{
+                onBlur: zFieldValidator(skillSchema.shape.keywords),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <TagsInput
+                    name={name}
+                    label="Keywords"
+                    placeholder="Type and press Enter to add keywords"
+                    value={state.value}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    clearable
+                  />
+                );
+              }}
+            </Field>
+
+            <Field
+              name="description"
+              validators={{
+                onBlur: zFieldValidator(skillSchema.shape.description),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <Textarea
+                    name={name}
+                    label="Description"
+                    placeholder="Describe your experience, projects, or achievements related to this skill..."
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    autosize
+                    minRows={3}
+                    maxRows={6}
+                  />
+                );
+              }}
+            </Field>
+
+            <Group justify="flex-end" mt="lg">
+              {mode === "edit" && initialData && (
+                <Tooltip label="Delete this skill">
+                  <ActionIcon
+                    color="red"
+                    size="lg"
+                    variant="outline"
+                    onClick={openDeleteModal}
+                    disabled={isPending}
+                  >
+                    <IconTrash size={18} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
+
+              <Button
+                variant="filled"
+                type="submit"
+                loading={state.isSubmitting || isPending}
               >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <Textarea
-                      name={name}
-                      label="Description"
-                      description="Optional description of your experience with this skill"
-                      placeholder="Describe your experience, projects, or achievements related to this skill"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      autosize
-                      minRows={3}
-                      maxRows={6}
-                    />
-                  );
-                }}
-              </Field>
-            </Stack>
-          </Paper>
+                {mode === "create" ? "Create Skill" : "Update Skill"}
+              </Button>
+            </Group>
+          </Stack>
+        </Paper>
 
-          <Group justify="flex-end" mt="lg">
-            <Button type="submit" loading={state.isSubmitting || isPending}>
-              {mode === "create" ? "Create Skill" : "Update Skill"}
-            </Button>
-          </Group>
-        </Stack>
+        {/* Delete Confirmation Modal */}
+        <Modal
+          opened={opened}
+          onClose={closeDeleteModal}
+          title="Delete Skill?"
+          centered
+        >
+          <Stack gap="md">
+            <Text>Are you sure you want to delete this skill?</Text>
+
+            <Group justify="flex-end">
+              <Button variant="default" onClick={closeDeleteModal}>
+                Cancel
+              </Button>
+              <Button color="red" onClick={handleDelete} loading={isDeleting}>
+                Delete Skill
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
       </form>
-
-      {/* Delete Confirmation Modal */}
-      <Modal
-        opened={opened}
-        onClose={closeDeleteModal}
-        title="Delete Skill"
-        centered
-      >
-        <Text mb="md">
-          Are you sure you want to delete this skill? This action cannot be
-          undone.
-        </Text>
-        <Group justify="flex-end">
-          <Button variant="light" onClick={closeDeleteModal}>
-            Cancel
-          </Button>
-          <Button color="red" onClick={handleDelete} loading={isDeleting}>
-            Delete
-          </Button>
-        </Group>
-      </Modal>
-    </>
+    </Box>
   );
 };

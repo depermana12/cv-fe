@@ -6,7 +6,6 @@ import {
   Stack,
   TextInput,
   Group,
-  Title,
   Paper,
   Textarea,
   ActionIcon,
@@ -47,6 +46,11 @@ export const CourseForm = ({
   const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
   const { mutate: deleteCourse, isPending: isDeleting } = useDeleteCourse();
 
+  // Dynamic descriptions state
+  const [descriptions, setDescriptions] = useState<string[]>(
+    initialData?.descriptions || [""],
+  );
+
   if (!activeCvId) {
     return <Text>No CV selected</Text>;
   }
@@ -70,11 +74,6 @@ export const CourseForm = ({
       },
     );
   };
-
-  // Dynamic descriptions state
-  const [descriptions, setDescriptions] = useState<string[]>(
-    initialData?.descriptions || [""],
-  );
 
   const defaultCourseValues: CourseInsert = {
     provider: "",
@@ -112,13 +111,31 @@ export const CourseForm = ({
         createCourse(
           { cvId: activeCvId, data: submitData },
           {
-            onSuccess: () => onSuccess?.(),
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                message: "Course created successfully",
+                color: "green",
+                icon: <IconCheck size={16} />,
+              });
+              onSuccess?.();
+            },
           },
         );
       } else if (mode === "edit" && initialData) {
         updateCourse(
           { cvId: activeCvId, courseId: initialData.id, data: submitData },
-          { onSuccess: () => onSuccess?.() },
+          {
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                message: "Course updated successfully",
+                color: "green",
+                icon: <IconCheck size={16} />,
+              });
+              onSuccess?.();
+            },
+          },
         );
       }
     },
@@ -137,7 +154,7 @@ export const CourseForm = ({
 
   const { Field, handleSubmit, state } = courseForm;
 
-  const isPending = isCreating || isUpdating;
+  const isPending = isCreating || isUpdating || isDeleting;
 
   const addDescription = () => {
     setDescriptions([...descriptions, ""]);
@@ -156,25 +173,8 @@ export const CourseForm = ({
   };
 
   return (
-    <>
-      {/* Header with delete action for edit mode */}
-      {mode === "edit" && initialData && (
-        <Group justify="space-between" align="center" mb="md">
-          <Title order={3} size="lg">
-            Edit Course
-          </Title>
-          <Tooltip label="Delete course">
-            <ActionIcon
-              color="red"
-              variant="light"
-              onClick={openDeleteModal}
-              size="lg"
-            >
-              <IconTrash size={18} />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
-      )}
+    <Box pos="relative">
+      <LoadingOverlay visible={state.isSubmitting || isPending} />
 
       <form
         onSubmit={(e) => {
@@ -182,208 +182,200 @@ export const CourseForm = ({
           handleSubmit();
         }}
       >
-        <LoadingOverlay visible={state.isSubmitting || isPending} />
+        <Paper withBorder p="md">
+          <Stack gap="xs">
+            {/* Course Information Section */}
+            <Text fw="bold">Course Information</Text>
 
-        <Stack gap="xl">
-          {/* Course Information Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Title order={4} size="md">
-                Course Information
-              </Title>
+            <Group grow>
+              <Field
+                name="provider"
+                validators={{
+                  onBlur: zFieldValidator(courseSchema.shape.provider),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <TextInput
+                      name={name}
+                      label="Provider"
+                      placeholder="Course provider (e.g., Coursera, Udemy, University)"
+                      value={state.value}
+                      onChange={(e) => handleChange(e.target.value)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      required
+                      autoComplete="organization"
+                    />
+                  );
+                }}
+              </Field>
 
-              <Group grow>
-                <Field
-                  name="provider"
-                  validators={{
-                    onBlur: zFieldValidator(courseSchema.shape.provider),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <TextInput
-                        name={name}
-                        label="Provider"
-                        placeholder="Course provider (e.g., Coursera, Udemy, University)"
-                        value={state.value}
-                        onChange={(e) => handleChange(e.target.value)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        required
-                        autoComplete="organization"
-                      />
-                    );
-                  }}
-                </Field>
+              <Field
+                name="courseName"
+                validators={{
+                  onBlur: zFieldValidator(courseSchema.shape.courseName),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <TextInput
+                      name={name}
+                      label="Course Name"
+                      placeholder="Full course title"
+                      value={state.value}
+                      onChange={(e) => handleChange(e.target.value)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      autoComplete="off"
+                    />
+                  );
+                }}
+              </Field>
+            </Group>
 
-                <Field
-                  name="courseName"
-                  validators={{
-                    onBlur: zFieldValidator(courseSchema.shape.courseName),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <TextInput
-                        name={name}
-                        label="Course Name"
-                        placeholder="Full course title"
-                        value={state.value}
-                        onChange={(e) => handleChange(e.target.value)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        autoComplete="off"
-                      />
-                    );
-                  }}
-                </Field>
-              </Group>
+            {/* Course Period Section */}
+            <Text fw="bold">Course Period</Text>
+
+            <Group grow>
+              <Field
+                name="startDate"
+                validators={{
+                  onBlur: zFieldValidator(courseSchema.shape.startDate),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <DateInput
+                      name={name}
+                      label="Start Date"
+                      placeholder="Course start date"
+                      value={state.value || null}
+                      onChange={(value) => handleChange(value as any)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      clearable
+                      maxDate={new Date()}
+                    />
+                  );
+                }}
+              </Field>
+
+              <Field
+                name="endDate"
+                validators={{
+                  onBlur: zFieldValidator(courseSchema.shape.endDate),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <DateInput
+                      name={name}
+                      label="End Date"
+                      placeholder="Course completion date"
+                      value={state.value || null}
+                      onChange={(value) => handleChange(value as any)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      clearable
+                      maxDate={new Date()}
+                    />
+                  );
+                }}
+              </Field>
+            </Group>
+
+            {/* Course Details Section */}
+            <Group justify="space-between" align="center">
+              <Text fw="bold">Course Details</Text>
+              <Button
+                variant="light"
+                size="sm"
+                leftSection={<IconPlus size={16} />}
+                onClick={addDescription}
+              >
+                Add bullet
+              </Button>
+            </Group>
+
+            <Stack gap="sm">
+              {descriptions.map((description, index) => (
+                <Box key={index}>
+                  <Group align="center" gap="xs">
+                    <Textarea
+                      placeholder={`Course detail ${index + 1}`}
+                      value={description}
+                      onChange={(e) => updateDescription(index, e.target.value)}
+                      autosize
+                      minRows={2}
+                      maxRows={4}
+                      style={{ flex: 1 }}
+                    />
+                    {descriptions.length > 1 && (
+                      <ActionIcon
+                        color="red"
+                        variant="light"
+                        onClick={() => removeDescription(index)}
+                        style={{ marginTop: 6 }}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    )}
+                  </Group>
+                </Box>
+              ))}
             </Stack>
-          </Paper>
+          </Stack>
+        </Paper>
 
-          {/* Course Period Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Title order={4} size="md">
-                Course Period
-              </Title>
-
-              <Group grow>
-                <Field
-                  name="startDate"
-                  validators={{
-                    onBlur: zFieldValidator(courseSchema.shape.startDate),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <DateInput
-                        name={name}
-                        label="Start Date"
-                        placeholder="Course start date"
-                        value={state.value || null}
-                        onChange={(value) => handleChange(value as any)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        clearable
-                        maxDate={new Date()}
-                      />
-                    );
-                  }}
-                </Field>
-
-                <Field
-                  name="endDate"
-                  validators={{
-                    onBlur: zFieldValidator(courseSchema.shape.endDate),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <DateInput
-                        name={name}
-                        label="End Date"
-                        placeholder="Course completion date"
-                        value={state.value || null}
-                        onChange={(value) => handleChange(value as any)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        clearable
-                        maxDate={new Date()}
-                      />
-                    );
-                  }}
-                </Field>
-              </Group>
-            </Stack>
-          </Paper>
-
-          {/* Course Descriptions Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Group justify="space-between" align="center">
-                <Title order={4} size="md">
-                  Course Details
-                </Title>
-                <Button
-                  variant="light"
-                  size="sm"
-                  leftSection={<IconPlus size={16} />}
-                  onClick={addDescription}
-                >
-                  Add Detail
-                </Button>
-              </Group>
-
-              <Text size="sm" c="dimmed">
-                Describe what you learned, key skills acquired, or notable
-                achievements from this course
-              </Text>
-
-              <Stack gap="sm">
-                {descriptions.map((description, index) => (
-                  <Box key={index}>
-                    <Group align="flex-start" gap="sm">
-                      <Textarea
-                        placeholder={`Course detail ${index + 1}`}
-                        value={description}
-                        onChange={(e) =>
-                          updateDescription(index, e.target.value)
-                        }
-                        autosize
-                        minRows={2}
-                        maxRows={4}
-                        style={{ flex: 1 }}
-                      />
-                      {descriptions.length > 1 && (
-                        <ActionIcon
-                          color="red"
-                          variant="light"
-                          onClick={() => removeDescription(index)}
-                          style={{ marginTop: 6 }}
-                        >
-                          <IconTrash size={16} />
-                        </ActionIcon>
-                      )}
-                    </Group>
-                  </Box>
-                ))}
-              </Stack>
-            </Stack>
-          </Paper>
-
-          <Group justify="flex-end" mt="lg">
-            <Button type="submit" loading={state.isSubmitting || isPending}>
-              {mode === "create" ? "Create Course" : "Update Course"}
-            </Button>
-          </Group>
-        </Stack>
+        <Group justify="flex-end" mt="lg">
+          {mode === "edit" && initialData && (
+            <Tooltip label="Delete course">
+              <ActionIcon
+                color="red"
+                variant="outline"
+                onClick={openDeleteModal}
+                size="lg"
+                disabled={isPending}
+              >
+                <IconTrash size={18} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+          <Button
+            type="submit"
+            variant="filled"
+            loading={state.isSubmitting || isPending}
+          >
+            {mode === "create" ? "Create Course" : "Update Course"}
+          </Button>
+        </Group>
       </form>
 
       {/* Delete Confirmation Modal */}
       <Modal
         opened={opened}
         onClose={closeDeleteModal}
-        title="Delete Course"
+        title="Delete Course?"
         centered
       >
-        <Text mb="md">
-          Are you sure you want to delete this course? This action cannot be
-          undone.
-        </Text>
-        <Group justify="flex-end">
-          <Button variant="light" onClick={closeDeleteModal}>
-            Cancel
-          </Button>
-          <Button color="red" onClick={handleDelete} loading={isDeleting}>
-            Delete
-          </Button>
-        </Group>
+        <Stack gap="md">
+          <Text>Are you sure you want to delete this course?</Text>
+
+          <Group justify="flex-end">
+            <Button variant="default" onClick={closeDeleteModal}>
+              Cancel
+            </Button>
+            <Button color="red" onClick={handleDelete} loading={isDeleting}>
+              Delete Course
+            </Button>
+          </Group>
+        </Stack>
       </Modal>
-    </>
+    </Box>
   );
 };

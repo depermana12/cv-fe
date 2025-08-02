@@ -6,7 +6,6 @@ import {
   Stack,
   TextInput,
   Group,
-  Title,
   Paper,
   Textarea,
   ActionIcon,
@@ -47,6 +46,11 @@ export const ProjectForm = ({
   const { mutate: updateProject, isPending: isUpdating } = useUpdateProject();
   const { mutate: deleteProject, isPending: isDeleting } = useDeleteProject();
 
+  // Dynamic descriptions state
+  const [descriptions, setDescriptions] = useState<string[]>(
+    initialData?.descriptions || [""],
+  );
+
   if (!activeCvId) {
     return <Text>No CV selected</Text>;
   }
@@ -58,23 +62,11 @@ export const ProjectForm = ({
       { projectId: initialData.id, cvId: activeCvId },
       {
         onSuccess: () => {
-          notifications.show({
-            title: "Success",
-            message: "Project deleted successfully",
-            color: "green",
-            icon: <IconCheck size={16} />,
-          });
           closeDeleteModal();
-          onSuccess?.();
         },
       },
     );
   };
-
-  // Dynamic descriptions state
-  const [descriptions, setDescriptions] = useState<string[]>(
-    initialData?.descriptions || [""],
-  );
 
   const defaultProjectValues: ProjectInsert = {
     name: "",
@@ -112,13 +104,32 @@ export const ProjectForm = ({
         createProject(
           { cvId: activeCvId, data: submitData },
           {
-            onSuccess: () => onSuccess?.(),
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                icon: <IconCheck size={16} />,
+                message: `Project "${value.name}" has been added.`,
+                color: "green",
+                withBorder: true,
+              });
+              onSuccess?.();
+            },
           },
         );
       } else if (mode === "edit" && initialData) {
         updateProject(
           { cvId: activeCvId, projectId: initialData.id, data: submitData },
-          { onSuccess: () => onSuccess?.() },
+          {
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                icon: <IconCheck size={16} />,
+                message: `Project has been updated.`,
+                color: "green",
+                withBorder: true,
+              });
+            },
+          },
         );
       }
     },
@@ -137,7 +148,7 @@ export const ProjectForm = ({
 
   const { Field, handleSubmit, state } = projectForm;
 
-  const isPending = isCreating || isUpdating;
+  const isPending = isCreating || isUpdating || isDeleting;
 
   const addDescription = () => {
     setDescriptions([...descriptions, ""]);
@@ -156,25 +167,8 @@ export const ProjectForm = ({
   };
 
   return (
-    <>
-      {/* Header with delete action for edit mode */}
-      {mode === "edit" && initialData && (
-        <Group justify="space-between" align="center" mb="md">
-          <Title order={3} size="lg">
-            Edit Project
-          </Title>
-          <Tooltip label="Delete project">
-            <ActionIcon
-              color="red"
-              variant="light"
-              onClick={openDeleteModal}
-              size="lg"
-            >
-              <IconTrash size={18} />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
-      )}
+    <Box pos="relative">
+      <LoadingOverlay visible={state.isSubmitting || isPending} />
 
       <form
         onSubmit={(e) => {
@@ -182,204 +176,198 @@ export const ProjectForm = ({
           handleSubmit();
         }}
       >
-        <LoadingOverlay visible={state.isSubmitting || isPending} />
+        <Paper withBorder p="md">
+          <Stack gap="xs">
+            {/* Project Information Section */}
+            <Text fw="bold">Project Information</Text>
 
-        <Stack gap="xl">
-          {/* Project Information Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Title order={4} size="md">
-                Project Information
-              </Title>
+            <Field
+              name="name"
+              validators={{
+                onBlur: zFieldValidator(projectSchema.shape.name),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <TextInput
+                    name={name}
+                    label="Project Name"
+                    placeholder="Enter project name"
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    required
+                    autoComplete="off"
+                  />
+                );
+              }}
+            </Field>
 
+            <Field
+              name="url"
+              validators={{
+                onBlur: zFieldValidator(projectSchema.shape.url),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <TextInput
+                    name={name}
+                    label="Project URL"
+                    placeholder="https://project-demo.com"
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    autoComplete="url"
+                  />
+                );
+              }}
+            </Field>
+
+            {/* Project Timeline Section */}
+            <Text fw="bold">Project Timeline</Text>
+
+            <Group grow>
               <Field
-                name="name"
+                name="startDate"
                 validators={{
-                  onBlur: zFieldValidator(projectSchema.shape.name),
+                  onBlur: zFieldValidator(projectSchema.shape.startDate),
                 }}
               >
                 {({ state, name, handleChange, handleBlur }) => {
                   const errorField = useFieldError(state.meta);
                   return (
-                    <TextInput
+                    <DateInput
                       name={name}
-                      label="Project Name"
-                      placeholder="Enter project name"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
+                      label="Start Date"
+                      placeholder="Project start date"
+                      value={state.value || null}
+                      onChange={(value) => handleChange(value as any)}
                       onBlur={handleBlur}
                       error={errorField}
-                      required
-                      autoComplete="off"
+                      clearable
+                      maxDate={new Date()}
                     />
                   );
                 }}
               </Field>
 
               <Field
-                name="url"
+                name="endDate"
                 validators={{
-                  onBlur: zFieldValidator(projectSchema.shape.url),
+                  onBlur: zFieldValidator(projectSchema.shape.endDate),
                 }}
               >
                 {({ state, name, handleChange, handleBlur }) => {
                   const errorField = useFieldError(state.meta);
                   return (
-                    <TextInput
+                    <DateInput
                       name={name}
-                      label="Project URL"
-                      placeholder="https://project-demo.com"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
+                      label="End Date"
+                      placeholder="Project completion date"
+                      value={state.value || null}
+                      onChange={(value) => handleChange(value as any)}
                       onBlur={handleBlur}
                       error={errorField}
-                      autoComplete="url"
+                      clearable
+                      maxDate={new Date()}
                     />
                   );
                 }}
               </Field>
+            </Group>
+
+            {/* Project Details Section */}
+            <Group justify="space-between" align="center">
+              <Text fw="bold">Project Details</Text>
+              <Button
+                variant="light"
+                size="sm"
+                leftSection={<IconPlus size={16} />}
+                onClick={addDescription}
+              >
+                Add bullet
+              </Button>
+            </Group>
+
+            <Stack gap="sm">
+              {descriptions.map((description, index) => (
+                <Box key={index}>
+                  <Group align="center" gap="xs">
+                    <Textarea
+                      placeholder={`Description ${index + 1}`}
+                      value={description}
+                      onChange={(e) => updateDescription(index, e.target.value)}
+                      autosize
+                      minRows={2}
+                      maxRows={4}
+                      style={{ flex: 1 }}
+                    />
+                    {descriptions.length > 1 && (
+                      <ActionIcon
+                        color="red"
+                        variant="light"
+                        onClick={() => removeDescription(index)}
+                        style={{ marginTop: 6 }}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    )}
+                  </Group>
+                </Box>
+              ))}
             </Stack>
-          </Paper>
+          </Stack>
+        </Paper>
 
-          {/* Project Timeline Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Title order={4} size="md">
-                Project Timeline
-              </Title>
-
-              <Group grow>
-                <Field
-                  name="startDate"
-                  validators={{
-                    onBlur: zFieldValidator(projectSchema.shape.startDate),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <DateInput
-                        name={name}
-                        label="Start Date"
-                        placeholder="Project start date"
-                        value={state.value || null}
-                        onChange={(value) => handleChange(value as any)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        clearable
-                        maxDate={new Date()}
-                      />
-                    );
-                  }}
-                </Field>
-
-                <Field
-                  name="endDate"
-                  validators={{
-                    onBlur: zFieldValidator(projectSchema.shape.endDate),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <DateInput
-                        name={name}
-                        label="End Date"
-                        placeholder="Project completion date"
-                        value={state.value || null}
-                        onChange={(value) => handleChange(value as any)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        clearable
-                        maxDate={new Date()}
-                      />
-                    );
-                  }}
-                </Field>
-              </Group>
-            </Stack>
-          </Paper>
-
-          {/* Project Details Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Group justify="space-between" align="center">
-                <Title order={4} size="md">
-                  Project Details
-                </Title>
-                <Button
-                  variant="light"
-                  size="sm"
-                  leftSection={<IconPlus size={16} />}
-                  onClick={addDescription}
-                >
-                  Add Bullet Description
-                </Button>
-              </Group>
-
-              <Text size="sm" c="dimmed">
-                Describe key features, challenges solved, achievements, or
-                technical highlights
-              </Text>
-
-              <Stack gap="sm">
-                {descriptions.map((description, index) => (
-                  <Box key={index}>
-                    <Group align="flex-start" gap="sm">
-                      <Textarea
-                        placeholder={`Detail ${index + 1}`}
-                        value={description}
-                        onChange={(e) =>
-                          updateDescription(index, e.target.value)
-                        }
-                        rows={2}
-                        style={{ flex: 1 }}
-                      />
-                      {descriptions.length > 1 && (
-                        <ActionIcon
-                          color="red"
-                          variant="light"
-                          onClick={() => removeDescription(index)}
-                          style={{ marginTop: 6 }}
-                        >
-                          <IconTrash size={16} />
-                        </ActionIcon>
-                      )}
-                    </Group>
-                  </Box>
-                ))}
-              </Stack>
-            </Stack>
-          </Paper>
-
-          <Group justify="flex-end" mt="lg">
-            <Button type="submit" loading={state.isSubmitting || isPending}>
-              {mode === "create" ? "Create Project" : "Update Project"}
-            </Button>
-          </Group>
-        </Stack>
+        <Group justify="flex-end" mt="lg">
+          {mode === "edit" && initialData && (
+            <Tooltip label="Delete project">
+              <ActionIcon
+                color="red"
+                variant="outline"
+                onClick={openDeleteModal}
+                size="lg"
+                disabled={isPending}
+              >
+                <IconTrash size={18} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+          <Button
+            type="submit"
+            variant="filled"
+            loading={state.isSubmitting || isPending}
+          >
+            {mode === "create" ? "Create Project" : "Update Project"}
+          </Button>
+        </Group>
       </form>
 
       {/* Delete Confirmation Modal */}
       <Modal
         opened={opened}
         onClose={closeDeleteModal}
-        title="Delete Project"
+        title="Delete Project?"
         centered
       >
-        <Text mb="md">
-          Are you sure you want to delete this project? This action cannot be
-          undone.
-        </Text>
-        <Group justify="flex-end">
-          <Button variant="light" onClick={closeDeleteModal}>
-            Cancel
-          </Button>
-          <Button color="red" onClick={handleDelete} loading={isDeleting}>
-            Delete
-          </Button>
-        </Group>
+        <Stack gap="md">
+          <Text>Are you sure you want to delete this project?</Text>
+
+          <Group justify="flex-end">
+            <Button variant="default" onClick={closeDeleteModal}>
+              Cancel
+            </Button>
+            <Button color="red" onClick={handleDelete} loading={isDeleting}>
+              Delete Project
+            </Button>
+          </Group>
+        </Stack>
       </Modal>
-    </>
+    </Box>
   );
 };

@@ -6,7 +6,6 @@ import {
   Stack,
   TextInput,
   Group,
-  Title,
   Paper,
   Checkbox,
   Textarea,
@@ -44,6 +43,15 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
   const { mutate: updateWork, isPending: isUpdating } = useUpdateWork();
   const { mutate: deleteWork, isPending: isDeleting } = useDeleteWork();
 
+  // Dynamic descriptions state
+  const [descriptions, setDescriptions] = useState<string[]>(
+    initialData?.descriptions || [""],
+  );
+
+  const [isCurrentWork, setIsCurrentWork] = useState(
+    initialData?.isCurrent || false,
+  );
+
   if (!activeCvId) {
     return <Text>No CV selected</Text>;
   }
@@ -68,15 +76,6 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
     );
   };
 
-  // Dynamic descriptions state
-  const [descriptions, setDescriptions] = useState<string[]>(
-    initialData?.descriptions || [""],
-  );
-
-  const [isCurrentWork, setIsCurrentWork] = useState(
-    initialData?.isCurrent || false,
-  );
-
   const defaultWorkValues: WorkInsert = {
     company: "",
     position: "",
@@ -88,23 +87,7 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
     location: "",
   };
 
-  const initialValues =
-    mode === "edit" && initialData
-      ? {
-          company: initialData.company,
-          position: initialData.position,
-          startDate: initialData.startDate
-            ? new Date(initialData.startDate)
-            : undefined,
-          endDate: initialData.endDate
-            ? new Date(initialData.endDate)
-            : undefined,
-          url: initialData.url || "",
-          isCurrent: initialData.isCurrent || false,
-          descriptions: initialData.descriptions || [""],
-          location: initialData.location || "",
-        }
-      : defaultWorkValues;
+  const initialValues = mode === "edit" ? initialData : defaultWorkValues;
 
   const workForm = useForm({
     defaultValues: initialValues,
@@ -121,13 +104,31 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
         createWork(
           { cvId: activeCvId, data: submitData },
           {
-            onSuccess: () => onSuccess?.(),
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                message: "Work experience created successfully",
+                color: "green",
+                icon: <IconCheck size={16} />,
+              });
+              onSuccess?.();
+            },
           },
         );
       } else if (mode === "edit" && initialData) {
         updateWork(
           { cvId: activeCvId, workId: initialData.id, data: submitData },
-          { onSuccess: () => onSuccess?.() },
+          {
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                message: "Work experience updated successfully",
+                color: "green",
+                icon: <IconCheck size={16} />,
+              });
+              onSuccess?.();
+            },
+          },
         );
       }
     },
@@ -145,7 +146,7 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
 
   const { Field, handleSubmit, state } = workForm;
 
-  const isPending = isCreating || isUpdating;
+  const isPending = isCreating || isUpdating || isDeleting;
 
   const addDescription = () => {
     setDescriptions([...descriptions, ""]);
@@ -164,25 +165,8 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
   };
 
   return (
-    <>
-      {/* Header with delete action for edit mode */}
-      {mode === "edit" && initialData && (
-        <Group justify="space-between" align="center" mb="md">
-          <Title order={3} size="lg">
-            Edit Work Experience
-          </Title>
-          <Tooltip label="Delete work experience">
-            <ActionIcon
-              color="red"
-              variant="light"
-              onClick={openDeleteModal}
-              size="lg"
-            >
-              <IconTrash size={18} />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
-      )}
+    <Box pos="relative">
+      <LoadingOverlay visible={state.isSubmitting || isPending} />
 
       <form
         onSubmit={(e) => {
@@ -190,14 +174,10 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
           handleSubmit();
         }}
       >
-        <LoadingOverlay visible={state.isSubmitting || isPending} />
-
         {/* Basic Information Section */}
         <Paper withBorder p="md">
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Basic Information
-            </Title>
+          <Stack gap="xs">
+            <Text fw="bold">Basic Information</Text>
 
             <Group grow>
               <Field
@@ -297,9 +277,7 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
               </Field>
             </Group>
             {/* Employment Period Section */}
-            <Title order={4} size="md">
-              Employment Period
-            </Title>
+            <Text fw="bold">Employment Period</Text>
 
             <Field
               name="isCurrent"
@@ -379,23 +357,21 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
 
             {/* Job Descriptions Section */}
             <Group justify="space-between" align="center">
-              <Title order={4} size="md">
-                Job Descriptions
-              </Title>
+              <Text fw="bold">Job Descriptions</Text>
               <Button
                 variant="light"
                 size="sm"
                 leftSection={<IconPlus size={16} />}
                 onClick={addDescription}
               >
-                Add Description
+                Add bullet
               </Button>
             </Group>
 
             <Stack gap="sm">
               {descriptions.map((description, index) => (
                 <Box key={index}>
-                  <Group align="flex-start" gap="sm">
+                  <Group align="center" gap="xs">
                     <Textarea
                       placeholder={`Description ${index + 1}`}
                       value={description}
@@ -404,8 +380,6 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
                       minRows={2}
                       maxRows={4}
                       style={{ flex: 1 }}
-                      description="Describe your key responsibilities, achievements, and
-              contributions in this role"
                     />
                     {descriptions.length > 1 && (
                       <ActionIcon
@@ -425,7 +399,23 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
         </Paper>
 
         <Group justify="flex-end" mt="lg">
-          <Button type="submit" loading={state.isSubmitting || isPending}>
+          {mode === "edit" && initialData && (
+            <Tooltip label="Delete work experience">
+              <ActionIcon
+                color="red"
+                variant="light"
+                onClick={openDeleteModal}
+                size="lg"
+              >
+                <IconTrash size={18} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+          <Button
+            type="submit"
+            variant="filled"
+            loading={state.isSubmitting || isPending}
+          >
             {mode === "create"
               ? "Create Work Experience"
               : "Update Work Experience"}
@@ -453,6 +443,6 @@ export const WorkForm = ({ mode, initialData, onSuccess }: WorkFormProps) => {
           </Button>
         </Group>
       </Modal>
-    </>
+    </Box>
   );
 };

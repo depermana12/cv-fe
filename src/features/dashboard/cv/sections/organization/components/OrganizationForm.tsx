@@ -6,7 +6,6 @@ import {
   Stack,
   TextInput,
   Group,
-  Title,
   Paper,
   Textarea,
   ActionIcon,
@@ -53,6 +52,11 @@ export const OrganizationForm = ({
   const { mutate: deleteOrganization, isPending: isDeleting } =
     useDeleteOrganization();
 
+  // Dynamic descriptions state
+  const [descriptions, setDescriptions] = useState<string[]>(
+    initialData?.descriptions || [""],
+  );
+
   if (!activeCvId) {
     return <Text>No CV selected</Text>;
   }
@@ -64,23 +68,11 @@ export const OrganizationForm = ({
       { organizationId: initialData.id, cvId: activeCvId },
       {
         onSuccess: () => {
-          notifications.show({
-            title: "Success",
-            message: "Organization deleted successfully",
-            color: "green",
-            icon: <IconCheck size={16} />,
-          });
           closeDeleteModal();
-          onSuccess?.();
         },
       },
     );
   };
-
-  // Dynamic descriptions state
-  const [descriptions, setDescriptions] = useState<string[]>(
-    initialData?.descriptions || [""],
-  );
 
   const defaultOrganizationValues: OrganizationInsert = {
     organization: "",
@@ -120,7 +112,16 @@ export const OrganizationForm = ({
         createOrganization(
           { cvId: activeCvId, data: submitData },
           {
-            onSuccess: () => onSuccess?.(),
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                icon: <IconCheck size={16} />,
+                message: `Organization "${value.organization}" has been added.`,
+                color: "green",
+                withBorder: true,
+              });
+              onSuccess?.();
+            },
           },
         );
       } else if (mode === "edit" && initialData) {
@@ -130,7 +131,17 @@ export const OrganizationForm = ({
             organizationId: initialData.id,
             data: submitData,
           },
-          { onSuccess: () => onSuccess?.() },
+          {
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                icon: <IconCheck size={16} />,
+                message: `Organization has been updated.`,
+                color: "green",
+                withBorder: true,
+              });
+            },
+          },
         );
       }
     },
@@ -151,7 +162,7 @@ export const OrganizationForm = ({
 
   const { Field, handleSubmit, state } = organizationForm;
 
-  const isPending = isCreating || isUpdating;
+  const isPending = isCreating || isUpdating || isDeleting;
 
   const addDescription = () => {
     setDescriptions([...descriptions, ""]);
@@ -170,25 +181,8 @@ export const OrganizationForm = ({
   };
 
   return (
-    <>
-      {/* Header with delete action for edit mode */}
-      {mode === "edit" && initialData && (
-        <Group justify="space-between" align="center" mb="md">
-          <Title order={3} size="lg">
-            Edit Organization
-          </Title>
-          <Tooltip label="Delete organization">
-            <ActionIcon
-              color="red"
-              variant="light"
-              onClick={openDeleteModal}
-              size="lg"
-            >
-              <IconTrash size={18} />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
-      )}
+    <Box pos="relative">
+      <LoadingOverlay visible={state.isSubmitting || isPending} />
 
       <form
         onSubmit={(e) => {
@@ -196,72 +190,18 @@ export const OrganizationForm = ({
           handleSubmit();
         }}
       >
-        <LoadingOverlay visible={state.isSubmitting || isPending} />
+        <Paper withBorder p="md">
+          <Stack gap="xs">
+            {/* Organization Information Section */}
+            <Text fw="bold">Organization Information</Text>
 
-        <Stack gap="xl">
-          {/* Organization Information Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Title order={4} size="md">
-                Organization Information
-              </Title>
-
-              <Group grow>
-                <Field
-                  name="organization"
-                  validators={{
-                    onBlur: zFieldValidator(
-                      organizationSchema.shape.organization,
-                    ),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <TextInput
-                        name={name}
-                        label="Organization"
-                        placeholder="Organization name"
-                        value={state.value}
-                        onChange={(e) => handleChange(e.target.value)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        required
-                        autoComplete="organization"
-                      />
-                    );
-                  }}
-                </Field>
-
-                <Field
-                  name="role"
-                  validators={{
-                    onBlur: zFieldValidator(organizationSchema.shape.role),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <TextInput
-                        name={name}
-                        label="Role"
-                        placeholder="Your role or position"
-                        value={state.value}
-                        onChange={(e) => handleChange(e.target.value)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        required
-                        autoComplete="organization-title"
-                      />
-                    );
-                  }}
-                </Field>
-              </Group>
-
+            <Group grow>
               <Field
-                name="location"
+                name="organization"
                 validators={{
-                  onBlur: zFieldValidator(organizationSchema.shape.location),
+                  onBlur: zFieldValidator(
+                    organizationSchema.shape.organization,
+                  ),
                 }}
               >
                 {({ state, name, handleChange, handleBlur }) => {
@@ -269,163 +209,207 @@ export const OrganizationForm = ({
                   return (
                     <TextInput
                       name={name}
-                      label="Location"
-                      placeholder="City, Country"
+                      label="Organization"
+                      placeholder="Organization name"
                       value={state.value}
                       onChange={(e) => handleChange(e.target.value)}
                       onBlur={handleBlur}
                       error={errorField}
-                      autoComplete="address-level2"
+                      required
+                      autoComplete="organization"
                     />
                   );
                 }}
               </Field>
+
+              <Field
+                name="role"
+                validators={{
+                  onBlur: zFieldValidator(organizationSchema.shape.role),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <TextInput
+                      name={name}
+                      label="Role"
+                      placeholder="Your role or position"
+                      value={state.value}
+                      onChange={(e) => handleChange(e.target.value)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      required
+                      autoComplete="organization-title"
+                    />
+                  );
+                }}
+              </Field>
+            </Group>
+
+            <Field
+              name="location"
+              validators={{
+                onBlur: zFieldValidator(organizationSchema.shape.location),
+              }}
+            >
+              {({ state, name, handleChange, handleBlur }) => {
+                const errorField = useFieldError(state.meta);
+                return (
+                  <TextInput
+                    name={name}
+                    label="Location"
+                    placeholder="City, Country"
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    error={errorField}
+                    autoComplete="address-level2"
+                  />
+                );
+              }}
+            </Field>
+
+            {/* Participation Period Section */}
+            <Text fw="bold">Participation Period</Text>
+
+            <Group grow>
+              <Field
+                name="startDate"
+                validators={{
+                  onBlur: zFieldValidator(organizationSchema.shape.startDate),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <DateInput
+                      name={name}
+                      label="Start Date"
+                      placeholder="Select start date"
+                      value={state.value || null}
+                      onChange={(value) => handleChange(value as any)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      clearable
+                      maxDate={new Date()}
+                    />
+                  );
+                }}
+              </Field>
+
+              <Field
+                name="endDate"
+                validators={{
+                  onBlur: zFieldValidator(organizationSchema.shape.endDate),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <DateInput
+                      name={name}
+                      label="End Date"
+                      placeholder="Select end date"
+                      value={state.value || null}
+                      onChange={(value) => handleChange(value as any)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      clearable
+                      maxDate={new Date()}
+                    />
+                  );
+                }}
+              </Field>
+            </Group>
+
+            {/* Role Descriptions Section */}
+            <Group justify="space-between" align="center">
+              <Text fw="bold">Role Descriptions</Text>
+              <Button
+                variant="light"
+                size="sm"
+                leftSection={<IconPlus size={16} />}
+                onClick={addDescription}
+              >
+                Add bullet
+              </Button>
+            </Group>
+
+            <Stack gap="sm">
+              {descriptions.map((description, index) => (
+                <Box key={index}>
+                  <Group align="center" gap="xs">
+                    <Textarea
+                      placeholder={`Description ${index + 1}`}
+                      value={description}
+                      onChange={(e) => updateDescription(index, e.target.value)}
+                      autosize
+                      minRows={2}
+                      maxRows={4}
+                      style={{ flex: 1 }}
+                    />
+                    {descriptions.length > 1 && (
+                      <ActionIcon
+                        color="red"
+                        variant="light"
+                        onClick={() => removeDescription(index)}
+                        style={{ marginTop: 6 }}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    )}
+                  </Group>
+                </Box>
+              ))}
             </Stack>
-          </Paper>
+          </Stack>
+        </Paper>
 
-          {/* Participation Period Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Title order={4} size="md">
-                Participation Period
-              </Title>
-
-              <Group grow>
-                <Field
-                  name="startDate"
-                  validators={{
-                    onBlur: zFieldValidator(organizationSchema.shape.startDate),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <DateInput
-                        name={name}
-                        label="Start Date"
-                        placeholder="Select start date"
-                        value={state.value || null}
-                        onChange={(value) => handleChange(value as any)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        clearable
-                        maxDate={new Date()}
-                      />
-                    );
-                  }}
-                </Field>
-
-                <Field
-                  name="endDate"
-                  validators={{
-                    onBlur: zFieldValidator(organizationSchema.shape.endDate),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <DateInput
-                        name={name}
-                        label="End Date"
-                        placeholder="Select end date"
-                        value={state.value || null}
-                        onChange={(value) => handleChange(value as any)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        clearable
-                        maxDate={new Date()}
-                      />
-                    );
-                  }}
-                </Field>
-              </Group>
-            </Stack>
-          </Paper>
-
-          {/* Role Descriptions Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Group justify="space-between" align="center">
-                <Title order={4} size="md">
-                  Role Descriptions
-                </Title>
-                <Button
-                  variant="light"
-                  size="sm"
-                  leftSection={<IconPlus size={16} />}
-                  onClick={addDescription}
-                >
-                  Add Description
-                </Button>
-              </Group>
-
-              <Text size="sm" c="dimmed">
-                Describe your responsibilities, contributions, and achievements
-                in this organization
-              </Text>
-
-              <Stack gap="sm">
-                {descriptions.map((description, index) => (
-                  <Box key={index}>
-                    <Group align="flex-start" gap="sm">
-                      <Textarea
-                        placeholder={`Description ${index + 1}`}
-                        value={description}
-                        onChange={(e) =>
-                          updateDescription(index, e.target.value)
-                        }
-                        autosize
-                        minRows={2}
-                        maxRows={4}
-                        style={{ flex: 1 }}
-                      />
-                      {descriptions.length > 1 && (
-                        <ActionIcon
-                          color="red"
-                          variant="light"
-                          onClick={() => removeDescription(index)}
-                          style={{ marginTop: 6 }}
-                        >
-                          <IconTrash size={16} />
-                        </ActionIcon>
-                      )}
-                    </Group>
-                  </Box>
-                ))}
-              </Stack>
-            </Stack>
-          </Paper>
-
-          <Group justify="flex-end" mt="lg">
-            <Button type="submit" loading={state.isSubmitting || isPending}>
-              {mode === "create"
-                ? "Create Organization"
-                : "Update Organization"}
-            </Button>
-          </Group>
-        </Stack>
+        <Group justify="flex-end" mt="lg">
+          {mode === "edit" && initialData && (
+            <Tooltip label="Delete organization">
+              <ActionIcon
+                color="red"
+                variant="outline"
+                onClick={openDeleteModal}
+                size="lg"
+                disabled={isPending}
+              >
+                <IconTrash size={18} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+          <Button
+            type="submit"
+            variant="filled"
+            loading={state.isSubmitting || isPending}
+          >
+            {mode === "create" ? "Create Organization" : "Update Organization"}
+          </Button>
+        </Group>
       </form>
 
       {/* Delete Confirmation Modal */}
       <Modal
         opened={opened}
         onClose={closeDeleteModal}
-        title="Delete Organization"
+        title="Delete Organization?"
         centered
       >
-        <Text mb="md">
-          Are you sure you want to delete this organization? This action cannot
-          be undone.
-        </Text>
-        <Group justify="flex-end">
-          <Button variant="light" onClick={closeDeleteModal}>
-            Cancel
-          </Button>
-          <Button color="red" onClick={handleDelete} loading={isDeleting}>
-            Delete
-          </Button>
-        </Group>
+        <Stack gap="md">
+          <Text>Are you sure you want to delete this organization?</Text>
+
+          <Group justify="flex-end">
+            <Button variant="default" onClick={closeDeleteModal}>
+              Cancel
+            </Button>
+            <Button color="red" onClick={handleDelete} loading={isDeleting}>
+              Delete Organization
+            </Button>
+          </Group>
+        </Stack>
       </Modal>
-    </>
+    </Box>
   );
 };
