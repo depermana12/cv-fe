@@ -5,72 +5,48 @@ import {
   Stack,
   TextInput,
   Group,
-  Title,
   Paper,
   Textarea,
   ActionIcon,
+  Tooltip,
+  Modal,
+  Text,
+  Box,
 } from "@mantine/core";
-import { IconPlus, IconTrash, IconUpload } from "@tabler/icons-react";
+import { IconUpload, IconTrash, IconCheck } from "@tabler/icons-react";
 
-import {
-  contactCreateSchema,
-  contactUpdateSchema,
-  contactSchema,
-} from "../schema/contactSchema";
+import { contactSchema } from "../schema/contactSchema";
 import { useCreateContact } from "../hooks/useCreateContact";
 import { useUpdateContact } from "../hooks/useUpdateContact";
+import { useDeleteContact } from "../hooks/useDeleteContact";
 import type { ContactFormProps, ContactInsert } from "../types/contact.types";
 import useFieldError from "@shared/hooks/useFieldError";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
-import { useFormStoreSync } from "../../../hooks/useCVFormIntegration";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 
-export const ContactForm = ({
-  mode,
-  cvId,
-  initialData,
-  onSuccess,
-}: ContactFormProps) => {
+export const ContactForm = ({ mode, cvId, initialData }: ContactFormProps) => {
+  const [opened, { open: openDeleteModal, close: closeDeleteModal }] =
+    useDisclosure(false);
+
   const { mutate: createContact, isPending: isCreating } = useCreateContact();
   const { mutate: updateContact, isPending: isUpdating } = useUpdateContact();
+  const { mutate: deleteContact, isPending: isDeleting } = useDeleteContact();
 
   const defaultContactValues: ContactInsert = {
     firstName: "",
     lastName: "",
-    bio: "",
     email: "",
     phone: "",
     city: "",
-    state: "",
     country: "",
     website: "",
     linkedin: "",
-    github: "",
-    portfolio: "",
     summary: "",
     profileImage: "",
-    socialLinks: [],
   };
 
-  const initialValues =
-    mode === "edit" && initialData
-      ? {
-          firstName: initialData.firstName || "",
-          lastName: initialData.lastName || "",
-          bio: initialData.bio || "",
-          email: initialData.email || "",
-          phone: initialData.phone || "",
-          city: initialData.city || "",
-          state: initialData.state || "",
-          country: initialData.country || "",
-          website: initialData.website || "",
-          linkedin: initialData.linkedin || "",
-          github: initialData.github || "",
-          portfolio: initialData.portfolio || "",
-          summary: initialData.summary || "",
-          profileImage: initialData.profileImage || "",
-          socialLinks: initialData.socialLinks || [],
-        }
-      : defaultContactValues;
+  const initialValues = mode === "edit" ? initialData : defaultContactValues;
 
   const contactForm = useForm({
     defaultValues: initialValues,
@@ -79,52 +55,67 @@ export const ContactForm = ({
         createContact(
           { cvId, data: value },
           {
-            onSuccess: () => onSuccess?.(),
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                icon: <IconCheck size={16} />,
+                message: `Contact ${value.firstName} ${value.lastName} has been added.`,
+                color: "green",
+                withBorder: true,
+              });
+            },
           },
         );
       } else if (mode === "edit" && initialData) {
         updateContact(
           { cvId, contactId: initialData.id, data: value },
-          { onSuccess: () => onSuccess?.() },
+          {
+            onSuccess: () => {
+              notifications.show({
+                title: "Success",
+                icon: <IconCheck size={16} />,
+                message: `Contact has been updated.`,
+                color: "green",
+                withBorder: true,
+              });
+            },
+          },
         );
       }
     },
-    validators: {
-      onSubmit: ({ value }) => {
-        const schema =
-          mode === "create" ? contactCreateSchema : contactUpdateSchema;
-        const result = schema.safeParse(value);
-        if (!result.success) {
-          return result.error.formErrors.fieldErrors;
-        }
-        return undefined;
-      },
-    },
   });
 
-  // Auto-sync to form store for live preview
-  useFormStoreSync(contactForm.store, "contact", cvId);
+  const { Field, handleSubmit, state, reset } = contactForm;
 
-  const { Field, handleSubmit, state } = contactForm;
+  const isPending = isCreating || isUpdating || isDeleting;
 
-  const isPending = isCreating || isUpdating;
+  const handleDelete = () => {
+    if (!initialData?.id) return;
+
+    deleteContact(
+      { cvId, contactId: initialData.id },
+      {
+        onSuccess: () => {
+          reset();
+          closeDeleteModal();
+        },
+      },
+    );
+  };
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSubmit();
-      }}
-    >
+    <Box pos="relative">
       <LoadingOverlay visible={state.isSubmitting || isPending} />
-      <Paper p="md" withBorder>
-        <Stack gap="md">
-          {/* Personal Information Section */}
-          <Stack>
-            <Title order={4} size="md">
-              Personal Information
-            </Title>
-
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+      >
+        <Paper p="md" withBorder>
+          <Stack gap="xs">
+            {/* Personal Information Section */}
+            <Text fw="bold">Personal Information</Text>
             <Group grow>
               <Field
                 name="firstName"
@@ -176,29 +167,6 @@ export const ContactForm = ({
             </Group>
 
             <Field
-              name="bio"
-              validators={{
-                onBlur: zFieldValidator(contactSchema.shape.bio),
-              }}
-            >
-              {({ state, name, handleChange, handleBlur }) => {
-                const errorField = useFieldError(state.meta);
-                return (
-                  <TextInput
-                    name={name}
-                    label="Bio"
-                    placeholder="e.g. Software Engineer | Full-Stack Developer"
-                    value={state.value}
-                    onChange={(e) => handleChange(e.target.value)}
-                    onBlur={handleBlur}
-                    error={errorField}
-                    autoComplete="off"
-                  />
-                );
-              }}
-            </Field>
-
-            <Field
               name="profileImage"
               validators={{
                 onBlur: zFieldValidator(contactSchema.shape.profileImage),
@@ -221,11 +189,7 @@ export const ContactForm = ({
                 );
               }}
             </Field>
-          </Stack>
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Professional Summary
-            </Title>
+            <Text fw="bold">Professional Summary</Text>
 
             <Field
               name="summary"
@@ -238,6 +202,7 @@ export const ContactForm = ({
                 return (
                   <Textarea
                     name={name}
+                    label="Summary"
                     placeholder="Write a brief summary about yourself, your experience, and your career goals..."
                     value={state.value}
                     onChange={(e) => handleChange(e.target.value)}
@@ -246,17 +211,14 @@ export const ContactForm = ({
                     autosize
                     minRows={4}
                     maxRows={8}
+                    required
                   />
                 );
               }}
             </Field>
-          </Stack>
 
-          {/* Contact Information Section */}
-          <Stack gap="md">
-            <Title order={4} size="md">
-              Contact Information
-            </Title>
+            {/* Contact Information Section */}
+            <Text fw="bold">Contact Information</Text>
 
             <Group grow>
               <Field
@@ -278,6 +240,7 @@ export const ContactForm = ({
                       error={errorField}
                       autoComplete="email"
                       type="email"
+                      required
                     />
                   );
                 }}
@@ -286,6 +249,7 @@ export const ContactForm = ({
               <Field
                 name="phone"
                 validators={{
+                  onChange: zFieldValidator(contactSchema.shape.phone),
                   onBlur: zFieldValidator(contactSchema.shape.phone),
                 }}
               >
@@ -332,9 +296,9 @@ export const ContactForm = ({
               </Field>
 
               <Field
-                name="state"
+                name="country"
                 validators={{
-                  onBlur: zFieldValidator(contactSchema.shape.state),
+                  onBlur: zFieldValidator(contactSchema.shape.country),
                 }}
               >
                 {({ state, name, handleChange, handleBlur }) => {
@@ -342,48 +306,21 @@ export const ContactForm = ({
                   return (
                     <TextInput
                       name={name}
-                      label="State/Province"
-                      placeholder="e.g. NY"
+                      label="Country"
+                      placeholder="e.g. United States"
                       value={state.value}
                       onChange={(e) => handleChange(e.target.value)}
                       onBlur={handleBlur}
                       error={errorField}
-                      autoComplete="address-level1"
+                      autoComplete="country-name"
                     />
                   );
                 }}
               </Field>
             </Group>
 
-            <Field
-              name="country"
-              validators={{
-                onBlur: zFieldValidator(contactSchema.shape.country),
-              }}
-            >
-              {({ state, name, handleChange, handleBlur }) => {
-                const errorField = useFieldError(state.meta);
-                return (
-                  <TextInput
-                    name={name}
-                    label="Country"
-                    placeholder="e.g. United States"
-                    value={state.value}
-                    onChange={(e) => handleChange(e.target.value)}
-                    onBlur={handleBlur}
-                    error={errorField}
-                    autoComplete="country-name"
-                  />
-                );
-              }}
-            </Field>
-          </Stack>
-
-          {/* Professional Links Section */}
-          <Stack>
-            <Title order={4} size="md">
-              Professional Links
-            </Title>
+            {/* Professional Links Section */}
+            <Text fw="bold">Professional Links</Text>
 
             <Group grow>
               <Field
@@ -410,31 +347,6 @@ export const ContactForm = ({
               </Field>
 
               <Field
-                name="portfolio"
-                validators={{
-                  onBlur: zFieldValidator(contactSchema.shape.portfolio),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <TextInput
-                      name={name}
-                      label="Portfolio"
-                      placeholder="https://portfolio.johndoe.com"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      autoComplete="url"
-                    />
-                  );
-                }}
-              </Field>
-            </Group>
-
-            <Group grow>
-              <Field
                 name="linkedin"
                 validators={{
                   onBlur: zFieldValidator(contactSchema.shape.linkedin),
@@ -456,93 +368,57 @@ export const ContactForm = ({
                   );
                 }}
               </Field>
-
-              <Field
-                name="github"
-                validators={{
-                  onBlur: zFieldValidator(contactSchema.shape.github),
-                }}
-              >
-                {({ state, name, handleChange, handleBlur }) => {
-                  const errorField = useFieldError(state.meta);
-                  return (
-                    <TextInput
-                      name={name}
-                      label="GitHub"
-                      placeholder="https://github.com/johndoe"
-                      value={state.value}
-                      onChange={(e) => handleChange(e.target.value)}
-                      onBlur={handleBlur}
-                      error={errorField}
-                      autoComplete="url"
-                    />
-                  );
-                }}
-              </Field>
             </Group>
-            <Field name="socialLinks">
-              {({ state, handleChange }) => {
-                const socialLinks = state.value || [];
 
-                const addSocialLink = () => {
-                  handleChange([...socialLinks, ""]);
-                };
+            <Group justify="flex-end" mt="lg">
+              {mode === "edit" && initialData && (
+                <Tooltip label="Delete this contact">
+                  <ActionIcon
+                    color="red"
+                    size="lg"
+                    variant="outline"
+                    onClick={openDeleteModal}
+                    disabled={isPending}
+                  >
+                    <IconTrash size={18} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
 
-                const updateSocialLink = (index: number, value: string) => {
-                  const updated = [...socialLinks];
-                  updated[index] = value;
-                  handleChange(updated);
-                };
-
-                const removeSocialLink = (index: number) => {
-                  const updated = socialLinks.filter((_, i) => i !== index);
-                  handleChange(updated);
-                };
-
-                return (
-                  <Stack>
-                    {socialLinks.map((link, index) => (
-                      <Group key={index} align="flex-end">
-                        <TextInput
-                          placeholder={`Social link ${index + 1} (e.g. https://twitter.com/johndoe)`}
-                          value={link}
-                          onChange={(e) =>
-                            updateSocialLink(index, e.target.value)
-                          }
-                          style={{ flex: 1 }}
-                          autoComplete="url"
-                        />
-                        <ActionIcon
-                          color="red"
-                          variant="subtle"
-                          onClick={() => removeSocialLink(index)}
-                        >
-                          <IconTrash size={16} />
-                        </ActionIcon>
-                      </Group>
-                    ))}
-
-                    <Button
-                      variant="outline"
-                      leftSection={<IconPlus size={16} />}
-                      onClick={addSocialLink}
-                      size="sm"
-                    >
-                      Add More Links
-                    </Button>
-                  </Stack>
-                );
-              }}
-            </Field>
+              <Button
+                variant="filled"
+                type="submit"
+                loading={state.isSubmitting || isPending}
+              >
+                {mode === "create" ? "Create Contact" : "Update Contact"}
+              </Button>
+            </Group>
           </Stack>
+        </Paper>
 
-          <Group justify="flex-end" mt="lg">
-            <Button type="submit" loading={state.isSubmitting || isPending}>
-              {mode === "create" ? "Create Contact" : "Update Contact"}
-            </Button>
-          </Group>
-        </Stack>
-      </Paper>
-    </form>
+        {/* Delete Confirmation Modal */}
+        <Modal
+          opened={opened}
+          onClose={closeDeleteModal}
+          title="Delete Contact Information?"
+          centered
+        >
+          <Stack gap="md">
+            <Text>
+              Are you sure you want to delete this contact information?
+            </Text>
+
+            <Group justify="flex-end">
+              <Button variant="default" onClick={closeDeleteModal}>
+                Cancel
+              </Button>
+              <Button color="red" onClick={handleDelete} loading={isDeleting}>
+                Delete Contact
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
+      </form>
+    </Box>
   );
 };
