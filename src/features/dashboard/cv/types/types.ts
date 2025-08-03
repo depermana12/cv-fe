@@ -6,6 +6,7 @@ import {
   cvQueryOptionsSchema,
   cvStatsSchema,
   cvSlugParamsSchema,
+  publicCvSchema,
 } from "../schema/cv.schema";
 
 export type Cv = z.infer<typeof cvSchema>;
@@ -14,6 +15,7 @@ export type CvUpdate = z.infer<typeof cvUpdateSchema>;
 export type CvQueryOptions = z.infer<typeof cvQueryOptionsSchema>;
 export type CvStats = z.infer<typeof cvStatsSchema>;
 export type CvSlugParams = z.infer<typeof cvSlugParamsSchema>;
+export type PublicCv = z.infer<typeof publicCvSchema>;
 
 export type CvStore = {
   activeCvId: number | null;
@@ -68,4 +70,12 @@ export type SectionCardProps = {
 export type SortableSectionCardProps = {
   section: Section;
   onRemove: (sectionId: SectionType) => void;
+};
+
+export type CvLibraryItemProps = {
+  cv: Cv;
+  onSelect: (cv: Cv) => void;
+  onEdit?: (cv: Cv) => void;
+  onDelete?: (cv: Cv) => void;
+  onToggleVisibility?: () => void;
 };

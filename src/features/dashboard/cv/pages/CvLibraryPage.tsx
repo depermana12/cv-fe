@@ -289,7 +289,7 @@ export const CvLibraryPage = () => {
               cv={cv}
               onSelect={handleCvSelect}
               onDelete={() => handleOpenDeleteModal(cv)}
-              onQuickEdit={() => handleOpenQuickEditModal(cv)}
+              onEdit={() => handleOpenQuickEditModal(cv)}
               onToggleVisibility={() => handleToggleVisibility(cv)}
             />
           ))}
@@ -347,13 +347,11 @@ export const CvLibraryPage = () => {
       </Modal>
 
       {/* Quick Edit Modal lifted to parent */}
-      {cvToEdit && (
-        <CvQuickEditModal
-          opened={quickEditModalOpened}
-          onClose={handleCloseQuickEditModal}
-          cvId={cvToEdit.id}
-        />
-      )}
+      <CvQuickEditModal
+        opened={quickEditModalOpened}
+        onClose={handleCloseQuickEditModal}
+        cvId={cvToEdit?.id ?? null}
+      />
     </Stack>
   );
 };

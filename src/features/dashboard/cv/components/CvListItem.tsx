@@ -1,30 +1,16 @@
 import {
-  Card,
   Group,
   Text,
   Badge,
   ActionIcon,
   Menu,
-  Box,
-  Flex,
   Title,
+  Paper,
+  Stack,
 } from "@mantine/core";
-import {
-  IconDots,
-  IconTrash,
-  IconLock,
-  IconWorld,
-  IconPencil,
-} from "@tabler/icons-react";
-import { Cv } from "@features/dashboard/cv/types/types";
-
-interface CvListItemProps {
-  cv: Cv;
-  onSelect: (cv: Cv) => void;
-  onEdit?: (cv: Cv) => void;
-  onDelete?: (cv: Cv) => void;
-  onToggleVisibility?: () => void;
-}
+import { IconDots } from "@tabler/icons-react";
+import { CvLibraryItemProps } from "@features/dashboard/cv/types/types";
+import { formatDate } from "../utils/formatDate";
 
 export const CvListItem = ({
   cv,
@@ -32,27 +18,22 @@ export const CvListItem = ({
   onEdit,
   onDelete,
   onToggleVisibility,
-}: CvListItemProps) => {
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }).format(new Date(date));
-  };
-
+}: CvLibraryItemProps) => {
   return (
-    <Card radius="md" withBorder shadow="sm">
-      <Flex justify="space-between" align="center" gap="md">
+    <Paper p="md" radius="md" withBorder shadow="sm">
+      <Group justify="space-between" align="center">
         {/* Left section - Main info */}
-        <Box style={{ flex: 1, minWidth: 0 }}>
-          <Group gap="sm" mb="xs">
+        <Stack gap="xs">
+          <Group gap="sm">
             <Title
               order={3}
               size="h4"
               lineClamp={1}
               onClick={() => onSelect(cv)}
-              style={{ cursor: "pointer" }}
+              style={{
+                cursor: "pointer",
+                wordBreak: "break-word",
+              }}
             >
               {cv.title}
             </Title>
@@ -61,19 +42,19 @@ export const CvListItem = ({
             </Badge>
           </Group>
 
-          {cv.description && (
-            <Text size="sm" lineClamp={2}>
-              {cv.description}
-            </Text>
-          )}
+          <Text size="sm" c="dimmed" lineClamp={1}>
+            {cv.description || "No description available"}
+          </Text>
 
-          <Group gap="md" c="dimmed" mt="xs">
+          <Group gap="md" c="dimmed">
             <Text size="xs" c="dimmed">
-              Created: {new Date(cv.createdAt).toLocaleDateString()}
+              Created: {formatDate(cv.createdAt)}
             </Text>
-            <Text size="xs">Updated {formatDate(cv.updatedAt)}</Text>
+            <Text size="xs" c="dimmed">
+              Updated: {formatDate(cv.updatedAt)}
+            </Text>
           </Group>
-        </Box>
+        </Stack>
 
         {/* Right section - Actions */}
         <Group gap="xs">
@@ -81,15 +62,18 @@ export const CvListItem = ({
             {cv.theme}
           </Badge>
 
-          <Badge variant="outline" size="sm">
-            {cv.language.toUpperCase()}
-          </Badge>
-
-          <Menu shadow="md" width={160}>
+          <Menu
+            position="bottom-end"
+            transitionProps={{ transition: "pop" }}
+            shadow="md"
+            withinPortal
+          >
             <Menu.Target>
               <ActionIcon
                 variant="subtle"
-                size="sm"
+                color="gray"
+                size="md"
+                aria-label="More options"
                 onClick={(e) => e.stopPropagation()}
               >
                 <IconDots size={16} />
@@ -98,7 +82,6 @@ export const CvListItem = ({
 
             <Menu.Dropdown>
               <Menu.Item
-                leftSection={<IconPencil size={14} />}
                 onClick={(e) => {
                   e.stopPropagation();
                   onEdit?.(cv);
@@ -106,11 +89,7 @@ export const CvListItem = ({
               >
                 Quick Edit
               </Menu.Item>
-              <Menu.Divider />
               <Menu.Item
-                leftSection={
-                  cv.isPublic ? <IconLock size={14} /> : <IconWorld size={14} />
-                }
                 onClick={(e) => {
                   e.stopPropagation();
                   onToggleVisibility?.();
@@ -120,7 +99,6 @@ export const CvListItem = ({
               </Menu.Item>
               <Menu.Divider />
               <Menu.Item
-                leftSection={<IconTrash size={14} />}
                 color="red"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -132,7 +110,7 @@ export const CvListItem = ({
             </Menu.Dropdown>
           </Menu>
         </Group>
-      </Flex>
-    </Card>
+      </Group>
+    </Paper>
   );
 };
