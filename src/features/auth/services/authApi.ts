@@ -79,4 +79,16 @@ export class AuthApi {
     const res = await axiosClient.get<ApiResponse<T>>("/users/me");
     return res.data;
   }
+
+  async isUsernameAvailable(
+    username: string,
+  ): Promise<ApiResponse<{ available: boolean }>> {
+    const res = await axiosClient.get<ApiResponse<{ available: boolean }>>(
+      `${this.base}/check-username`,
+      {
+        params: { username },
+      },
+    );
+    return res.data;
+  }
 }

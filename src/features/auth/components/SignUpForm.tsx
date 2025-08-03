@@ -13,10 +13,12 @@ import {
   Divider,
   Progress,
   Popover,
+  Loader,
 } from "@mantine/core";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
 import useFieldError from "@shared/hooks/useFieldError";
 import { IconBrandGoogle, IconX, IconCheck } from "@tabler/icons-react";
+import { authService } from "../services/autsService";
 
 function PasswordRequirement({
   meets,
@@ -93,10 +95,26 @@ const SignUpForm = () => {
           <Field
             name="username"
             validators={{
-              onBlur: zFieldValidator(signUpSchema.innerType().shape.username),
+              onChange: ({ value }) =>
+                value.length < 3
+                  ? "Username must be at least 3 characters"
+                  : undefined,
+              onChangeAsyncDebounceMs: 500,
+              onChangeAsync: async ({ value }) => {
+                try {
+                  const res = await authService.isUsernameAvailable(value);
+                  if (!res.data.available) {
+                    return "Username is already taken";
+                  }
+                  return undefined;
+                } catch (error) {
+                  return "Unable to check username availability";
+                }
+              },
             }}
             children={({ state, name, handleChange, handleBlur }) => {
-              const errorField = useFieldError(state.meta);
+              const errorField = state.meta.errors.join(", ");
+              const isValidating = state.meta.isValidating;
               return (
                 <TextInput
                   label="Username"
@@ -109,6 +127,15 @@ const SignUpForm = () => {
                   onBlur={handleBlur}
                   onChange={(e) => handleChange(e.target.value)}
                   error={errorField}
+                  rightSection={
+                    isValidating ? (
+                      <Loader size={16} />
+                    ) : state.value && !errorField ? (
+                      <IconCheck size={16} color="teal" />
+                    ) : state.value && errorField ? (
+                      <IconX size={16} color="red" />
+                    ) : null
+                  }
                 />
               );
             }}
@@ -140,7 +167,9 @@ const SignUpForm = () => {
           <Field
             name="password"
             validators={{
-              onBlur: zFieldValidator(signUpSchema.innerType().shape.password),
+              onChange: zFieldValidator(
+                signUpSchema.innerType().shape.password,
+              ),
             }}
             children={({ state, name, handleChange, handleBlur }) => {
               const errorField = useFieldError(state.meta);
@@ -159,7 +188,7 @@ const SignUpForm = () => {
                 <Popover
                   opened={popoverOpened}
                   position="bottom"
-                  width="target"
+                  width={300}
                   transitionProps={{ transition: "pop" }}
                 >
                   <Popover.Target>
@@ -195,12 +224,16 @@ const SignUpForm = () => {
           <Field
             name="confirmPassword"
             validators={{
-              onBlur: zFieldValidator(
-                signUpSchema.innerType().shape.confirmPassword,
-              ),
+              onChangeListenTo: ["password"],
+              onChange: ({ value, fieldApi }) => {
+                if (value !== fieldApi.form.getFieldValue("password")) {
+                  return "Passwords do not match";
+                }
+                return undefined;
+              },
             }}
             children={({ state, name, handleChange, handleBlur }) => {
-              const errorField = useFieldError(state.meta);
+              const errorField = state.meta.errors.join(", ");
               return (
                 <PasswordInput
                   label="Confirm Password"
