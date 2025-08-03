@@ -1,4 +1,11 @@
-import { PasswordInput, Button, Group, Box, Anchor } from "@mantine/core";
+import {
+  PasswordInput,
+  Button,
+  Group,
+  Box,
+  Anchor,
+  LoadingOverlay,
+} from "@mantine/core";
 import { useForm } from "@tanstack/react-form";
 import { Link } from "@tanstack/react-router";
 
@@ -18,7 +25,7 @@ export const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
     confirmPassword: "",
   };
 
-  const { Field, handleSubmit } = useForm({
+  const { Field, handleSubmit, state } = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
       resetPasswordMutation.mutate({ token, data: value });
@@ -29,14 +36,18 @@ export const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
   });
 
   return (
-    <Box>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleSubmit();
-        }}
-      >
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleSubmit();
+      }}
+    >
+      <Box>
+        <LoadingOverlay
+          visible={resetPasswordMutation.isPending || state.isSubmitting}
+          overlayProps={{ radius: "sm", blur: 2 }}
+        />
         <Field
           name="password"
           validators={{
@@ -86,12 +97,15 @@ export const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
         <Button
           type="submit"
           fullWidth
+          variant="filled"
           mt="xl"
           loading={resetPasswordMutation.isPending}
+          loaderProps={{ type: "dots", color: "indigo" }}
+          disabled={state.isSubmitting || resetPasswordMutation.isPending}
         >
           Reset Password
         </Button>
-      </form>
-    </Box>
+      </Box>
+    </form>
   );
 };

@@ -38,7 +38,7 @@ const SignInForm = () => {
           visible={state.isSubmitting || isPending}
           overlayProps={{ radius: "sm", blur: 2 }}
         />
-        <Stack gap="md">
+        <Stack gap="xs">
           <Field
             name="email"
             validators={{
@@ -81,8 +81,8 @@ const SignInForm = () => {
                 />
               );
             }}
-          />{" "}
-          <Group justify="space-between">
+          />
+          <Group justify="space-between" mt="md">
             <Field
               name="rememberMe"
               children={({ state, handleChange }) => (
@@ -107,12 +107,12 @@ const SignInForm = () => {
           </Group>
           <Button
             fullWidth
+            variant="filled"
             type="submit"
-            size="md"
             mt="md"
             loading={isPending}
             loaderProps={{ type: "dots", color: "indigo" }}
-            disabled={state.isSubmitting}
+            disabled={state.isSubmitting || isPending}
           >
             Sign In
           </Button>

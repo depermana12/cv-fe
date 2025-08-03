@@ -1,4 +1,12 @@
-import { TextInput, Button, Group, Box, Anchor, Center } from "@mantine/core";
+import {
+  TextInput,
+  Button,
+  Group,
+  Box,
+  Anchor,
+  Center,
+  LoadingOverlay,
+} from "@mantine/core";
 import { useForm } from "@tanstack/react-form";
 import { Link } from "@tanstack/react-router";
 
@@ -13,7 +21,7 @@ export const ForgetPasswordForm = () => {
   const defaultValues: ForgetPassword = {
     email: "",
   };
-  const { Field, handleSubmit } = useForm({
+  const { Field, handleSubmit, state } = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
       forgetPasswordMutation.mutate(value);
@@ -24,14 +32,18 @@ export const ForgetPasswordForm = () => {
   });
 
   return (
-    <Box>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleSubmit();
-        }}
-      >
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleSubmit();
+      }}
+    >
+      <Box pos="relative">
+        <LoadingOverlay
+          visible={forgetPasswordMutation.isPending || state.isSubmitting}
+          overlayProps={{ radius: "sm", blur: 2 }}
+        />
         <Field
           name="email"
           validators={{
@@ -53,7 +65,7 @@ export const ForgetPasswordForm = () => {
             />
           )}
         </Field>
-        <Group justify="space-between" mt="lg">
+        <Group justify="space-between" mt="xl">
           <Anchor c="dimmed" size="sm" component={Link} to="/auth/signin">
             <Center inline>
               <IconArrowLeft size={12} stroke={1.5} />
@@ -61,15 +73,16 @@ export const ForgetPasswordForm = () => {
             </Center>
           </Anchor>
           <Button
-            radius="sm"
-            size="sm"
+            variant="filled"
             type="submit"
             loading={forgetPasswordMutation.isPending}
+            loaderProps={{ type: "dots", color: "indigo" }}
+            disabled={state.isSubmitting || forgetPasswordMutation.isPending}
           >
             Reset password
           </Button>
         </Group>
-      </form>
-    </Box>
+      </Box>
+    </form>
   );
 };

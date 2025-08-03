@@ -10,14 +10,12 @@ import {
   Stack,
   TextInput,
   Text,
-  Anchor,
   Divider,
   Progress,
   Popover,
 } from "@mantine/core";
 import { zFieldValidator } from "@shared/utils/zFieldValidator";
 import useFieldError from "@shared/hooks/useFieldError";
-import { Link } from "@tanstack/react-router";
 import { IconBrandGoogle, IconX, IconCheck } from "@tabler/icons-react";
 
 function PasswordRequirement({
@@ -88,10 +86,10 @@ const SignUpForm = () => {
       <Box pos="relative">
         <LoadingOverlay
           zIndex={1000}
-          visible={isPending}
+          visible={state.isSubmitting || isPending}
           overlayProps={{ radius: "sm", blur: 2 }}
         />
-        <Stack gap="md">
+        <Stack gap="xs">
           <Field
             name="username"
             validators={{
@@ -220,8 +218,9 @@ const SignUpForm = () => {
           />
           <Button
             fullWidth
+            variant="filled"
             type="submit"
-            mt="md"
+            mt="xl"
             loading={isPending}
             loaderProps={{ type: "dots", color: "indigo" }}
             disabled={isPending || state.isSubmitting}
@@ -229,12 +228,7 @@ const SignUpForm = () => {
             Sign Up
           </Button>
         </Stack>
-        <Text ta="center" size="sm" mt="md" c="dimmed">
-          Already have an account?{" "}
-          <Anchor component={Link} to="/auth/signin" underline="hover" fw={500}>
-            Sign In
-          </Anchor>
-        </Text>
+
         <Divider my="xs" label="or" labelPosition="center" />
         <Button
           variant="default"
