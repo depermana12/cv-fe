@@ -14,6 +14,8 @@ import {
   SegmentedControl,
   Tooltip,
   Modal,
+  Skeleton,
+  Card,
 } from "@mantine/core";
 import {
   IconFileCv,
@@ -81,6 +83,51 @@ export const CvLibraryPage = () => {
   const cvs = paginatedData?.data || [];
   const totalItems = paginatedData?.total || 0;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const GridSkeleton = () => (
+    <SimpleGrid cols={{ base: 1, sm: 2, md: 2, lg: 3 }} spacing="lg">
+      {Array.from([1, 2, 3]).map((_, index) => (
+        <Card key={index} p="md" radius="md" withBorder>
+          <Stack gap="sm">
+            <Group justify="space-between" align="flex-start">
+              <Stack gap="xs" style={{ flex: 1 }}>
+                <Skeleton height={30} width="80%" />
+              </Stack>
+              <Skeleton height={24} width={60} radius="xl" />
+            </Group>
+            <Skeleton height={50} />
+            <Group gap="xs">
+              <Skeleton height={20} width={100} />
+              <Skeleton height={20} width={100} />
+            </Group>
+          </Stack>
+        </Card>
+      ))}
+    </SimpleGrid>
+  );
+
+  const ListSkeleton = () => (
+    <Stack gap="md">
+      {Array.from([1, 2]).map((_, index) => (
+        <Card key={index} p="md" radius="md" withBorder>
+          <Group justify="space-between" align="center">
+            <Stack gap="sm" style={{ flex: 1 }}>
+              <Skeleton height={25} width="40%" />
+              <Skeleton height={35} width="60%" />
+              <Group gap="xs">
+                <Skeleton height={20} width={100} />
+                <Skeleton height={20} width={100} />
+              </Group>
+            </Stack>
+            <Group gap="md">
+              <Skeleton height={20} width={80} />
+              <Skeleton height={20} width={60} radius="xl" />
+            </Group>
+          </Group>
+        </Card>
+      ))}
+    </Stack>
+  );
 
   // Handlers for modals
   const deleteCv = useDeleteCv();
@@ -229,7 +276,12 @@ export const CvLibraryPage = () => {
         </Stack>
       )}
 
-      {cvs.length > 0 && viewMode === "grid" && (
+      {/* Loading skeletons */}
+      {isLoading && viewMode === "grid" && <GridSkeleton />}
+      {isLoading && viewMode === "list" && <ListSkeleton />}
+
+      {/* Actual content when loaded */}
+      {!isLoading && cvs.length > 0 && viewMode === "grid" && (
         <SimpleGrid cols={{ base: 1, sm: 2, md: 2, lg: 3 }} spacing="lg">
           {cvs.map((cv) => (
             <CvGridCard
@@ -244,7 +296,7 @@ export const CvLibraryPage = () => {
         </SimpleGrid>
       )}
 
-      {cvs.length > 0 && viewMode === "list" && (
+      {!isLoading && cvs.length > 0 && viewMode === "list" && (
         <Stack gap="md">
           {cvs.map((cv) => (
             <CvListItem
