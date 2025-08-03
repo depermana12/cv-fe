@@ -240,13 +240,22 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
               {getTitle("skill")}
             </Title>
             <Divider color="dark" mb="xs" />
-            <Group gap="xs">
-              {skills.map((skill, index) => (
-                <Badge key={index} variant="light" size="sm">
-                  {skill.name}
-                </Badge>
+            <Stack gap="sm">
+              {skills.map((skillCategory, index) => (
+                <Box key={index}>
+                  <Text size="sm" fw={600} mb="xs">
+                    {skillCategory.category}
+                  </Text>
+                  <Group gap="xs">
+                    {skillCategory.skill.map((skillName, skillIndex) => (
+                      <Badge key={skillIndex} variant="light" size="sm">
+                        {skillName}
+                      </Badge>
+                    ))}
+                  </Group>
+                </Box>
               ))}
-            </Group>
+            </Stack>
           </Box>
         ) : null;
 
