@@ -1,5 +1,4 @@
 import {
-  Card,
   Stack,
   Group,
   Title,
@@ -7,35 +6,23 @@ import {
   Menu,
   ActionIcon,
   Text,
-  Divider,
+  Paper,
 } from "@mantine/core";
-import {
-  IconDots,
-  IconEdit,
-  IconPencil,
-  IconLock,
-  IconWorld,
-  IconTrash,
-} from "@tabler/icons-react";
-import { Cv } from "@features/dashboard/cv/types/types";
+import { IconDots } from "@tabler/icons-react";
+import { CvLibraryItemProps } from "@features/dashboard/cv/types/types";
+import { formatDate } from "../utils/formatDate";
 
 export const CvGridCard = ({
   cv,
   onSelect,
+  onEdit,
   onDelete,
-  onQuickEdit,
   onToggleVisibility,
-}: {
-  cv: Cv;
-  onSelect: (cv: Cv) => void;
-  onDelete?: () => void;
-  onQuickEdit?: () => void;
-  onToggleVisibility?: () => void;
-}) => {
+}: CvLibraryItemProps) => {
   return (
     <>
-      <Card radius="md" withBorder shadow="sm">
-        <Stack>
+      <Paper p="md" radius="md" withBorder shadow="sm">
+        <Stack style={{ height: "100%" }}>
           <Group justify="space-between" wrap="nowrap">
             <Group gap="sm">
               <Title
@@ -43,7 +30,10 @@ export const CvGridCard = ({
                 size="h4"
                 lineClamp={2}
                 onClick={() => onSelect(cv)}
-                style={{ cursor: "pointer" }}
+                style={{
+                  cursor: "pointer",
+                  wordBreak: "break-word",
+                }}
               >
                 {cv.title}
               </Title>
@@ -51,69 +41,72 @@ export const CvGridCard = ({
                 {cv.isPublic ? "Public" : "Private"}
               </Badge>
             </Group>
-            <Menu position="bottom-end" withinPortal>
+            <Menu
+              position="bottom-end"
+              transitionProps={{ transition: "pop" }}
+              shadow="md"
+              withinPortal
+            >
               <Menu.Target>
                 <ActionIcon
-                  variant="transparent"
+                  variant="subtle"
+                  color="gray"
+                  size="md"
                   aria-label="cv options setting"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <IconDots size={16} color="gray" />
+                  <IconDots size={16} />
                 </ActionIcon>
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Item
-                  leftSection={<IconEdit size={14} />}
-                  onClick={() => onSelect(cv)}
-                >
-                  Full Edit
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={<IconPencil size={14} />}
-                  onClick={onQuickEdit}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit?.(cv);
+                  }}
                 >
                   Quick Edit
                 </Menu.Item>
-                <Menu.Divider />
                 <Menu.Item
-                  leftSection={
-                    cv.isPublic ? (
-                      <IconLock size={14} />
-                    ) : (
-                      <IconWorld size={14} />
-                    )
-                  }
-                  onClick={onToggleVisibility}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleVisibility?.();
+                  }}
                 >
                   Make {cv.isPublic ? "Private" : "Public"}
                 </Menu.Item>
                 <Menu.Divider />
                 <Menu.Item
                   color="red"
-                  leftSection={<IconTrash size={14} />}
-                  onClick={onDelete}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete?.(cv);
+                  }}
                 >
                   Delete
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
           </Group>
-          <Text size="sm" lineClamp={2}>
-            {cv.description || "No description"}
+
+          {/* Description Section */}
+          <Text size="sm" c="dimmed" lineClamp={3} style={{ flex: 1 }}>
+            {cv.description || "No description available"}
           </Text>
-          <Group>
-            <Text size="xs" c="dimmed">
-              Created: {new Date(cv.createdAt).toLocaleDateString()}
-            </Text>
-            <Divider orientation="vertical" size="sm" />
-            <Text size="xs" c="dimmed">
-              Updated:{" "}
-              {cv.updatedAt
-                ? new Date(cv.updatedAt).toLocaleDateString()
-                : "N/A"}
-            </Text>
-          </Group>
+
+          {/* Date Section - Always at bottom */}
+          <Stack gap="xs" mt="auto">
+            <Group justify="space-between" align="center">
+              <Text size="xs" c="dimmed">
+                Created: {formatDate(cv.createdAt)}
+              </Text>
+              <Text size="xs" c="dimmed">
+                Updated: {cv.updatedAt ? formatDate(cv.updatedAt) : "N/A"}
+              </Text>
+            </Group>
+          </Stack>
         </Stack>
-      </Card>
+      </Paper>
     </>
   );
 };
