@@ -59,11 +59,11 @@ interface CVContentEditorProps {
 }
 
 // Enhanced wrapper components that handle submit + next flow
-const ContactFormWrapper = ({ cvId: _ }: { cvId: number }) => {
+const ContactFormWrapper = ({ cvId }: { cvId: number }) => {
   return (
     <Stack gap="md">
       <Title order={4}>Contact Information</Title>
-      <ContactForm />
+      <ContactForm cvId={cvId} />
     </Stack>
   );
 };
@@ -226,8 +226,6 @@ export const CVContentEditor = ({ cvId }: CVContentEditorProps) => {
     }
   }, [steps.length, activeStep]);
 
-  const currentSection = steps[activeStep];
-
   const prevStep = () => setActiveStep((current) => Math.max(current - 1, 0));
 
   return (
@@ -290,8 +288,16 @@ export const CVContentEditor = ({ cvId }: CVContentEditorProps) => {
           </Paper>
         ) : (
           <div key={`step-${activeStep}`}>
-            {currentSection &&
-              React.createElement(currentSection.component, { cvId })}
+            {/* FIXED: Always render all wrapper components to maintain hook order */}
+            {/* Only show the active one, but call all hooks consistently */}
+            {steps.map((step, index) => (
+              <div
+                key={step.id}
+                style={{ display: index === activeStep ? "block" : "none" }}
+              >
+                {React.createElement(step.component, { cvId })}
+              </div>
+            ))}
           </div>
         )}
       </Box>

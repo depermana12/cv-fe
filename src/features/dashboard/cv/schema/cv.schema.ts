@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+// Import child schemas for public CV response
+import { contactSchema } from "../sections/contact/schema/contactSchema";
+import { educationSchema } from "../sections/education/schema/educationSchema";
+import { workSchema } from "../sections/work/schema/workSchema";
+import { projectSchema } from "../sections/project/schema/projectSchema";
+import { organizationSchema } from "../sections/organization/schema/organizationSchema";
+import { courseSchema } from "../sections/course/schema/courseSchema";
+import { skillSchema } from "../sections/skill/schema/skillSchema";
+import { languageSchema } from "../sections/language/schema/languageSchema";
+
 export const cvSchema = z.object({
   id: z.number().int().positive(),
   userId: z.number().int().positive(),
@@ -91,4 +101,16 @@ export const cvStatsSchema = z.object({
 export const cvSlugParamsSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
   slug: z.string().min(1, { message: "Slug is required" }),
+});
+
+// Extended CV schema for public endpoint that includes all child data
+export const publicCvSchema = cvSchema.extend({
+  contacts: z.array(contactSchema).optional(),
+  educations: z.array(educationSchema).optional(),
+  works: z.array(workSchema).optional(),
+  projects: z.array(projectSchema).optional(),
+  organizations: z.array(organizationSchema).optional(),
+  courses: z.array(courseSchema).optional(),
+  skills: z.array(skillSchema).optional(),
+  languages: z.array(languageSchema).optional(),
 });

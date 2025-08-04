@@ -56,8 +56,8 @@ export type SectionType =
 export type Section = {
   id: SectionType;
   name: string;
-  description: string;
-  icon: React.ReactNode;
+  description?: string;
+  icon?: React.ReactNode;
 };
 
 export type SectionCardProps = {

@@ -1,4 +1,4 @@
-import { Card, Group, Stack, Text, ActionIcon } from "@mantine/core";
+import { Paper, Group, Stack, Text, ActionIcon } from "@mantine/core";
 import { IconGripVertical, IconX } from "@tabler/icons-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -30,33 +30,21 @@ export const SectionCard = ({
         };
 
   return (
-    <Card
-      padding="md"
-      radius="md"
-      withBorder
-      shadow="sm"
-      bg="white"
-      {...cardProps}
-    >
+    <Paper p="xs" radius="sm" withBorder bg="white" {...cardProps}>
       <Group justify="space-between">
-        <Group gap="sm">
+        <Group gap="xs">
           {variant === "selected" && sortable && (
             <ActionIcon
               variant="transparent"
               {...sortable.listeners}
+              color="gray"
               style={{ cursor: "grab" }}
             >
               <IconGripVertical size={18} />
             </ActionIcon>
           )}
-          {section.icon}
           <Stack gap={0}>
-            <Text fw={600} size="sm">
-              {section.name}
-            </Text>
-            <Text size="xs" c="dimmed">
-              {section.description}
-            </Text>
+            <Text size="sm">{section.name}</Text>
           </Stack>
         </Group>
 
@@ -66,6 +54,6 @@ export const SectionCard = ({
           </ActionIcon>
         )}
       </Group>
-    </Card>
+    </Paper>
   );
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Stack,
   Group,
@@ -48,7 +48,7 @@ export const CvBuilderPage = () => {
     }
   }, [cvIdNumber, setActiveCvId, loadSectionsForCv]);
 
-  if (isLoading) {
+  if (isLoading || !cvIdNumber) {
     return <Loader color="blue" type="dots" />;
   }
 
@@ -100,7 +100,7 @@ export const CvBuilderPage = () => {
                 <CvSectionManager />
               </Tabs.Panel>
               <Tabs.Panel value="content">
-                <CVContentEditor cvId={cvIdNumber} />
+                {cvIdNumber && <CVContentEditor cvId={cvIdNumber} />}
               </Tabs.Panel>
               <Tabs.Panel value="design" p="md">
                 <CVDesignEditor />
@@ -119,9 +119,7 @@ export const CvBuilderPage = () => {
                 Preview
               </Title>
 
-              <Box>
-                <CVLivePreviewA4 cvId={cvIdNumber} />
-              </Box>
+              <Box>{cvIdNumber && <CVLivePreviewA4 cvId={cvIdNumber} />}</Box>
             </Stack>
           </Grid.Col>
         </Grid>

@@ -47,7 +47,7 @@ export const CvSectionManager = () => {
       </Stack>
 
       <Paper
-        p="md"
+        p="sm"
         radius="md"
         withBorder
         bg="gray.0"

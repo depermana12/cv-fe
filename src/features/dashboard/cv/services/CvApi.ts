@@ -5,6 +5,7 @@ import {
   CvQueryOptions,
   CvListResponse,
   CvStats,
+  PublicCv,
 } from "../types/types";
 import { axiosClient } from "@shared/lib/axiosClient";
 import { ApiResponse } from "@/shared/types/type";
@@ -31,8 +32,8 @@ export class CvApi extends ResourceApi<Cv, CvCreate> {
   }
 
   async getByUsernameAndSlug(username: string, slug: string) {
-    const res = await axiosClient.get<ApiResponse<Cv>>(
-      `${this.resource}/${username}/${slug}`,
+    const res = await axiosClient.get<ApiResponse<PublicCv>>(
+      `${this.resource}/public/${username}/${slug}`,
     );
     return res.data;
   }
