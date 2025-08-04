@@ -27,28 +27,30 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useCvStore } from "@features/dashboard/cv/store/cvStore";
 
-export const ContactForm = () => {
+interface ContactFormProps {
+  cvId?: number;
+}
+
+export const ContactForm = ({ cvId: propCvId }: ContactFormProps = {}) => {
   const { activeCvId } = useCvStore();
 
+  // Use prop cvId if provided, otherwise fall back to store
+  const actualCvId = propCvId || activeCvId;
+  // FIXED: Ensure consistent hook parameters - use 0 as fallback to prevent hook violations
+  const safeActiveCvId = actualCvId || 0;
+
   // Query contacts and determine mode and initial data
-  const { data: contacts = [], isLoading } = useContacts(activeCvId!);
+  const { data: contacts = [], isLoading } = useContacts(safeActiveCvId);
   const existingContact = contacts.length > 0 ? contacts[0] : undefined;
   const mode = existingContact ? "edit" : "create";
 
+  // FIXED: Always call all hooks in the same order - no early returns before this point
   const [opened, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
 
   const { mutate: createContact, isPending: isCreating } = useCreateContact();
   const { mutate: updateContact, isPending: isUpdating } = useUpdateContact();
   const { mutate: deleteContact, isPending: isDeleting } = useDeleteContact();
-
-  if (!activeCvId) {
-    return <Text>No CV selected</Text>;
-  }
-
-  if (isLoading) {
-    return <Text>Loading contact information...</Text>;
-  }
 
   const defaultContactValues: ContactInsert = {
     firstName: "",
@@ -71,7 +73,7 @@ export const ContactForm = () => {
     onSubmit: ({ value }) => {
       if (mode === "create") {
         createContact(
-          { cvId: activeCvId, data: value },
+          { cvId: actualCvId!, data: value },
           {
             onSuccess: () => {
               notifications.show({
@@ -86,7 +88,7 @@ export const ContactForm = () => {
         );
       } else if (mode === "edit" && existingContact) {
         updateContact(
-          { cvId: activeCvId, contactId: existingContact.id, data: value },
+          { cvId: actualCvId!, contactId: existingContact.id, data: value },
           {
             onSuccess: () => {
               notifications.show({
@@ -111,7 +113,7 @@ export const ContactForm = () => {
     if (!existingContact?.id) return;
 
     deleteContact(
-      { cvId: activeCvId, contactId: existingContact.id },
+      { cvId: actualCvId!, contactId: existingContact.id },
       {
         onSuccess: () => {
           reset();
@@ -120,6 +122,15 @@ export const ContactForm = () => {
       },
     );
   };
+
+  // FIXED: Conditional rendering moved to the end after all hooks are called
+  if (!actualCvId) {
+    return <Text>No CV selected</Text>;
+  }
+
+  if (isLoading) {
+    return <Text>Loading contact information...</Text>;
+  }
 
   return (
     <Box pos="relative">
