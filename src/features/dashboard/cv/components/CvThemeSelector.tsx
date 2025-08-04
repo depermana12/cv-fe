@@ -1,14 +1,17 @@
 import {
   Stack,
   Group,
-  Button,
   NumberInput,
   Select,
-  ColorInput,
-  Card,
   Title,
   Divider,
+  Switch,
+  ActionIcon,
+  Slider,
+  ColorSwatch,
+  SegmentedControl,
 } from "@mantine/core";
+import { IconAlignJustified, IconAlignCenter } from "@tabler/icons-react";
 import {
   useCvStyleStore,
   THEME_PRESETS,
@@ -16,124 +19,179 @@ import {
 
 export const CvThemeSelector = () => {
   const {
+    // Typography
+    fontFamily,
     fontSize,
     lineHeight,
-    padding,
-    fontFamily,
     headerColor,
+
+    // Layout
+    contactAlignment,
+    margin,
+    sectionDivider,
+
+    // Theme
     theme,
+
+    // Typography actions
+    setFontFamily,
     setFontSize,
     setLineHeight,
-    setPadding,
-    setFontFamily,
     setHeaderColor,
+
+    // Layout actions
+    setContactAlignment,
+    setMargin,
+    setSectionDivider,
+
+    // Theme actions
     setTheme,
   } = useCvStyleStore();
 
   const fontOptions = [
+    { value: "Poppins, sans-serif", label: "Poppins" },
+    { value: "Helvetica, Arial, sans-serif", label: "Helvetica" },
     {
       value: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       label: "Inter",
     },
-    { value: "Georgia, Times, serif", label: "Georgia" },
-    { value: "Helvetica, Arial, sans-serif", label: "Helvetica" },
-    { value: "Montserrat, sans-serif", label: "Montserrat" },
     { value: "Roboto, sans-serif", label: "Roboto" },
-    { value: "Open Sans, sans-serif", label: "Open Sans" },
+  ];
+
+  const accentColors = [
+    { name: "Black", color: "#000000" },
+    { name: "Brown", color: "#8B4513" },
+    { name: "Navy", color: "#1e40af" },
+    { name: "Green", color: "#059669" },
   ];
 
   return (
-    <Stack gap="lg">
+    <Stack gap="sm">
       {/* Theme Presets */}
-      <Card p="md" withBorder>
-        <Title order={4} mb="md">
-          Theme Presets
-        </Title>
-        <Group gap="xs">
-          {Object.keys(THEME_PRESETS).map((themeName) => (
-            <Button
-              key={themeName}
-              variant={theme === themeName ? "filled" : "outline"}
-              size="sm"
-              onClick={() => setTheme(themeName)}
-              style={{ textTransform: "capitalize" }}
-            >
-              {themeName}
-            </Button>
-          ))}
-        </Group>
-      </Card>
+      <Title order={3} size="h4">
+        Theme Presets
+      </Title>
+      <Group>
+        <SegmentedControl
+          value={theme}
+          onChange={setTheme}
+          color="blue"
+          data={Object.keys(THEME_PRESETS).map((themeName) => ({
+            label: themeName,
+            value: themeName,
+          }))}
+        />
+      </Group>
+      <Divider my="sm" />
+      {/* Typography Section */}
+      <Title order={3} size="h4">
+        Typography
+      </Title>
 
-      <Divider />
+      <Select
+        label="Font Family"
+        value={fontFamily}
+        onChange={(value) => setFontFamily(value || fontOptions[0].value)}
+        data={fontOptions}
+        maw={300}
+      />
+      <NumberInput
+        label="Font Size"
+        value={fontSize}
+        onChange={(value) => setFontSize(Number(value))}
+        min={10}
+        max={20}
+        suffix="px"
+        step={1}
+        maw={300}
+      />
 
-      {/* Custom Style Controls */}
-      <Card p="md" withBorder>
-        <Title order={4} mb="md">
-          Custom Styling
-        </Title>
-        <Stack gap="md">
-          {/* Typography */}
-          <Group grow>
-            <NumberInput
-              label="Font Size"
-              description="Text size in pixels"
-              value={fontSize}
-              onChange={(value) => setFontSize(Number(value))}
-              min={10}
-              max={20}
-              suffix="px"
-            />
-            <NumberInput
-              label="Line Height"
-              description="Text line spacing"
-              value={lineHeight}
-              onChange={(value) => setLineHeight(Number(value))}
-              min={1}
-              max={2.5}
-              step={0.1}
-              decimalScale={1}
-            />
-          </Group>
+      {/* Line Height and Accent Color */}
+      <NumberInput
+        label="Line Height"
+        value={lineHeight}
+        onChange={(value) => setLineHeight(Number(value))}
+        min={1}
+        max={2.5}
+        step={0.1}
+        decimalScale={1}
+        maw={300}
+        mb="lg"
+      />
 
-          {/* Layout */}
-          <Group grow>
-            <NumberInput
-              label="Padding"
-              description="Page margins in pixels"
-              value={padding}
-              onChange={(value) => setPadding(Number(value))}
-              min={16}
-              max={60}
-              suffix="px"
-            />
-            <Select
-              label="Font Family"
-              description="Text font"
-              value={fontFamily}
-              onChange={(value) => setFontFamily(value || fontOptions[0].value)}
-              data={fontOptions}
-            />
-          </Group>
-
-          {/* Colors */}
-          <ColorInput
-            label="Header Color"
-            description="Color for headings and titles"
-            value={headerColor}
-            onChange={setHeaderColor}
-            format="hex"
-            swatches={[
-              "#2b2b2b",
-              "#1a1a1a",
-              "#333333",
-              "#2563eb",
-              "#dc2626",
-              "#059669",
-              "#7c3aed",
-            ]}
+      <Title order={4} size="h5">
+        Accent Color
+      </Title>
+      <Group gap="xs">
+        {accentColors.map((color) => (
+          <ColorSwatch
+            key={color.color}
+            color={color.color}
+            size={30}
+            style={{
+              cursor: "pointer",
+              border:
+                headerColor === color.color
+                  ? "3px solid #228be6"
+                  : "2px solid transparent",
+            }}
+            onClick={() => setHeaderColor(color.color)}
           />
-        </Stack>
-      </Card>
+        ))}
+      </Group>
+      <Divider my="sm" />
+      {/* Layout Section */}
+      <Title order={3} size="h4">
+        Layout
+      </Title>
+      {/* Contact Alignment */}
+      <Title order={4} size="h5">
+        Alignment
+      </Title>
+      <Group gap="xs" mb="lg">
+        <ActionIcon
+          variant={contactAlignment === "left" ? "filled" : "outline"}
+          size="lg"
+          onClick={() => setContactAlignment("left")}
+        >
+          <IconAlignJustified size={16} />
+        </ActionIcon>
+        <ActionIcon
+          variant={contactAlignment === "center" ? "filled" : "outline"}
+          size="lg"
+          onClick={() => setContactAlignment("center")}
+        >
+          <IconAlignCenter size={16} />
+        </ActionIcon>
+      </Group>
+
+      {/* Margin and Section Divider */}
+      <Title order={4} size="h5">
+        Page Margin
+      </Title>
+      <Slider
+        value={margin}
+        onChange={setMargin}
+        mb="lg"
+        min={0.25}
+        max={1}
+        step={0.05}
+        marks={[
+          { value: 0.25, label: '0.25"' },
+          { value: 0.5, label: '0.5"' },
+          { value: 0.75, label: '0.75"' },
+          { value: 1, label: '1"' },
+        ]}
+        label={(value) => `${value}"`}
+      />
+      <Title order={4} size="h5">
+        Section Dividers
+      </Title>
+      <Switch
+        label="Title Dividers"
+        checked={sectionDivider}
+        onChange={(event) => setSectionDivider(event.currentTarget.checked)}
+      />
     </Stack>
   );
 };

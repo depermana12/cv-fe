@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import {
   Box,
   Title,
@@ -8,52 +9,71 @@ import {
   Badge,
   Anchor,
   List,
+  LoadingOverlay,
+  Alert,
 } from "@mantine/core";
+import { IconExclamationCircle } from "@tabler/icons-react";
 import { useCvStyleStore } from "@features/dashboard/cv/store/cvStyleStore";
 import { useCVSectionStore } from "@features/dashboard/cv/store/cvSectionStore";
 import { useCvStore } from "@features/dashboard/cv/store/cvStore";
+import { useCVData } from "../hooks/useCVData";
 import { CvA4Preview } from "./CvA4Preview";
 import { CvPaper } from "./CvPaper";
-
-// Import all data hooks for direct query consumption
-import { useContacts } from "../sections/contact/hooks/useContact";
-import { useEducations } from "../sections/education/hooks/useEducations";
-import { useWorks } from "../sections/work/hooks/useWorks";
-import { useSkills } from "../sections/skill/hooks/useSkills";
-import { useProjects } from "../sections/project/hooks/useProjects";
-import { useOrganizations } from "../sections/organization/hooks/useOrganizations";
-import { useCourses } from "../sections/course/hooks/useCourses";
-import { useLanguages } from "../sections/language/hooks/useLanguages";
-
-/**
- * CVLivePreviewA4 - A4-sized CV preview with direct query data consumption
- * - Uses direct query hooks for real-time data (no intermediate store)
- * - Integrates with cvStyleStore for theme support
- * - Automatically updates when queries refetch after mutations
- * - Simple and performant: single source of truth from server
- */
 
 interface CVLivePreviewA4Props {
   cvId?: number;
 }
 
+/**
+ * REFACTORED: CVLivePreviewA4 using centralized useCVData hook
+ *
+ * Before: 11 individual hooks called separately
+ * After: 4 hooks with centralized data management
+ *
+ * Benefits:
+ * - Reduced from 11 hooks to 4 hooks (63% reduction)
+ * - Consistent loading state across all sections
+ * - Better error handling
+ * - Simplified component logic
+ * - Performance improvements through coordinated data fetching
+ */
 export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
-  // Use provided cvId or fall back to store
+  // Store hooks (these remain the same)
   const { activeCvId } = useCvStore();
+  const {
+    headerColor,
+    fontFamily,
+    fontSize,
+    lineHeight,
+    contactAlignment,
+    margin,
+    sectionDivider,
+  } = useCvStyleStore();
+  const { getSectionTitle, selectedSections } = useCVSectionStore();
+
+  // SINGLE centralized data hook replaces 8 individual data hooks
   const actualCvId = cvId || activeCvId;
+  const safeActiveCvId = actualCvId || 0;
 
-  // Always call hooks in the same order, regardless of activeCvId state
-  // This prevents "Rendered more hooks than during the previous render" errors
-  const contactsQuery = useContacts(actualCvId || 0);
-  const educationsQuery = useEducations(actualCvId || 0);
-  const worksQuery = useWorks(actualCvId || 0);
-  const skillsQuery = useSkills(actualCvId || 0);
-  const projectsQuery = useProjects(actualCvId || 0);
-  const organizationsQuery = useOrganizations(actualCvId || 0);
-  const coursesQuery = useCourses(actualCvId || 0);
-  const languagesQuery = useLanguages(actualCvId || 0);
+  const cvData = useCVData(safeActiveCvId);
 
-  // Early return after all hooks are called
+  // Destructure data for better DX
+  const {
+    data: {
+      contacts,
+      educations,
+      works,
+      skills,
+      projects,
+      organizations,
+      courses,
+      languages,
+    },
+    isLoading,
+    hasError,
+  } = cvData;
+
+  // Early return after all hooks are called (same pattern as before)
   if (!actualCvId) {
     return (
       <CvA4Preview>
@@ -71,15 +91,48 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
     );
   }
 
-  // Extract data from queries
-  const contacts = contactsQuery.data || [];
-  const educations = educationsQuery.data || [];
-  const works = worksQuery.data || [];
-  const skills = skillsQuery.data || [];
-  const projects = projectsQuery.data || [];
-  const organizations = organizationsQuery.data || [];
-  const courses = coursesQuery.data || [];
-  const languages = languagesQuery.data || [];
+  // Enhanced error handling
+  if (hasError) {
+    return (
+      <CvA4Preview>
+        <CvPaper>
+          <Alert
+            icon={<IconExclamationCircle size="1rem" />}
+            title="Error loading CV data"
+            color="red"
+          >
+            There was an error loading your CV data. Please try refreshing the
+            page.
+          </Alert>
+        </CvPaper>
+      </CvA4Preview>
+    );
+  }
+
+  // Enhanced loading state
+  if (isLoading) {
+    return (
+      <CvA4Preview>
+        <CvPaper>
+          <Box style={{ position: "relative", minHeight: "400px" }}>
+            <LoadingOverlay visible={true} />
+            <Stack
+              gap="lg"
+              align="center"
+              justify="center"
+              style={{ minHeight: "200px" }}
+            >
+              <Text c="dimmed">Loading CV data...</Text>
+              <Text size="sm" c="dimmed">
+                {cvData.completedSections} of {cvData.totalSections} sections
+                loaded
+              </Text>
+            </Stack>
+          </Box>
+        </CvPaper>
+      </CvA4Preview>
+    );
+  }
 
   // Get contact data (single item)
   const contact = contacts.length > 0 ? contacts[0] : null;
@@ -100,9 +153,6 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
       }
     : null;
 
-  const { headerColor } = useCvStyleStore();
-  const { getSectionTitle, selectedSections } = useCVSectionStore();
-
   // Helper function to format dates
   const formatDate = (date: string | Date | undefined): string => {
     if (!date) return "Present";
@@ -122,18 +172,32 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
     switch (sectionType) {
       case "contact":
         return contactDisplay ? (
-          <Box key="contact">
+          <Box key="contact" style={{ textAlign: contactAlignment }}>
             <Title order={1} size="h2" style={{ color: headerColor }}>
               {contactDisplay.fullName}
             </Title>
-            <Group gap="xs" style={{ fontSize: "13px" }}>
+            <Group
+              gap="xs"
+              style={{
+                justifyContent:
+                  contactAlignment === "center" ? "center" : "flex-start",
+              }}
+            >
               {contactDisplay.address && (
-                <Text c="dimmed">{contactDisplay.address} •</Text>
+                <Text c="dimmed" size="sm">
+                  {contactDisplay.address} •
+                </Text>
               )}
               {contactDisplay.email && (
-                <Text c="dimmed">{contactDisplay.email} •</Text>
+                <Text c="dimmed" size="sm">
+                  {contactDisplay.email} •
+                </Text>
               )}
-              {contact?.phone && <Text c="dimmed">{contact.phone} •</Text>}
+              {contact?.phone && (
+                <Text c="dimmed" size="sm">
+                  {contact.phone} •
+                </Text>
+              )}
 
               {contactDisplay.linkedin && (
                 <Anchor c="blue">
@@ -144,7 +208,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
                 </Anchor>
               )}
               {contactDisplay.website && (
-                <Anchor c="blue">
+                <Anchor c="blue" size="sm">
                   {contactDisplay.website.replace(
                     /^(https?:\/\/)?(www\.)?/i,
                     "",
@@ -152,7 +216,9 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
                 </Anchor>
               )}
             </Group>
-            <Text mt="xs">{contactDisplay.summary}</Text>
+            <Text mt="xs" size="sm">
+              {contactDisplay.summary}
+            </Text>
           </Box>
         ) : null;
 
@@ -162,11 +228,11 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("work")}
             </Title>
-            <Divider color="dark" mb="xs" />
-            <Stack gap="md">
+            {sectionDivider && <Divider color={headerColor} mb="xs" />}
+            <Stack gap="xs">
               {works.map((job: any, index: number) => (
                 <Box key={index}>
-                  <Group justify="space-between" mb="xs">
+                  <Group justify="space-between">
                     <Text fw={600} size="sm">
                       {job.location && ` ${job.company} • ${job.location}`}
                     </Text>
@@ -183,7 +249,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
 
                   {Array.isArray(job.descriptions) &&
                   job.descriptions.length > 0 ? (
-                    <List withPadding spacing="xs" size="sm" mt={2}>
+                    <List withPadding spacing={1} size="sm">
                       {job.descriptions.map((desc: string, i: number) => (
                         <List.Item key={i}>{desc}</List.Item>
                       ))}
@@ -203,11 +269,11 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("education")}
             </Title>
-            <Divider color="dark" mb="xs" />
-            <Stack gap="md">
+            {sectionDivider && <Divider color={headerColor} mb="xs" />}
+            <Stack gap="xs">
               {educations.map((edu: any, index: number) => (
                 <Box key={index}>
-                  <Group justify="space-between" mb="xs">
+                  <Group justify="space-between">
                     <Text fw={600} size="sm">
                       {`${edu.degree.charAt(0).toUpperCase() + edu.degree.slice(1)}'s in ${edu.fieldOfStudy}`}
                     </Text>
@@ -215,7 +281,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
                       {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
                     </Text>
                   </Group>
-                  <Text size="sm" c="dimmed">
+                  <Text size="sm">
                     {edu.institution}
                     {edu.location &&
                       edu.gpa &&
@@ -239,21 +305,22 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("skill")}
             </Title>
-            <Divider color="dark" mb="xs" />
-            <Stack gap="sm">
+            {sectionDivider && <Divider color={headerColor} mb="xs" />}
+            <Stack gap={0}>
               {skills.map((skillCategory, index) => (
-                <Box key={index}>
-                  <Text size="sm" fw={600} mb="xs">
-                    {skillCategory.category}
-                  </Text>
+                <Stack key={index} gap={0}>
                   <Group gap="xs">
+                    <Text size="sm" fw={600}>
+                      {skillCategory.category}:{" "}
+                    </Text>
                     {skillCategory.skill.map((skillName, skillIndex) => (
-                      <Badge key={skillIndex} variant="light" size="sm">
-                        {skillName}
-                      </Badge>
+                      <Text key={skillIndex} size="sm">
+                        {skillName.trim()}
+                        {skillIndex < skillCategory.skill.length - 1 && ","}
+                      </Text>
                     ))}
                   </Group>
-                </Box>
+                </Stack>
               ))}
             </Stack>
           </Box>
@@ -265,7 +332,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("project")}
             </Title>
-            <Divider color="dark" mb="xs" />
+            <Divider color={headerColor} mb="xs" />
             <Stack gap="md">
               {projects.map((project: any, index: number) => (
                 <Box key={index}>
@@ -315,7 +382,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("language")}
             </Title>
-            <Divider color="dark" mb="xs" />
+            <Divider color={headerColor} mb="xs" />
             <Group gap="md">
               {languages.map((lang: any, index: number) => (
                 <Text key={index} size="sm">
@@ -340,7 +407,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("organization")}
             </Title>
-            <Divider color="dark" mb="xs" />
+            <Divider color={headerColor} mb="xs" />
             <Stack gap="md">
               {organizations.map((org: any, index: number) => (
                 <Box key={index}>
@@ -375,7 +442,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("course")}
             </Title>
-            <Divider color="dark" mb="xs" />
+            <Divider color={headerColor} mb="xs" />
             <Stack gap="md">
               {courses.map((course: any, index: number) => (
                 <Box key={index}>
@@ -412,11 +479,48 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
   return (
     <CvA4Preview>
       <CvPaper>
-        <Stack gap="lg">
-          {selectedSections
-            .map((sectionType) => renderSection(sectionType))
-            .filter(Boolean)}
-        </Stack>
+        <Box
+          style={{
+            position: "relative",
+            fontFamily: fontFamily,
+            fontSize: `${fontSize}px`,
+            lineHeight: lineHeight,
+            margin: `${margin}in`,
+          }}
+        >
+          <Stack gap="xs">
+            {selectedSections
+              .map((sectionType) => renderSection(sectionType))
+              .filter(Boolean)
+              .map((section, index, filteredSections) => (
+                <Fragment key={index}>{section}</Fragment>
+              ))}
+
+            {/* Debug info in development */}
+            {process.env.NODE_ENV === "development" && (
+              <Stack
+                gap="xs"
+                p="sm"
+                style={{
+                  backgroundColor: "#f8f9fa",
+                  borderRadius: "4px",
+                  fontSize: "12px",
+                  color: "#666",
+                }}
+              >
+                <Text size="xs">Debug Info:</Text>
+                <Text size="xs">Total items: {cvData.totalItems}</Text>
+                <Text size="xs">
+                  Completion: {cvData.completionPercentage}%
+                </Text>
+                <Text size="xs">
+                  Sections with data: {cvData.completedSections}/
+                  {cvData.totalSections}
+                </Text>
+              </Stack>
+            )}
+          </Stack>
+        </Box>
       </CvPaper>
     </CvA4Preview>
   );
