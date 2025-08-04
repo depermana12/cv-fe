@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import "@mantine/core/styles.css";
@@ -52,8 +51,4 @@ const AppProviders = () => {
   );
 };
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <AppProviders />
-  </StrictMode>,
-);
+createRoot(document.getElementById("root")!).render(<AppProviders />);
