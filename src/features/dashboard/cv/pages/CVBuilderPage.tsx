@@ -81,7 +81,7 @@ export const CvBuilderPage = () => {
       >
         <Tabs.List>
           <Tabs.Tab value="sections" leftSection={<IconList size={16} />}>
-            Sections
+            Section Order
           </Tabs.Tab>
           <Tabs.Tab value="content" leftSection={<IconPencil size={16} />}>
             Content Editor

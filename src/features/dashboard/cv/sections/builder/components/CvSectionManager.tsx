@@ -1,4 +1,4 @@
-import { Stack, Title, Text, Paper, Center } from "@mantine/core";
+import { Stack, Title, Text, Paper } from "@mantine/core";
 import { useMemo } from "react";
 import {
   DndContext,
@@ -24,13 +24,7 @@ export const CvSectionManager = () => {
     }),
   );
 
-  const {
-    availableSections,
-    selectedSectionDetails,
-    handleAddSection,
-    handleRemoveSection,
-    handleDragEnd,
-  } = useSectionManager();
+  const { selectedSectionDetails, handleDragEnd } = useSectionManager();
 
   const sortableItems = useMemo(
     () => selectedSectionDetails.map((section) => section.id),
@@ -38,30 +32,17 @@ export const CvSectionManager = () => {
   );
 
   return (
-    <Stack gap="xl" p="md">
+    <Stack gap="lg" p="md">
       <Stack gap={0}>
-        <Title order={3}>Manage CV Sections</Title>
+        <Title order={3} size="h4">
+          Section Order
+        </Title>
         <Text c="dimmed" size="sm">
-          Select and arrange sections. Drag to reorder.
+          Drag sections to reorder how they appear in cv
         </Text>
       </Stack>
 
-      <Paper
-        p="sm"
-        radius="md"
-        withBorder
-        bg="gray.0"
-        style={{ minHeight: "400px" }}
-      >
-        <Stack gap="sm" mb="md">
-          <Title order={4}>
-            Selected CV Sections ({selectedSectionDetails.length})
-          </Title>
-          <Text size="sm" c="dimmed">
-            Drag to reorder
-          </Text>
-        </Stack>
-
+      <Paper p="sm" radius="md" withBorder bg="gray.0">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -77,53 +58,12 @@ export const CvSectionManager = () => {
                   key={section.id}
                   section={section}
                   variant="selected"
-                  onRemove={() => handleRemoveSection(section.id)}
                 />
               ))}
             </Stack>
           </SortableContext>
         </DndContext>
-
-        {selectedSectionDetails.length === 0 && (
-          <Paper p="xs" radius="md" withBorder bg="white">
-            <Stack gap={0} align="center">
-              <Text c="dimmed">No sections selected</Text>
-              <Text size="sm" c="dimmed">
-                Add sections from below to build your CV
-              </Text>
-            </Stack>
-          </Paper>
-        )}
       </Paper>
-
-      <Stack gap="sm">
-        <Title order={4}>Available Sections</Title>
-        <Text size="sm" c="dimmed">
-          Click to add
-        </Text>
-
-        {availableSections.length > 0 ? (
-          <Stack gap="sm">
-            {availableSections.map((section) => (
-              <SectionCard
-                key={section.id}
-                section={section}
-                variant="available"
-                onClick={() => handleAddSection(section.id)}
-              />
-            ))}
-          </Stack>
-        ) : (
-          <Paper p="xl" radius="md" withBorder>
-            <Stack gap="sm" align="center">
-              <Text c="dimmed">All sections added</Text>
-              <Text size="sm" c="dimmed">
-                You've added all available sections
-              </Text>
-            </Stack>
-          </Paper>
-        )}
-      </Stack>
     </Stack>
   );
 };

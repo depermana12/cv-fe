@@ -3,7 +3,7 @@ import { subscribeWithSelector } from "zustand/middleware";
 import { SectionType } from "../types/types";
 
 interface CVSectionState {
-  // Selected sections for the current CV
+  // Selected sections for the current CV (now always all sections)
   selectedSections: SectionType[];
   // CV-specific section configurations (cvId -> sections)
   cvSectionConfigs: Record<number, SectionType[]>;
@@ -12,8 +12,6 @@ interface CVSectionState {
 
   // Actions
   setSelectedSections: (sections: SectionType[]) => void;
-  addSection: (section: SectionType) => void;
-  removeSection: (section: SectionType) => void;
   reorderSections: (sections: SectionType[]) => void;
 
   // Custom title actions
@@ -32,12 +30,16 @@ interface CVSectionState {
   hasSection: (section: SectionType) => boolean;
 }
 
-// Default sections for new CVs
+// Default sections for new CVs (now includes ALL sections)
 const DEFAULT_SECTIONS: SectionType[] = [
   "contact",
   "education",
   "work",
   "skill",
+  "project",
+  "organization",
+  "course",
+  "language",
 ];
 
 // Default section titles
@@ -59,17 +61,6 @@ export const useCVSectionStore = create<CVSectionState>()(
     customSectionTitles: {},
 
     setSelectedSections: (sections) => set({ selectedSections: sections }),
-
-    addSection: (section) =>
-      set((state) => {
-        if (state.selectedSections.includes(section)) return state;
-        return { selectedSections: [...state.selectedSections, section] };
-      }),
-
-    removeSection: (section) =>
-      set((state) => ({
-        selectedSections: state.selectedSections.filter((s) => s !== section),
-      })),
 
     reorderSections: (sections) => set({ selectedSections: sections }),
 
