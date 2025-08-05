@@ -6,7 +6,6 @@ import {
   Stack,
   Group,
   Divider,
-  Badge,
   Anchor,
   List,
   LoadingOverlay,
@@ -332,43 +331,44 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("project")}
             </Title>
-            <Divider color={headerColor} mb="xs" />
-            <Stack gap="md">
+            {sectionDivider && <Divider color={headerColor} mb="xs" />}
+            <Stack gap="xs">
               {projects.map((project: any, index: number) => (
                 <Box key={index}>
-                  <Group justify="space-between" mb="xs">
+                  <Group justify="space-between">
                     <Text fw={600} size="sm">
                       {project.name}
+                      {project.url && (
+                        <Text component="span" c="blue" size="sm">
+                          {" "}
+                          •{" "}
+                          {project.url.replace(/^(https?:\/\/)?(www\.)?/i, "")}
+                        </Text>
+                      )}
                     </Text>
                     <Text size="xs" c="dimmed">
                       {formatDate(project.startDate)} -{" "}
                       {formatDate(project.endDate) || "Present"}
                     </Text>
                   </Group>
-                  {(project.descriptions?.length > 0
-                    ? project.descriptions.join(" • ")
-                    : project.description) && (
-                    <Text size="sm" style={{ lineHeight: 1.4 }}>
-                      {project.descriptions?.length > 0
-                        ? project.descriptions.join(" • ")
-                        : project.description}
-                    </Text>
-                  )}
+
                   {project.technologies && project.technologies.length > 0 && (
-                    <Group gap="xs" mt="xs">
-                      {project.technologies.map(
-                        (tech: string, techIndex: number) => (
-                          <Badge key={techIndex} variant="outline" size="xs">
-                            {tech}
-                          </Badge>
-                        ),
-                      )}
-                    </Group>
-                  )}
-                  {project.url && (
-                    <Text size="xs" c="blue" mt="xs">
-                      {project.url}
+                    <Text fw={500} size="sm" c="dimmed">
+                      Technologies: {project.technologies.join(", ")}
                     </Text>
+                  )}
+
+                  {Array.isArray(project.descriptions) &&
+                  project.descriptions.length > 0 ? (
+                    <List withPadding spacing={1} size="sm">
+                      {project.descriptions.map((desc: string, i: number) => (
+                        <List.Item key={i}>{desc}</List.Item>
+                      ))}
+                    </List>
+                  ) : (
+                    project.description && (
+                      <Text size="sm">{project.description}</Text>
+                    )
                   )}
                 </Box>
               ))}
@@ -407,28 +407,39 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("organization")}
             </Title>
-            <Divider color={headerColor} mb="xs" />
-            <Stack gap="md">
+            {sectionDivider && <Divider color={headerColor} mb="xs" />}
+            <Stack gap="xs">
               {organizations.map((org: any, index: number) => (
                 <Box key={index}>
-                  <Group justify="space-between" mb="xs">
+                  <Group justify="space-between">
                     <Text fw={600} size="sm">
-                      {org.role} at {org.organization}
+                      {org.organization}
+                      {org.location && (
+                        <Text component="span" c="dimmed" size="sm">
+                          {" "}
+                          • {org.location}
+                        </Text>
+                      )}
                     </Text>
                     <Text size="xs" c="dimmed">
                       {formatDate(org.startDate)} -{" "}
                       {formatDate(org.endDate) || "Present"}
                     </Text>
                   </Group>
-                  {org.location && (
-                    <Text size="xs" c="dimmed" mb="xs">
-                      {org.location}
-                    </Text>
-                  )}
-                  {org.descriptions && org.descriptions.length > 0 && (
-                    <Text size="sm" style={{ lineHeight: 1.4 }}>
-                      {org.descriptions.join(" • ")}
-                    </Text>
+
+                  <Text fw={600} size="sm">
+                    {org.role}
+                  </Text>
+
+                  {Array.isArray(org.descriptions) &&
+                  org.descriptions.length > 0 ? (
+                    <List withPadding spacing={1} size="sm">
+                      {org.descriptions.map((desc: string, i: number) => (
+                        <List.Item key={i}>{desc}</List.Item>
+                      ))}
+                    </List>
+                  ) : (
+                    org.description && <Text size="sm">{org.description}</Text>
                   )}
                 </Box>
               ))}
@@ -442,28 +453,35 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("course")}
             </Title>
-            <Divider color={headerColor} mb="xs" />
-            <Stack gap="md">
+            {sectionDivider && <Divider color={headerColor} mb="xs" />}
+            <Stack gap="xs">
               {courses.map((course: any, index: number) => (
                 <Box key={index}>
-                  <Group justify="space-between" mb="xs">
+                  <Group justify="space-between">
                     <Text fw={600} size="sm">
-                      {course.courseName || course.provider}
+                      {course.provider}
                     </Text>
                     <Text size="xs" c="dimmed">
                       {formatDate(course.startDate)} -{" "}
                       {formatDate(course.endDate)}
                     </Text>
                   </Group>
-                  {course.provider && course.courseName && (
-                    <Text size="sm" c="dimmed">
-                      {course.provider}
-                    </Text>
-                  )}
-                  {course.descriptions && course.descriptions.length > 0 && (
-                    <Text size="sm" style={{ lineHeight: 1.4 }} mt="xs">
-                      {course.descriptions.join(" • ")}
-                    </Text>
+
+                  <Text fw={600} size="sm">
+                    {course.courseName}
+                  </Text>
+
+                  {Array.isArray(course.descriptions) &&
+                  course.descriptions.length > 0 ? (
+                    <List withPadding spacing={1} size="sm">
+                      {course.descriptions.map((desc: string, i: number) => (
+                        <List.Item key={i}>{desc}</List.Item>
+                      ))}
+                    </List>
+                  ) : (
+                    course.description && (
+                      <Text size="sm">{course.description}</Text>
+                    )
                   )}
                 </Box>
               ))}
@@ -492,33 +510,9 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             {selectedSections
               .map((sectionType) => renderSection(sectionType))
               .filter(Boolean)
-              .map((section, index, filteredSections) => (
+              .map((section, index) => (
                 <Fragment key={index}>{section}</Fragment>
               ))}
-
-            {/* Debug info in development */}
-            {process.env.NODE_ENV === "development" && (
-              <Stack
-                gap="xs"
-                p="sm"
-                style={{
-                  backgroundColor: "#f8f9fa",
-                  borderRadius: "4px",
-                  fontSize: "12px",
-                  color: "#666",
-                }}
-              >
-                <Text size="xs">Debug Info:</Text>
-                <Text size="xs">Total items: {cvData.totalItems}</Text>
-                <Text size="xs">
-                  Completion: {cvData.completionPercentage}%
-                </Text>
-                <Text size="xs">
-                  Sections with data: {cvData.completedSections}/
-                  {cvData.totalSections}
-                </Text>
-              </Stack>
-            )}
           </Stack>
         </Box>
       </CvPaper>

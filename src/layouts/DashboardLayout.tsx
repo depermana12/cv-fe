@@ -62,7 +62,14 @@ export const DashboardLayout = () => {
       layout="alt"
       transitionDuration={300}
     >
-      <AppShell.Header px="md">
+      <AppShell.Header
+        px="md"
+        style={{
+          backgroundColor:
+            "color-Mix(in srgb, var(--mantine-color-body), transparent 15%",
+          backdropFilter: "blur(5px)",
+        }}
+      >
         <Group h="100%" justify="space-between" wrap="nowrap">
           <Group gap="sm">
             <Tooltip

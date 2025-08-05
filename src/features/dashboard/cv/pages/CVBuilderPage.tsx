@@ -61,14 +61,16 @@ export const CvBuilderPage = () => {
   }
 
   return (
-    <Stack gap="md">
+    <Stack gap="sm">
       {/* Header */}
       <Group justify="space-between">
         <Title order={2} size="h3">
           {cv.title}
         </Title>
 
-        <Button leftSection={<IconFileText size={16} />}>Export</Button>
+        <Button size="xs" leftSection={<IconFileText size={16} />}>
+          Export
+        </Button>
       </Group>
 
       {/* Tabs Header */}
