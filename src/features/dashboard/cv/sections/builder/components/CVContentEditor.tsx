@@ -2,27 +2,15 @@ import React, { useState, useEffect } from "react";
 import {
   Box,
   Stepper,
-  Button,
   Group,
   Stack,
   Text,
   Paper,
   Center,
   Title,
+  Button,
+  Accordion,
 } from "@mantine/core";
-import {
-  IconUser,
-  IconSchool,
-  IconBriefcase,
-  IconBulb,
-  IconCode,
-  IconBuilding,
-  IconCertificate,
-  IconWorld,
-  IconCheck,
-  IconArrowLeft,
-  IconArrowRight,
-} from "@tabler/icons-react";
 
 import { WorkForm } from "../../work/components/WorkForm";
 import { SkillForm } from "../../skill/components/SkillForm";
@@ -42,13 +30,13 @@ import { useProjects } from "../../project/hooks/useProjects";
 import { useOrganizations } from "../../organization/hooks/useOrganizations";
 import { useCourses } from "../../course/hooks/useCourses";
 import { useLanguages } from "../../language/hooks/useLanguages";
+import { useContacts } from "../../contact/hooks/useContact";
 
 import { CVMultiItemSection } from "./CVMultiItemSection";
 
 interface SectionConfig {
   id: SectionType;
   title: string;
-  icon: React.ReactNode;
   component: React.ComponentType<{
     cvId: number;
   }>;
@@ -58,12 +46,50 @@ interface CVContentEditorProps {
   cvId: number;
 }
 
-// Enhanced wrapper components that handle submit + next flow
 const ContactFormWrapper = ({ cvId }: { cvId: number }) => {
+  const { data: contacts = [] } = useContacts(cvId);
+  const [isAccordionOpen, setIsAccordionOpen] = useState(true);
+
   return (
-    <Stack gap="md">
+    <Stack gap={0}>
       <Title order={4}>Contact Information</Title>
-      <ContactForm cvId={cvId} />
+
+      {/* Contact form in accordion */}
+      <Accordion
+        value={isAccordionOpen ? "contact-form" : null}
+        onChange={() => setIsAccordionOpen(!isAccordionOpen)}
+        variant="default"
+        chevronPosition="left"
+        styles={{
+          content: {
+            paddingLeft: "0px",
+            paddingRight: "0px",
+          },
+          control: {
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
+          },
+          label: {
+            "&:hover": {
+              textDecoration: "underline",
+            },
+          },
+        }}
+      >
+        <Accordion.Item value="contact-form">
+          <Accordion.Control>
+            <Text size="sm">
+              {contacts.length > 0
+                ? "Edit Contact Information"
+                : "Add Contact Information"}
+            </Text>
+          </Accordion.Control>
+          <Accordion.Panel>
+            <ContactForm cvId={cvId} />
+          </Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>
     </Stack>
   );
 };
@@ -163,49 +189,41 @@ const SECTION_CONFIG: Record<SectionType, SectionConfig> = {
   contact: {
     id: "contact",
     title: "Contact",
-    icon: <IconUser size={16} />,
     component: ContactFormWrapper,
   },
   education: {
     id: "education",
     title: "Education",
-    icon: <IconSchool size={16} />,
     component: EducationFormWrapper,
   },
   work: {
     id: "work",
     title: "Work",
-    icon: <IconBriefcase size={16} />,
     component: WorkFormWrapper,
   },
   skill: {
     id: "skill",
     title: "Skills",
-    icon: <IconBulb size={16} />,
     component: SkillFormWrapper,
   },
   project: {
     id: "project",
     title: "Projects",
-    icon: <IconCode size={16} />,
     component: ProjectFormWrapper,
   },
   organization: {
     id: "organization",
     title: "Organizations",
-    icon: <IconBuilding size={16} />,
     component: OrganizationFormWrapper,
   },
   course: {
     id: "course",
     title: "Courses",
-    icon: <IconCertificate size={16} />,
     component: CourseFormWrapper,
   },
   language: {
     id: "language",
     title: "Languages",
-    icon: <IconWorld size={16} />,
     component: LanguageFormWrapper,
   },
 };
@@ -226,57 +244,86 @@ export const CVContentEditor = ({ cvId }: CVContentEditorProps) => {
     }
   }, [steps.length, activeStep]);
 
-  const prevStep = () => setActiveStep((current) => Math.max(current - 1, 0));
-
   return (
-    <Stack gap="md" p="md">
-      {/* Stepper */}
-      <Stepper
-        active={activeStep}
-        size="sm"
-        color="teal"
-        styles={{
-          steps: {
-            display: "flex",
-            justifyContent: "space-between",
-            borderBottom: "1px solid var(--mantine-color-default-border)",
-            paddingBottom: "1rem",
-            marginBottom: "1rem",
-          },
-          step: {
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-          },
+    <Stack gap="lg" p="md">
+      {/* Stepper with integrated navigation */}
+      <Box>
+        <Group align="flex-start" gap="md">
+          <Box style={{ flex: 1 }}>
+            <Stepper
+              active={activeStep}
+              onStepClick={setActiveStep}
+              size="xs"
+              color="blue"
+              styles={{
+                steps: {
+                  display: "flex",
+                  justifyContent: "space-between",
+                },
+                step: {
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                },
+                stepIcon: {
+                  width: "24px",
+                  height: "24px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "50%",
+                },
+                separator: {
+                  marginLeft: -25,
+                  marginRight: -25,
+                  marginTop: -12,
+                  height: 2,
+                },
+                stepBody: {
+                  marginLeft: 0,
+                  textAlign: "center",
+                },
+                stepLabel: {
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  textAlign: "center",
+                  whiteSpace: "normal",
+                  wordWrap: "break-word",
+                  maxWidth: "80px",
+                },
+              }}
+            >
+              {steps.map((step: SectionConfig) => (
+                <Stepper.Step key={step.id} label={step.title} />
+              ))}
+            </Stepper>
+          </Box>
 
-          separator: {
-            marginLeft: -15,
-            marginRight: -15,
-            marginTop: -15,
-            height: 3,
-          },
-          stepBody: {
-            marginLeft: 0,
-            textAlign: "center",
-          },
-          stepLabel: {
-            fontSize: "12px",
-            fontWeight: 600,
-            textAlign: "center",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-          },
-        }}
-      >
-        {steps.map((step: SectionConfig) => (
-          <Stepper.Step
-            key={step.id}
-            label={step.title}
-            icon={step.icon}
-            completedIcon={<IconCheck size={16} />}
-          />
-        ))}
-      </Stepper>
+          {/* Navigation hint beside stepper */}
+          <Stack gap={1} align="center">
+            {activeStep > 0 && (
+              <Button
+                size="xs"
+                variant="light"
+                style={{ cursor: "pointer" }}
+                onClick={() => setActiveStep(activeStep - 1)}
+              >
+                Prev
+              </Button>
+            )}
+            {activeStep < steps.length - 1 && (
+              <Button
+                size="xs"
+                variant="light"
+                style={{ cursor: "pointer" }}
+                onClick={() => setActiveStep(activeStep + 1)}
+              >
+                Next
+              </Button>
+            )}
+          </Stack>
+        </Group>
+      </Box>
 
       {/* Current Form */}
       <Box style={{ flex: 1, overflow: "auto" }}>
@@ -301,30 +348,6 @@ export const CVContentEditor = ({ cvId }: CVContentEditorProps) => {
           </div>
         )}
       </Box>
-
-      <Group justify="space-between" pt="md">
-        <Button
-          variant="default"
-          leftSection={<IconArrowLeft size={16} />}
-          onClick={prevStep}
-          disabled={activeStep === 0}
-        >
-          Previous
-        </Button>
-        <Text size="sm" c="dimmed">
-          Step {activeStep + 1} of {steps.length}
-        </Text>
-        <Button
-          variant="default"
-          rightSection={<IconArrowRight size={16} />}
-          onClick={() =>
-            setActiveStep((s) => Math.min(s + 1, steps.length - 1))
-          }
-          disabled={activeStep === steps.length - 1}
-        >
-          Next
-        </Button>
-      </Group>
     </Stack>
   );
 };

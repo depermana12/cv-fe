@@ -29,7 +29,7 @@ export const SectionCard = ({
         };
 
   return (
-    <Paper p="sm" radius="sm" shadow="sm" bg="white" {...cardProps}>
+    <Paper p="xs" radius="sm" withBorder bg="white" {...cardProps}>
       <Group justify="space-between">
         <Group gap="sm">
           {variant === "selected" && sortable && (

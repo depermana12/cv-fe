@@ -19,7 +19,7 @@ export const useCreateProject = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["cvs", "projects", data.cvId],
+        queryKey: ["cvs", data.cvId, "projects"],
       });
     },
     onError: (err) => {

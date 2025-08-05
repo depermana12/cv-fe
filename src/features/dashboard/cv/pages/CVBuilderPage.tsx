@@ -114,13 +114,7 @@ export const CvBuilderPage = () => {
               borderLeft: "1px solid var(--mantine-color-gray-3)",
             }}
           >
-            <Stack gap="xs">
-              <Title order={5} pl="xs">
-                Preview
-              </Title>
-
-              <Box>{cvIdNumber && <CVLivePreviewA4 cvId={cvIdNumber} />}</Box>
-            </Stack>
+            {cvIdNumber && <CVLivePreviewA4 cvId={cvIdNumber} />}
           </Grid.Col>
         </Grid>
       </Tabs>

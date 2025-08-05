@@ -6,8 +6,8 @@ import {
   Text,
   Accordion,
   Title,
-  Badge,
   ActionIcon,
+  Button,
 } from "@mantine/core";
 import { IconPlus, IconX } from "@tabler/icons-react";
 
@@ -52,24 +52,30 @@ export const CVMultiItemSection = <T = any,>({
   };
 
   return (
-    <Stack gap="md">
+    <Stack gap={0}>
       {/* Header with section title */}
       {/* Simple header */}
-      <Group justify="space-between" align="center">
+      <Group justify="space-between" align="center" mb="md">
         <Title order={4}>
           {sectionTitle} {items.length > 0 && `(${items.length})`}
         </Title>
         <Tooltip label={`Add new ${sectionTitle.toLowerCase()}`}>
-          <ActionIcon variant="filled" onClick={handleAddMore}>
-            <IconPlus size={16} />
-          </ActionIcon>
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={handleAddMore}
+            leftSection={<IconPlus size={16} />}
+          >
+            Add new {sectionTitle.toLowerCase()}
+          </Button>
         </Tooltip>
       </Group>
 
       {/* Empty state message */}
       {items.length === 0 && formAccordions.length === 0 && (
-        <Text c="dimmed" size="sm">
-          No {sectionTitle.toLowerCase()} added yet.
+        <Text c="dimmed" size="sm" mb="md">
+          No {sectionTitle.toLowerCase()} added yet. Click "Add new{" "}
+          {sectionTitle.toLowerCase()}" to create one.
         </Text>
       )}
 
@@ -90,16 +96,23 @@ export const CVMultiItemSection = <T = any,>({
                 paddingLeft: "0px",
                 paddingRight: "0px",
               },
+              control: {
+                "&:hover": {
+                  backgroundColor: "transparent",
+                },
+              },
+              label: {
+                "&:hover": {
+                  textDecoration: "underline",
+                },
+              },
             }}
           >
             <Accordion.Item value={itemKey}>
               <Accordion.Control>
-                <Group>
-                  <Text size="sm">{sectionTitle}</Text>
-                  <Badge variant="outline" size="md">
-                    #{index + 1}
-                  </Badge>
-                </Group>
+                <Text size="sm">
+                  {sectionTitle} #{index + 1}
+                </Text>
               </Accordion.Control>
               <Accordion.Panel>
                 <FormComponent
@@ -125,17 +138,24 @@ export const CVMultiItemSection = <T = any,>({
               paddingLeft: "0px",
               paddingRight: "0px",
             },
+            control: {
+              "&:hover": {
+                backgroundColor: "transparent",
+              },
+            },
+            label: {
+              "&:hover": {
+                textDecoration: "underline",
+              },
+            },
           }}
         >
           <Accordion.Item value={formId}>
             <Group gap={0}>
               <Accordion.Control style={{ flex: 1 }}>
-                <Group>
-                  <Text size="sm">{sectionTitle}</Text>
-                  <Badge variant="outline" size="md">
-                    #{items.length + index + 1}
-                  </Badge>
-                </Group>
+                <Text size="sm">
+                  {sectionTitle} #{items.length + index + 1}
+                </Text>
               </Accordion.Control>
               <ActionIcon
                 size="lg"
