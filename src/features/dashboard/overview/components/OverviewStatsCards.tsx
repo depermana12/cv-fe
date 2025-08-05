@@ -2,6 +2,7 @@ import { SimpleGrid, Text, Skeleton, Group, Paper } from "@mantine/core";
 import { IconArrowDownRight, IconArrowUpRight } from "@tabler/icons-react";
 import { useUserStats } from "../../../user/hooks/useUserStats";
 import { useApplicationMonthlyRate } from "../../analytics/hooks/useApplicationMonthlyRate";
+import { useApplicationMonthlyIntv } from "../../analytics/hooks/useApplicationMonthlyIntv";
 import { useAuthStore } from "@app/store/authStore";
 
 export const OverviewStatsCards = () => {
@@ -12,8 +13,13 @@ export const OverviewStatsCards = () => {
     isLoading: isMonthlyRateLoading,
     error: monthlyRateError,
   } = useApplicationMonthlyRate(user?.id!);
+  const {
+    data: monthlyIntvData,
+    isLoading: isMonthlyIntvLoading,
+    error: monthlyIntvError,
+  } = useApplicationMonthlyIntv(user?.id!);
 
-  if (isLoading || isMonthlyRateLoading) {
+  if (isLoading || isMonthlyRateLoading || isMonthlyIntvLoading) {
     return (
       <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} spacing="md">
         {Array.from({ length: 4 }).map((_, i) => (
@@ -23,7 +29,7 @@ export const OverviewStatsCards = () => {
     );
   }
 
-  if (error || !stats || monthlyRateError) {
+  if (error || !stats || monthlyRateError || monthlyIntvError) {
     return (
       <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} spacing="md">
         {Array.from({ length: 4 }).map((_, i) => (
@@ -47,19 +53,19 @@ export const OverviewStatsCards = () => {
       diff: null, // No growth data for CVs
     },
     {
-      title: "Monthly Applications",
-      value: monthlyRateData?.data?.thisMonth || 0,
-      diff: monthlyRateData?.data?.growthRate || 0,
-    },
-    {
       title: "Total Applications",
       value: stats?.totalJobApplications || 0,
       diff: null, // No growth data for total
     },
     {
-      title: "Last Month Applications",
-      value: monthlyRateData?.data?.lastMonth || 0,
-      diff: null, // This is historical data
+      title: "Monthly Applications",
+      value: monthlyRateData?.data?.thisMonth || 0,
+      diff: monthlyRateData?.data?.growthRate || 0,
+    },
+    {
+      title: "Monthly Interviews",
+      value: monthlyIntvData?.data?.thisMonth || 0,
+      diff: monthlyIntvData?.data?.growthRate || 0,
     },
   ];
 
@@ -94,7 +100,7 @@ export const OverviewStatsCards = () => {
         </Group>
 
         <Text size="xs" c="dimmed" mt={7}>
-          {hasDiff ? "Compared to previous month" : "Total count"}
+          {hasDiff ? "Compared to last month" : "Total count"}
         </Text>
       </Paper>
     );

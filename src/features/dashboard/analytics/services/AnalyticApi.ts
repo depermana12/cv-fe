@@ -31,7 +31,7 @@ export class AnalyticApi {
   }
   async applicationMonthlyRate(userId: number) {
     const response = await axiosClient.get<ApiResponse<MonthlyApplicationRate>>(
-      `${this.resource}/monthly-metrics`,
+      `${this.resource}/monthly-application-metrics`,
       {
         params: { userId },
       },
@@ -41,7 +41,16 @@ export class AnalyticApi {
 
   async applicationMonthlyGoal(userId: number) {
     const response = await axiosClient.get<ApiResponse<ApplicationMonthlyGoal>>(
-      `${this.resource}/monthly-progress`,
+      `${this.resource}/monthly-application-progress`,
+      {
+        params: { userId },
+      },
+    );
+    return response.data;
+  }
+  async applicationsMonthlyInterview(userId: number) {
+    const response = await axiosClient.get<ApiResponse<MonthlyApplicationRate>>(
+      `${this.resource}/monthly-interview-metrics`,
       {
         params: { userId },
       },

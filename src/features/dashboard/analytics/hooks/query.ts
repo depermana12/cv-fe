@@ -37,3 +37,13 @@ export const applicationMonthlyGoalQuery = (userId: number) => {
     enabled: !!userId,
   });
 };
+
+// TODO: invalidate in the job statuses mutation
+export const applicationsMonthlyInterviewQuery = (userId: number) => {
+  return queryOptions({
+    queryKey: ["applicationsMonthlyInterview", userId],
+    queryFn: () => analyticService.applicationsMonthlyInterview(userId),
+    staleTime: 1000 * 60 * 60 * 24 * 30,
+    enabled: !!userId,
+  });
+};
