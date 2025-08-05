@@ -18,3 +18,12 @@ export const applicationStatusDistributionQuery = (userId: number) => {
     enabled: !!userId,
   });
 };
+
+export const applicationMonthlyRateQuery = (userId: number) => {
+  return queryOptions({
+    queryKey: ["applicationMonthlyRate", userId],
+    queryFn: () => analyticService.applicationMonthlyRate(userId),
+    staleTime: 1000 * 60 * 5,
+    enabled: !!userId,
+  });
+};
