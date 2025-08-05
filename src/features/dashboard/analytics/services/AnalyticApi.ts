@@ -1,6 +1,7 @@
 import { axiosClient } from "@shared/lib/axiosClient";
 import { ApiResponse } from "../../../../shared/types/type";
 import type {
+  ApplicationMonthlyGoal,
   ApplicationTrends,
   MonthlyApplicationRate,
   StatusDistribution,
@@ -31,6 +32,16 @@ export class AnalyticApi {
   async applicationMonthlyRate(userId: number) {
     const response = await axiosClient.get<ApiResponse<MonthlyApplicationRate>>(
       `${this.resource}/monthly-metrics`,
+      {
+        params: { userId },
+      },
+    );
+    return response.data;
+  }
+
+  async applicationMonthlyGoal(userId: number) {
+    const response = await axiosClient.get<ApiResponse<ApplicationMonthlyGoal>>(
+      `${this.resource}/monthly-progress`,
       {
         params: { userId },
       },

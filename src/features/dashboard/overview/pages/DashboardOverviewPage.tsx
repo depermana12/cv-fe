@@ -2,7 +2,7 @@ import { Stack, Title, Grid } from "@mantine/core";
 import { OverviewStatsCards } from "../components/OverviewStatsCards";
 import { OverviewRecentCvs } from "../components/OverviewRecentCvs";
 import { OverviewQuickItems } from "../components/OverviewQuickItems";
-import { OverviewRecentActivity } from "../components/OverviewRecentActivity";
+import { MonthlyGoalCard } from "../components/MonthlyGoalCard";
 import { ApplicationTrendsChart } from "../../analytics/components/ApplicationTrendsChart";
 import { ApplicationStatusDistributionChart } from "../../analytics/components/ApplicationStatusDistributionChart";
 
@@ -28,7 +28,7 @@ export const DashboardOverviewPage = () => {
           </Stack>
         </Grid.Col>
         <Grid.Col span={{ base: 12, lg: 4 }}>
-          <OverviewRecentActivity />
+          <MonthlyGoalCard />
         </Grid.Col>
       </Grid>
     </Stack>

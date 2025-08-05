@@ -13,3 +13,11 @@ export type MonthlyApplicationRate = {
   lastMonth: number;
   growthRate: number;
 };
+
+export type ApplicationMonthlyGoal = {
+  goal: number;
+  current: number;
+  percentage: number;
+  remainingItem: number;
+  remainingDays: number;
+};
