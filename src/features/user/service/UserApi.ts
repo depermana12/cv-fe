@@ -5,6 +5,7 @@ import {
   UserStats,
   UserCredentialsUpdate,
   UserPreferencesUpdate,
+  UserProfileProgressRes,
 } from "../types/user.types";
 import { ApiResponse } from "@shared/types/type";
 
@@ -100,6 +101,13 @@ export class UserApi<T, I> extends ResourceApi<T, I> {
   > {
     const res = await axiosClient.get<ApiResponse<{ verified: boolean }>>(
       `${this.resource}/me/email-verification-status`,
+    );
+    return res.data;
+  }
+
+  async getProfileProgress(): Promise<ApiResponse<UserProfileProgressRes>> {
+    const res = await axiosClient.get<ApiResponse<UserProfileProgressRes>>(
+      `${this.resource}/me/profile-progress`,
     );
     return res.data;
   }

@@ -19,3 +19,10 @@ export type UserCredentialsUpdate = z.infer<typeof userCredentialsUpdateSchema>;
 export type UserPreferencesUpdate = z.infer<typeof userPreferencesUpdateSchema>;
 
 export type CheckUsername = z.infer<typeof checkUsernameSchema>;
+
+export type UserProfileProgressRes = {
+  totalFields: number;
+  filledFields: number;
+  progressPercentage: number;
+  emptyFieldNames: string[];
+};

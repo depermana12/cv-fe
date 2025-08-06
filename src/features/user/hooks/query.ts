@@ -39,3 +39,12 @@ export const emailVerificationQuery = () =>
       return res.data;
     },
   });
+
+export const userProfileProgressQuery = () =>
+  queryOptions({
+    queryKey: ["user", "profile-progress"],
+    queryFn: async () => {
+      const res = await userService.getProfileProgress();
+      return res.data;
+    },
+  });

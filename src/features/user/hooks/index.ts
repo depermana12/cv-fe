@@ -1,5 +1,6 @@
 export { useUser } from "./useUser";
 export { useUserStats } from "./useUserStats";
+export { useProfileProgress } from "./useProfileProgress";
 export { useUpdateProfile } from "./useUpdateProfile";
 export { useUpdateCredentials } from "./useUpdateCredentials";
 export { useUpdatePreferences } from "./useUpdatePreferences";
