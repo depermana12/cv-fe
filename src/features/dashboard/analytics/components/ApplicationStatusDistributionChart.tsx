@@ -1,46 +1,83 @@
 import { Paper, Title, Stack, Box, Text, LoadingOverlay } from "@mantine/core";
+import { Loader, Skeleton } from "@mantine/core";
 import { PieChart } from "@mantine/charts";
 import { useApplicationStatusDist } from "../hooks/useApplicationStatusDist";
 import { useAuthStore } from "@app/store/authStore";
-
-const STATUS_COLORS = [
-  "indigo.6",
-  "blue.6",
-  "cyan.6",
-  "violet.6",
-  "indigo.4",
-  "blue.4",
-  "slate.6",
-  "indigo.8",
-];
+// TODO: Extract to constant for job status colors
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "applied":
+      return "gray.6";
+    case "interview":
+      return "indigo.6";
+    case "offer":
+      return "teal.5";
+    case "accepted":
+      return "green.6";
+    case "rejected":
+      return "red.6";
+    case "ghosted":
+      return "dark.4";
+    default:
+      return "gray.6";
+  }
+};
 
 export const ApplicationStatusDistributionChart = () => {
   const { user } = useAuthStore();
 
   const { data, isLoading, error } = useApplicationStatusDist(user?.id!);
 
-  const chartData = (data?.data || []).map((item, index) => ({
+  const chartData = (data?.data || []).map((item) => ({
     name: item.status,
     value: item.count,
-    color: STATUS_COLORS[index % STATUS_COLORS.length],
+    color: getStatusColor(item.status),
   }));
+
+  if (isLoading) {
+    return (
+      <Paper withBorder p="sm" style={{ height: "100%" }}>
+        <Stack gap={0} mb="sm">
+          <Box>
+            <Title order={4}>Application Status Distribution</Title>
+            <Skeleton height={16} width={280} mt={2} />
+          </Box>
+          <Box
+            h={190}
+            display="flex"
+            style={{ alignItems: "center", justifyContent: "center" }}
+          >
+            <Loader size="lg" color="indigo" />
+          </Box>
+        </Stack>
+      </Paper>
+    );
+  }
 
   if (error) {
     return (
-      <Paper withBorder p="md">
-        <Title order={4} size="md" mb="md">
-          Application Status Distribution
-        </Title>
-        <Text c="red" size="sm">
-          Failed to load status distribution data
-        </Text>
+      <Paper withBorder p="sm" style={{ height: "100%" }}>
+        <Stack gap={0} mb="sm">
+          <Box>
+            <Title order={4}>Application Status Distribution</Title>
+          </Box>
+          <Box
+            h={190}
+            display="flex"
+            style={{ alignItems: "center", justifyContent: "center" }}
+          >
+            <Text c="red" size="sm" style={{ textAlign: "center" }}>
+              Failed to load status distribution data
+            </Text>
+          </Box>
+        </Stack>
       </Paper>
     );
   }
 
   return (
-    <Paper withBorder p="md" style={{ height: "100%" }}>
-      <Stack gap="md">
+    <Paper withBorder p="sm" style={{ height: "100%" }}>
+      <Stack gap={0} mb="sm">
         <Box>
           <Title order={4}>Application Status Distribution</Title>
           <Text c="dimmed" size="sm">
@@ -48,7 +85,7 @@ export const ApplicationStatusDistributionChart = () => {
           </Text>
         </Box>
 
-        <Box pos="relative" h={300}>
+        <Box pos="relative">
           <LoadingOverlay visible={isLoading} />
           <Stack align="center">
             {chartData.length > 0 ? (
@@ -58,14 +95,14 @@ export const ApplicationStatusDistributionChart = () => {
                 labelsType="value"
                 withLabels
                 data={chartData}
-                size={240}
+                size={190}
                 withTooltip
                 tooltipDataSource="segment"
               />
             ) : (
               !isLoading && (
                 <Box
-                  h={300}
+                  h={190}
                   display="flex"
                   style={{
                     alignItems: "center",
@@ -91,18 +128,23 @@ export const ApplicationStatusDistributionChart = () => {
               alignItems: "center",
               flexWrap: "wrap",
               gap: 10,
+              marginInline: 20,
             }}
           >
             {chartData.map((item) => (
               <Box
                 key={item.name}
                 display="flex"
-                style={{ alignItems: "center", gap: 4 }}
+                style={{
+                  alignItems: "center",
+                  gap: 4,
+                  minWidth: 50,
+                }}
               >
                 <Box
                   style={{
-                    width: 12,
-                    height: 12,
+                    width: 15,
+                    height: 15,
                     background: `var(--mantine-color-${item.color.replace(".", "-")})`,
                     marginRight: 3,
                   }}

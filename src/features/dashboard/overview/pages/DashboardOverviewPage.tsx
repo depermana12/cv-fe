@@ -5,12 +5,23 @@ import { OverviewQuickItems } from "../components/OverviewQuickItems";
 import { MonthlyGoalCard } from "../components/MonthlyGoalCard";
 import { ApplicationTrendsChart } from "../../analytics/components/ApplicationTrendsChart";
 import { ApplicationStatusDistributionChart } from "../../analytics/components/ApplicationStatusDistributionChart";
+import { useUser } from "@/features/user/hooks";
 
 export const DashboardOverviewPage = () => {
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "morning";
+    if (hour < 17) return "afternoon";
+    return "evening";
+  };
+
+  const { data } = useUser();
+  const user = data?.firstName || data?.username;
+
   return (
     <Stack gap="md">
       <Title order={2} size="h3">
-        Dashboard Overview
+        Good {getGreeting()}, {user}
       </Title>
 
       <OverviewStatsCards />
@@ -22,13 +33,13 @@ export const DashboardOverviewPage = () => {
           <ApplicationStatusDistributionChart />
         </Grid.Col>
         <Grid.Col span={{ base: 12, lg: 8 }}>
-          <Stack gap="lg">
-            <OverviewRecentCvs />
-            <OverviewQuickItems />
-          </Stack>
+          <OverviewQuickItems />
         </Grid.Col>
         <Grid.Col span={{ base: 12, lg: 4 }}>
           <MonthlyGoalCard />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, lg: 4 }}>
+          <OverviewRecentCvs />
         </Grid.Col>
       </Grid>
     </Stack>

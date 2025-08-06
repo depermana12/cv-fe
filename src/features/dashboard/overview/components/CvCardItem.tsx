@@ -54,7 +54,7 @@ export const CvCardItem = ({ cv }: { cv: Cv }) => {
 
   return (
     <>
-      <Paper p="md" radius="sm" withBorder>
+      <Paper p="xs" radius="sm" withBorder>
         <Group justify="space-between">
           <Group gap="sm">
             <Stack justify="center" align="center">
@@ -74,7 +74,11 @@ export const CvCardItem = ({ cv }: { cv: Cv }) => {
                   {cv.title}
                 </Title>
 
-                <Badge variant="default" size="xs">
+                <Badge
+                  variant="filled"
+                  size="xs"
+                  color={cv.isPublic ? "green" : "gray"}
+                >
                   {cv.isPublic ? "Public" : "Private"}
                 </Badge>
               </Group>

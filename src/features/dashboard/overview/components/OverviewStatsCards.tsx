@@ -23,7 +23,7 @@ export const OverviewStatsCards = () => {
     return (
       <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} spacing="md">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} height={120} radius="md" />
+          <Skeleton key={i} height={110} radius="md" />
         ))}
       </SimpleGrid>
     );
@@ -75,14 +75,14 @@ export const OverviewStatsCards = () => {
     const hasDiff = stat.diff !== null && stat.diff !== undefined;
 
     return (
-      <Paper withBorder p="md" radius="md" key={stat.title}>
+      <Paper withBorder p="sm" radius="md" key={stat.title}>
         <Group justify="space-between">
           <Text size="xs" c="dimmed" tt="uppercase" fw={700}>
             {stat.title}
           </Text>
         </Group>
 
-        <Group align="flex-end" gap="xs" mt={25}>
+        <Group align="flex-end" gap="xs" mt="sm">
           <Text size="xl" fw={700}>
             {stat.value}
           </Text>
@@ -90,7 +90,6 @@ export const OverviewStatsCards = () => {
             <Text
               c={stat.diff! > 0 ? "teal" : stat.diff! < 0 ? "red" : "dimmed"}
               size="sm"
-              fw={500}
               style={{ display: "flex", alignItems: "center", gap: "2px" }}
             >
               <span>{stat.diff}%</span>

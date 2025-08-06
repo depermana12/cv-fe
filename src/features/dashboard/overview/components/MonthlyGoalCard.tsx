@@ -20,20 +20,17 @@ export const MonthlyGoalCard = () => {
   if (isLoading) {
     return (
       <Paper radius="md" withBorder p="md">
-        <Stack gap="md">
-          <Group>
-            <Skeleton circle height={60} width={60} />
-            <Stack gap="xs" flex={1}>
-              <Skeleton height={20} width="60%" />
-              <Skeleton height={16} width="40%" />
-            </Stack>
-          </Group>
-          <Skeleton height={10} />
-          <Group justify="space-between">
-            <Skeleton height={16} width="30%" />
-            <Skeleton height={24} width={80} />
+        <Stack gap={0} mb="xs">
+          <Group justify="space-between" mb="xl">
+            <Title order={4} mb="sm">
+              Monthly Goal
+            </Title>
+            <Skeleton height={22} width={100} radius="xl" />
           </Group>
         </Stack>
+        <Skeleton height={16} width={70} my="md" />
+        <Skeleton height={20} width="100%" radius="md" mb={16} />
+        <Skeleton height={16} width={50} />
       </Paper>
     );
   }
@@ -61,7 +58,9 @@ export const MonthlyGoalCard = () => {
     >
       <Stack gap={0} mb="xs">
         <Group justify="space-between">
-          <Title order={4}>Monthly Goal</Title>
+          <Title order={4} mb="sm">
+            Monthly Goal
+          </Title>
           {isGoalAchieved ? (
             <Badge size="md" color="green" variant="filled">
               Goal achieved!
@@ -72,7 +71,9 @@ export const MonthlyGoalCard = () => {
             </Badge>
           )}
         </Group>
-
+        <Text size="sm" fw={500}>
+          Target
+        </Text>
         <Text c="dimmed" size="sm">
           {goal} applications / month
         </Text>

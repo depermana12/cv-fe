@@ -77,23 +77,16 @@ export const CvStatsCards = () => {
   return (
     <Grid>
       {statCards.map((stat) => {
-        const Icon = stat.icon;
         return (
           <Grid.Col key={stat.title} span={{ base: 12, sm: 6, md: 4, lg: 2.4 }}>
-            <Card padding="lg" radius="md" withBorder>
+            <Card padding="sm" radius="md" withBorder>
               <Group justify="space-between">
-                <div>
-                  <Text size="sm" c="dimmed" fw={500}>
-                    {stat.title}
-                  </Text>
-                  <Text size="xl" fw={700}>
-                    {stat.value.toLocaleString()}
-                  </Text>
-                </div>
-                <Icon
-                  size={32}
-                  color={`var(--mantine-color-${stat.color}-6)`}
-                />
+                <Text size="sm" c="dimmed" fw={500}>
+                  {stat.title}
+                </Text>
+                <Text size="xl" fw={700}>
+                  {stat.value.toLocaleString()}
+                </Text>
               </Group>
             </Card>
           </Grid.Col>

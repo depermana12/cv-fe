@@ -18,14 +18,14 @@ export const OverviewRecentCvs = () => {
 
   if (isLoading) {
     return (
-      <Paper p="lg" radius="md" withBorder>
-        <Group justify="space-between" mb="md">
-          <Skeleton height={24} width={120} />
-          <Skeleton height={32} width={80} />
+      <Paper p="sm" radius="md" withBorder>
+        <Group justify="space-between" mb="xl">
+          <Title order={4}>Recent CVs</Title>
+          <Skeleton height={24} width={80} />
         </Group>
         <Stack gap="sm">
           {Array.from({ length: 3 }).map((_, index) => (
-            <Skeleton key={index} height={80} radius="md" />
+            <Skeleton key={index} height={60} radius="md" />
           ))}
         </Stack>
       </Paper>
@@ -34,7 +34,7 @@ export const OverviewRecentCvs = () => {
 
   if (error) {
     return (
-      <Paper p="lg" radius="md" withBorder>
+      <Paper p="sm" radius="md" withBorder>
         <Group justify="space-between" mb="md">
           <Title order={4}>Recent CVs</Title>
         </Group>
@@ -50,7 +50,7 @@ export const OverviewRecentCvs = () => {
   }
 
   return (
-    <Paper p="lg" radius="md" withBorder>
+    <Paper p="sm" radius="md" withBorder>
       <Group justify="space-between" mb="sm">
         <Title order={4}>Recent CVs</Title>
         <Button

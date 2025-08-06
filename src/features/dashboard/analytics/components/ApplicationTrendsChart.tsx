@@ -8,6 +8,8 @@ import {
   Text,
   LoadingOverlay,
   Group,
+  Loader,
+  Skeleton,
 } from "@mantine/core";
 import { LineChart } from "@mantine/charts";
 import { useApplicationTrends } from "../hooks/useApplicationTrends";
@@ -30,30 +32,61 @@ export const ApplicationTrendsChart = () => {
 
   const chartData = (data?.data || []).map((item) => ({
     ...item,
-    date: new Date(item.date).toLocaleDateString("en-US", {
+    date: new Date(item.date).toLocaleDateString("en-ID", {
       month: "short",
       day: "2-digit",
-      year: "numeric",
+      year: "2-digit",
     }),
   }));
 
+  if (isLoading) {
+    return (
+      <Paper withBorder p="sm" style={{ height: "100%" }}>
+        <Stack gap="md">
+          <Group justify="space-between" align="center" mb="md">
+            <Stack gap={0}>
+              <Title order={4}>Application Trends</Title>
+              <Skeleton height={16} width={180} mt={2} />
+            </Stack>
+            <Skeleton height={35} width={310} radius="sm" />
+          </Group>
+          <Box
+            h={250}
+            display="flex"
+            style={{ alignItems: "center", justifyContent: "center" }}
+          >
+            <Loader size="lg" color="indigo" />
+          </Box>
+        </Stack>
+      </Paper>
+    );
+  }
+
   if (error) {
     return (
-      <Paper withBorder p="md">
-        <Title order={4} mb="md">
-          Application Trends
-        </Title>
-        <Text c="red" size="sm">
-          Failed to load application trends data
-        </Text>
+      <Paper withBorder p="sm" style={{ height: "100%" }}>
+        <Stack gap="md">
+          <Title order={4} mb="md">
+            Application Trends
+          </Title>
+          <Box
+            h={250}
+            display="flex"
+            style={{ alignItems: "center", justifyContent: "center" }}
+          >
+            <Text c="red" size="sm" style={{ textAlign: "center" }}>
+              Failed to load application trends data
+            </Text>
+          </Box>
+        </Stack>
       </Paper>
     );
   }
 
   return (
-    <Paper withBorder p="md" style={{ height: "100%" }}>
+    <Paper withBorder p="sm" style={{ height: "100%" }}>
       <Stack gap="md">
-        <Group justify="space-between" align="center">
+        <Group justify="space-between" align="center" mb="md">
           <Stack gap={0}>
             <Title order={4}>Application Trends</Title>
             <Text c="dimmed" size="sm">
@@ -70,12 +103,12 @@ export const ApplicationTrendsChart = () => {
           />
         </Group>
 
-        <Box pos="relative" h={300}>
+        <Box pos="relative">
           <LoadingOverlay visible={isLoading} />
 
           {chartData.length > 0 ? (
             <LineChart
-              h={350}
+              h={250}
               data={chartData}
               dataKey="date"
               series={[
@@ -87,10 +120,10 @@ export const ApplicationTrendsChart = () => {
               ]}
               curveType="natural"
               tickLine="x"
-              withYAxis={false}
+              withYAxis={true}
               withDots={true}
-              dotProps={{ r: 4, strokeWidth: 2 }}
-              activeDotProps={{ r: 6, strokeWidth: 2 }}
+              activeDotProps={{ r: 4 }}
+              tooltipAnimationDuration={200}
             />
           ) : (
             !isLoading && (

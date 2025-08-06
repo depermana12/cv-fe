@@ -1,4 +1,12 @@
-import { Card, Group, ActionIcon, Box, Text, Badge } from "@mantine/core";
+import {
+  Card,
+  Group,
+  ActionIcon,
+  Box,
+  Text,
+  Badge,
+  Stack,
+} from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import type { Icon } from "@tabler/icons-react";
 
@@ -16,28 +24,21 @@ export const ContextualActionCardItem = ({
   item: ContextualQuickActionItem;
 }) => {
   return (
-    <Card padding="md" radius="sm" withBorder>
-      <Group justify="space-between" mb="xs">
-        <Group>
-          <ActionIcon
-            variant="light"
-            size="lg"
-            radius="md"
-            aria-label={item.title}
-          >
-            <item.icon size={20} />
-          </ActionIcon>
-          <Box>
-            <Text size="sm" fw={500} component={Link} to={item.route}>
+    <Card padding="xs" radius="sm" withBorder>
+      <Group justify="space-between">
+        <Group justify="flex-start" align="center">
+          <item.icon size={24} />
+          <Stack gap={0}>
+            <Text size="sm" component={Link} to={item.route}>
               {item.title}
             </Text>
             <Text size="xs" c="dimmed" lineClamp={2}>
               {item.description}
             </Text>
-          </Box>
+          </Stack>
         </Group>
         {item.badge && (
-          <Badge size="sm" variant="light">
+          <Badge size="md" variant="default">
             {item.badge}
           </Badge>
         )}

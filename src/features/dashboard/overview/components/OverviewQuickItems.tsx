@@ -113,7 +113,7 @@ export const OverviewQuickItems = () => {
         </Title>
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} height={80} radius="sm" />
+            <Skeleton key={i} height={55} radius="sm" />
           ))}
         </SimpleGrid>
       </Card>
@@ -143,8 +143,8 @@ export const OverviewQuickItems = () => {
   const contextualActions = getContextualActions();
 
   return (
-    <Card padding="lg" radius="md" withBorder>
-      <Title order={4} mb="md">
+    <Card padding="md" radius="md" withBorder>
+      <Title order={4} mb="sm">
         Quick Actions
       </Title>
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
