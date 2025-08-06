@@ -61,7 +61,7 @@ export const OverviewQuickItems = () => {
             ? "Get started with our guided CV builder"
             : "Let's create another tailored CV for your next job",
         icon: IconPlus,
-        route: "/dashboard/cv/setup",
+        route: "/dashboard/cv/library/new",
         badge: stats.cvCreated > 0 ? `${stats.cvCreated} CVs` : undefined,
       },
 
