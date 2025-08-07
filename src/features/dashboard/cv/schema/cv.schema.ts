@@ -70,6 +70,7 @@ export const cvQueryOptionsSchema = z.object({
     .int({ message: "Must be integer" })
     .nonnegative({ message: "Cannot be negative" })
     .default(0),
+  isPublic: z.coerce.boolean().optional(),
   from: z.coerce.date({ message: "Invalid from date" }).optional(),
   to: z.coerce.date({ message: "Invalid to date" }).optional(),
 });
