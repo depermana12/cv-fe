@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/shared/lib/queryClient";
 import { notifications } from "@mantine/notifications";
-
 import { languageService } from "../services/languageService";
 import type { LanguageInsert } from "../types/language.types";
 
@@ -17,7 +17,6 @@ export const useCreateLanguage = () => {
       return res.data;
     },
     onSuccess: (_data, { cvId }) => {
-      const queryClient = useQueryClient();
       queryClient.invalidateQueries({ queryKey: ["cvs", cvId, "languages"] });
     },
     onError: (err) => {

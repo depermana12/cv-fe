@@ -11,7 +11,7 @@ export const useDeleteLanguage = () => {
       languageService.delete(cvId, languageId),
     onSuccess: (_deleted, { cvId }) => {
       queryClient.invalidateQueries({
-        queryKey: ["languages", cvId],
+        queryKey: ["cvs", cvId, "languages"],
       });
     },
     onError: (error: any) => {

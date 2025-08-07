@@ -12,6 +12,7 @@ import {
   Tooltip,
   Modal,
   ActionIcon,
+  Box,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -125,122 +126,119 @@ export const LanguageForm = ({
   const isPending = isCreating || isUpdating;
 
   return (
-    <>
-      {/* Header with delete action for edit mode */}
-      {mode === "edit" && initialData && (
-        <Group justify="space-between" align="center" mb="md">
-          <Title order={3} size="lg">
-            Edit Language
-          </Title>
-          <Tooltip label="Delete language">
-            <ActionIcon
-              color="red"
-              variant="light"
-              onClick={openDeleteModal}
-              size="lg"
-            >
-              <IconTrash size={18} />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
-      )}
-
+    <Box pos="relative">
+      <LoadingOverlay visible={state.isSubmitting || isPending} />
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
       >
-        <LoadingOverlay visible={state.isSubmitting || isPending} />
+        {/* Language Information Section */}
+        <Paper withBorder p="md">
+          <Stack gap="xs">
+            <Title order={4} size="md">
+              Language Information
+            </Title>
 
-        <Stack gap="xl">
-          {/* Language Information Section */}
-          <Paper withBorder p="md">
-            <Stack gap="md">
-              <Title order={4} size="md">
-                Language Information
-              </Title>
+            <Group grow>
+              <Field
+                name="language"
+                validators={{
+                  onBlur: zFieldValidator(languageSchema.shape.language),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <TextInput
+                      name={name}
+                      label="Language"
+                      placeholder="Enter language name (e.g., English, Spanish, French)"
+                      value={state.value}
+                      onChange={(e) => handleChange(e.target.value)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      required
+                      autoComplete="language"
+                    />
+                  );
+                }}
+              </Field>
 
-              <Group grow>
-                <Field
-                  name="language"
-                  validators={{
-                    onBlur: zFieldValidator(languageSchema.shape.language),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <TextInput
-                        name={name}
-                        label="Language"
-                        placeholder="Enter language name (e.g., English, Spanish, French)"
-                        value={state.value}
-                        onChange={(e) => handleChange(e.target.value)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        required
-                        autoComplete="language"
-                      />
-                    );
-                  }}
-                </Field>
+              <Field
+                name="fluency"
+                validators={{
+                  onBlur: zFieldValidator(languageSchema.shape.fluency),
+                }}
+              >
+                {({ state, name, handleChange, handleBlur }) => {
+                  const errorField = useFieldError(state.meta);
+                  return (
+                    <Select
+                      name={name}
+                      label="Fluency Level"
+                      placeholder="Select your fluency level"
+                      data={fluencyOptions}
+                      value={state.value || null}
+                      onChange={(value) => handleChange(value as any)}
+                      onBlur={handleBlur}
+                      error={errorField}
+                      clearable
+                    />
+                  );
+                }}
+              </Field>
+            </Group>
+          </Stack>
+        </Paper>
 
-                <Field
-                  name="fluency"
-                  validators={{
-                    onBlur: zFieldValidator(languageSchema.shape.fluency),
-                  }}
-                >
-                  {({ state, name, handleChange, handleBlur }) => {
-                    const errorField = useFieldError(state.meta);
-                    return (
-                      <Select
-                        name={name}
-                        label="Fluency Level"
-                        placeholder="Select your fluency level"
-                        data={fluencyOptions}
-                        value={state.value || null}
-                        onChange={(value) => handleChange(value as any)}
-                        onBlur={handleBlur}
-                        error={errorField}
-                        clearable
-                      />
-                    );
-                  }}
-                </Field>
-              </Group>
-            </Stack>
-          </Paper>
-
-          <Group justify="flex-end" mt="lg">
-            <Button type="submit" loading={state.isSubmitting || isPending}>
-              {mode === "create" ? "Create Language" : "Update Language"}
-            </Button>
-          </Group>
-        </Stack>
-      </form>
-
-      {/* Delete Confirmation Modal */}
-      <Modal
-        opened={opened}
-        onClose={closeDeleteModal}
-        title="Delete Language"
-        centered
-      >
-        <Text mb="md">
-          Are you sure you want to delete this language? This action cannot be
-          undone.
-        </Text>
-        <Group justify="flex-end">
-          <Button variant="light" onClick={closeDeleteModal}>
-            Cancel
-          </Button>
-          <Button color="red" onClick={handleDelete} loading={isDeleting}>
-            Delete
+        <Group justify="flex-end" mt="lg">
+          {mode === "edit" && initialData && (
+            <Tooltip label="Delete Language" position="top">
+              <ActionIcon
+                color="red"
+                size="lg"
+                variant="light"
+                onClick={openDeleteModal}
+                disabled={isPending}
+              >
+                <IconTrash size={18} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+          <Button
+            variant="filled"
+            type="submit"
+            loading={state.isSubmitting || isPending}
+          >
+            {mode === "create" ? "Create Language" : "Update Language"}
           </Button>
         </Group>
-      </Modal>
-    </>
+        {/* Delete Confirmation Modal */}
+        <Modal
+          opened={opened}
+          onClose={closeDeleteModal}
+          title="Delete Language"
+          centered
+        >
+          <Stack gap="md">
+            <Text>
+              Are you sure you want to delete this language? This action cannot
+              be undone.
+            </Text>
+
+            <Group justify="flex-end">
+              <Button variant="default" onClick={closeDeleteModal}>
+                Cancel
+              </Button>
+              <Button color="red" onClick={handleDelete} loading={isDeleting}>
+                Delete Contact
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
+      </form>
+    </Box>
   );
 };
