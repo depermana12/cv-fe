@@ -1,11 +1,20 @@
 export type ProfilePictureProps = {
   user: {
+    id: number;
     firstName?: string | null;
     lastName?: string | null;
     username: string;
     bio?: string | null;
     profileImage?: string | null;
+    isEmailVerified?: boolean;
+    subscriptionType?: string;
   };
+  userStats?: {
+    cvCreated: number;
+    totalJobApplications: number;
+    accountAge: number;
+  };
+  onEditProfile?: () => void;
 };
 
 export type AccountInformationProps = {
@@ -26,4 +35,5 @@ export type ProfileFormProps = {
     about?: string | null;
     bio?: string | null;
   };
+  onClose: () => void;
 };

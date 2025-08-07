@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Stack,
   Group,
@@ -18,8 +17,7 @@ import { zFieldValidator } from "@shared/utils/zFieldValidator";
 import { userUpdateSchema } from "@features/user/schema/user";
 import { ProfileFormProps } from "../types/profile.type";
 
-export const ProfileForm = ({ user }: ProfileFormProps) => {
-  const [isEditing, setIsEditing] = useState(false);
+export const ProfileForm = ({ user, onClose }: ProfileFormProps) => {
   const { mutate: updateProfile, isPending } = useUpdateProfile();
 
   const { Field, handleSubmit, state } = useForm({
@@ -32,11 +30,7 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
       bio: user?.bio || "",
     },
     onSubmit: async ({ value }) => {
-      updateProfile(value, {
-        onSuccess: () => {
-          setIsEditing(false);
-        },
-      });
+      updateProfile(value);
     },
   });
 
@@ -66,10 +60,9 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                   label="First Name"
                   placeholder="Enter your first name"
                   value={state.value || ""}
-                  error={isEditing ? useFieldError(state.meta) : undefined}
+                  error={useFieldError(state.meta)}
                   onChange={(e) => handleChange(e.target.value)}
                   onBlur={handleBlur}
-                  disabled={!isEditing}
                 />
               )}
             </Field>
@@ -85,10 +78,9 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                   label="Last Name"
                   placeholder="Enter your last name"
                   value={state.value || ""}
-                  error={isEditing ? useFieldError(state.meta) : undefined}
+                  error={useFieldError(state.meta)}
                   onChange={(e) => handleChange(e.target.value)}
                   onBlur={handleBlur}
-                  disabled={!isEditing}
                 />
               )}
             </Field>
@@ -111,9 +103,8 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                     handleChange(date ? new Date(date) : undefined)
                   }
                   onBlur={handleBlur}
-                  error={isEditing ? useFieldError(state.meta) : undefined}
+                  error={useFieldError(state.meta)}
                   maxDate={new Date()}
-                  disabled={!isEditing}
                 />
               )}
             </Field>
@@ -137,9 +128,8 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                     handleChange(value as "male" | "female" | undefined)
                   }
                   onBlur={handleBlur}
-                  error={isEditing ? useFieldError(state.meta) : undefined}
+                  error={useFieldError(state.meta)}
                   clearable
-                  disabled={!isEditing}
                 />
               )}
             </Field>
@@ -159,9 +149,8 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                   value={state.value || ""}
                   onChange={(e) => handleChange(e.target.value)}
                   onBlur={handleBlur}
-                  error={isEditing ? useFieldError(state.meta) : undefined}
+                  error={useFieldError(state.meta)}
                   autosize
-                  disabled={!isEditing}
                   minRows={3}
                   maxRows={6}
                 />
@@ -184,9 +173,8 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                   value={state.value || ""}
                   onChange={(e) => handleChange(e.target.value)}
                   onBlur={handleBlur}
-                  error={isEditing ? useFieldError(state.meta) : undefined}
+                  error={useFieldError(state.meta)}
                   autosize
-                  disabled={!isEditing}
                   minRows={2}
                   maxRows={4}
                 />
@@ -195,25 +183,19 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
           </Field>
 
           <Group justify="space-between" mt="md">
-            {!isEditing ? (
-              <Button variant="outline" onClick={() => setIsEditing(true)}>
-                Edit Profile
+            <Group>
+              <Button variant="default" onClick={onClose}>
+                Cancel
               </Button>
-            ) : (
-              <Group>
-                <Button variant="default" onClick={() => setIsEditing(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  variant="outline"
-                  type="submit"
-                  loading={state.isSubmitting || isPending}
-                  disabled={state.isSubmitting || isPending}
-                >
-                  Save Changes
-                </Button>
-              </Group>
-            )}
+              <Button
+                variant="outline"
+                type="submit"
+                loading={state.isSubmitting || isPending}
+                disabled={state.isSubmitting || isPending}
+              >
+                Save Changes
+              </Button>
+            </Group>
           </Group>
         </Stack>
       </form>
