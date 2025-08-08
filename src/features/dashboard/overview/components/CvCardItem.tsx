@@ -113,13 +113,11 @@ export const CvCardItem = ({ cv }: { cv: Cv }) => {
         </Group>
       </Paper>
       {/* Quick Edit Modal lifted to parent */}
-      {cvToEdit && (
-        <CvQuickEditModal
-          opened={quickEditModalOpened}
-          onClose={handleCloseQuickEditModal}
-          cvId={cvToEdit.id}
-        />
-      )}
+      <CvQuickEditModal
+        opened={quickEditModalOpened}
+        onClose={handleCloseQuickEditModal}
+        cvId={cvToEdit?.id ?? null}
+      />
     </>
   );
 };
