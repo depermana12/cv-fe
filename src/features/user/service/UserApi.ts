@@ -6,6 +6,7 @@ import {
   UserCredentialsUpdate,
   UserPreferencesUpdate,
   UserProfileProgressRes,
+  UpdateMonthlyGoal,
 } from "../types/user.types";
 import { ApiResponse } from "@shared/types/type";
 
@@ -108,6 +109,16 @@ export class UserApi<T, I> extends ResourceApi<T, I> {
   async getProfileProgress(): Promise<ApiResponse<UserProfileProgressRes>> {
     const res = await axiosClient.get<ApiResponse<UserProfileProgressRes>>(
       `${this.resource}/me/profile-progress`,
+    );
+    return res.data;
+  }
+
+  async updateMonthlyGoal(
+    data: UpdateMonthlyGoal,
+  ): Promise<ApiResponse<{ goal: number }>> {
+    const res = await axiosClient.patch<ApiResponse<{ goal: number }>>(
+      `${this.resource}/me/monthly-goal`,
+      data,
     );
     return res.data;
   }

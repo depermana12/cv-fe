@@ -8,11 +8,12 @@ import {
   Skeleton,
   Card,
   Badge,
-  Button,
   Progress,
   Box,
   Anchor,
   Modal,
+  SimpleGrid,
+  Alert,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useUser } from "@features/user/hooks/useUser";
@@ -23,13 +24,18 @@ import { ProfileCard } from "../components/ProfileCard";
 import { ProfileForm } from "../components/ProfileForm";
 import { AccountDelete } from "../components/AccountDelete";
 import { AccountInformation } from "../components/AccountInformation";
+import { UpdateMonthlyGoal } from "../components/UpdateMonthlyGoal";
 
 export const ProfilePage = () => {
   const { data: user, isLoading: userLoading, error: userError } = useUser();
   const { data: userStats, isLoading: statsLoading } = useUserStats();
   const { data: profileProgress, isLoading: progressLoading } =
     useProfileProgress();
-  const { data: publicCvs, isLoading: publicCvsLoading } = useCvsPaginated({
+  const {
+    data: publicCvs,
+    isLoading: publicCvsLoading,
+    error: publicCvsError,
+  } = useCvsPaginated({
     isPublic: true,
     limit: 10,
     offset: 0,
@@ -102,7 +108,7 @@ export const ProfilePage = () => {
         <Tabs.Panel value="profile">
           <Grid>
             {/* Profile Header Card */}
-            <Grid.Col span={4}>
+            <Grid.Col span={{ base: 12, md: 4 }}>
               <ProfileCard
                 user={user}
                 userStats={
@@ -117,9 +123,9 @@ export const ProfilePage = () => {
                 }
                 onEditProfile={openProfileModal}
               />
-            </Grid.Col>{" "}
+            </Grid.Col>
             {/* Public CVs/Activity */}
-            <Grid.Col span={8}>
+            <Grid.Col span={{ base: 12, md: 8 }}>
               <Card withBorder radius="md" p="lg">
                 <Group justify="space-between" mb="md">
                   <Title order={4}>Public CVs</Title>
@@ -127,12 +133,20 @@ export const ProfilePage = () => {
                     Visible to everyone
                   </Text>
                 </Group>
-
                 {publicCvsLoading ? (
                   <Stack gap="md">
-                    <Skeleton height={80} radius="md" />
-                    <Skeleton height={80} radius="md" />
+                    {[...Array(4)].map((_, i) => (
+                      <Card key={i} withBorder radius="sm" p="md">
+                        <Skeleton height={12} width="60%" mb="sm" />
+                        <Skeleton height={10} width="90%" mb="xs" />
+                        <Skeleton height={10} width="50%" />
+                      </Card>
+                    ))}
                   </Stack>
+                ) : publicCvsError ? (
+                  <Alert color="red" variant="light">
+                    Failed to load public CVs. Please try again later.
+                  </Alert>
                 ) : publicCvs?.data && publicCvs.data.length > 0 ? (
                   <Stack gap="md">
                     {publicCvs.data.map((cv) => (
@@ -149,7 +163,7 @@ export const ProfilePage = () => {
                           >
                             {cv.title || "Untitled CV"}
                           </Anchor>
-                          <Text size="sm" c="dimmed" mb="xs">
+                          <Text size="sm" c="dimmed" mb="xs" lineClamp={2}>
                             {cv.description || "No description available"}
                           </Text>
                           <Group gap="xs">
@@ -163,12 +177,6 @@ export const ProfilePage = () => {
                         </Box>
                       </Card>
                     ))}
-
-                    {publicCvs.total > publicCvs.data.length && (
-                      <Button variant="light" fullWidth mt="md">
-                        View All Public CVs ({publicCvs.total})
-                      </Button>
-                    )}
                   </Stack>
                 ) : (
                   <Stack gap="md" align="center" py="xl">
@@ -185,7 +193,7 @@ export const ProfilePage = () => {
             </Grid.Col>
             {/* Second Row */}
             {/* Left Column - Progress & About */}
-            <Grid.Col span={4}>
+            <Grid.Col span={{ base: 12, md: 4 }}>
               <Stack gap="md">
                 <Card withBorder radius="md" p="lg">
                   <Title order={4} mb="md">
@@ -196,6 +204,8 @@ export const ProfilePage = () => {
                       "No information provided. Update your profile to share more about yourself."}
                   </Text>
                 </Card>
+                {/* Monthly Goal */}
+                <UpdateMonthlyGoal />
 
                 {/* Profile Progress Card */}
                 <Card withBorder radius="md" p="lg">
@@ -231,7 +241,7 @@ export const ProfilePage = () => {
               </Stack>
             </Grid.Col>
             {/* Empty columns for spacing */}
-            <Grid.Col span={8}></Grid.Col>
+            <Grid.Col span={{ base: 12, md: 8 }}></Grid.Col>
           </Grid>
         </Tabs.Panel>
 

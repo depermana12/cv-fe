@@ -32,6 +32,7 @@ export const userSchema = z.object({
   emailNotifications: z
     .boolean({ message: "Email notifications must be true or false" })
     .optional(),
+
   monthlyReports: z
     .boolean({ message: "Monthly reports must be true or false" })
     .optional(),
@@ -105,4 +106,13 @@ export const checkUsernameSchema = z.object({
   username: z.string().min(1, "Username must be at least 1 character"),
   available: z.boolean().describe("Indicates if the username is available"),
   exists: z.boolean().describe("Indicates if the username already exists"),
+});
+
+export const updateMonthlyGoalSchema = z.object({
+  goal: z.coerce
+    .number()
+    .int()
+    .positive({ message: "Monthly goal must be a positive integer" })
+    .min(1, { message: "Monthly goal must be at least 1" })
+    .max(1000, { message: "Monthly goal cannot exceed 1000" }),
 });

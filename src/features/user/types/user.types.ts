@@ -7,6 +7,7 @@ import {
   userCredentialsUpdateSchema,
   userPreferencesUpdateSchema,
   checkUsernameSchema,
+  updateMonthlyGoalSchema,
 } from "../schema/user";
 
 export type User = z.infer<typeof userSchema>;
@@ -26,3 +27,5 @@ export type UserProfileProgressRes = {
   progressPercentage: number;
   emptyFieldNames: string[];
 };
+
+export type UpdateMonthlyGoal = z.infer<typeof updateMonthlyGoalSchema>;
