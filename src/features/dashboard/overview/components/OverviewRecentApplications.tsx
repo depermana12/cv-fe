@@ -93,12 +93,11 @@ export const OverviewRecentApplications = () => {
             style={{ cursor: "pointer" }}
           >
             <Group justify="space-between" align="center">
-              <Stack gap={0}>
+              <Stack gap={2}>
                 <Group gap={8} wrap="nowrap">
-                  <Title order={6} fw={500} lineClamp={1}>
-                    {app.jobTitle}
-                  </Title>
-                  <Text size="xs" c="dimmed" lineClamp={1}>
+                  <Text lineClamp={1}>{app.jobTitle}</Text>
+                  <Text component="span" size="xs" c="dimmed" lineClamp={1}>
+                    {" "}
                     at {app.companyName}
                   </Text>
                 </Group>

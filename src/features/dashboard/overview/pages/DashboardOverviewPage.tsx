@@ -8,6 +8,7 @@ import { ApplicationTrendsChart } from "../../analytics/components/ApplicationTr
 import { ApplicationStatusDistributionChart } from "../../analytics/components/ApplicationStatusDistributionChart";
 import { PortalPerformanceChart } from "../../analytics/components/PortalPerformanceChart";
 import { useUser } from "@/features/user/hooks";
+import { FollowUpsReminderCard } from "../components/FollowUpsReminderCard";
 
 export const DashboardOverviewPage = () => {
   const getGreeting = () => {
@@ -48,6 +49,9 @@ export const DashboardOverviewPage = () => {
         </Grid.Col>
         <Grid.Col span={{ base: 12, lg: 4 }}>
           <OverviewRecentApplications />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, lg: 4 }}>
+          <FollowUpsReminderCard />
         </Grid.Col>
       </Grid>
     </Stack>
