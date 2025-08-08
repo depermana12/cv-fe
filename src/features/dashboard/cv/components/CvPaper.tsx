@@ -10,6 +10,9 @@ interface CvPaperProps {
  * Uses percentages for responsive scaling within CvA4Preview
  * Customizable styling through cvStyleStore
  * White background with light box-shadow
+ *
+ * Note: overflow is handled by parent containers (CvA4Preview/CVMultiPagePreview)
+ * to allow proper height measurement for multi-page functionality
  */
 export const CvPaper = ({ children }: CvPaperProps) => {
   const { fontSize, lineHeight, fontFamily } = useCvStyleStore();
@@ -26,7 +29,7 @@ export const CvPaper = ({ children }: CvPaperProps) => {
         lineHeight: lineHeight,
         fontFamily: fontFamily,
         color: "#000",
-        overflow: "auto", // Changed from hidden to auto for scrolling within paper
+        overflow: "visible", // Changed to visible to allow proper height measurement
         position: "relative",
       }}
     >

@@ -11,6 +11,9 @@ interface CvA4PreviewProps {
  * Maintains A4 aspect ratio (794x1123px at 96 DPI)
  * Uses Mantine's useResizeObserver hook for responsive scaling
  * Uses transform-origin: top left for proper alignment
+ *
+ * Note: Overflow and scrolling is handled by parent containers.
+ * This component allows content to expand beyond its bounds for proper measurement.
  */
 export const CvA4Preview = ({ children }: CvA4PreviewProps) => {
   const [ref, rect] = useResizeObserver();
@@ -56,13 +59,13 @@ export const CvA4Preview = ({ children }: CvA4PreviewProps) => {
         display: "flex",
         justifyContent: "center",
         alignItems: "flex-start",
-        overflow: "auto",
+        overflow: "visible", // Let parent handle overflow and scrolling
       }}
     >
       <Box
         style={{
           width: A4_WIDTH * scale, // Use scaled dimensions for proper centering
-          height: A4_HEIGHT * scale, // Use scaled dimensions for proper centering
+          minHeight: A4_HEIGHT * scale, // Use minHeight instead of height to allow expansion
           position: "relative",
           backgroundColor: "transparent",
         }}
@@ -70,12 +73,13 @@ export const CvA4Preview = ({ children }: CvA4PreviewProps) => {
         <Box
           style={{
             width: A4_WIDTH,
-            height: A4_HEIGHT,
+            minHeight: A4_HEIGHT, // Use minHeight to allow content expansion
             transform: `scale(${scale})`,
             transformOrigin: "top left",
             position: "absolute",
             top: 0,
             left: 0,
+            overflow: "visible", // Allow content to be visible for measurement
           }}
         >
           {children}

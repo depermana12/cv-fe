@@ -16,28 +16,26 @@ import { useCvStyleStore } from "@features/dashboard/cv/store/cvStyleStore";
 import { useCVSectionStore } from "@features/dashboard/cv/store/cvSectionStore";
 import { useCvStore } from "@features/dashboard/cv/store/cvStore";
 import { useCVData } from "../hooks/useCVData";
-import { CvA4Preview } from "./CvA4Preview";
-import { CvPaper } from "./CvPaper";
+import { CVStackedPagesPreview } from "./CVStackedPagesPreview";
 
-interface CVLivePreviewA4Props {
+interface CVLivePreviewA4MultiPageProps {
   cvId?: number;
 }
 
 /**
- * REFACTORED: CVLivePreviewA4 using centralized useCVData hook
+ * CVLivePreviewA4MultiPage - Enhanced CV preview with stacked multi-page support
  *
- * Before: 11 individual hooks called separately
- * After: 4 hooks with centralized data management
- *
- * Benefits:
- * - Reduced from 11 hooks to 4 hooks (63% reduction)
- * - Consistent loading state across all sections
- * - Better error handling
- * - Simplified component logic
- * - Performance improvements through coordinated data fetching
+ * Features:
+ * - Stacked A4 papers with flowing content
+ * - Content automatically flows from page to page
+ * - Scroll to view additional pages (no pagination controls)
+ * - Direct DOM measurement for overflow detection
+ * - Maintains all existing functionality from CVLivePreviewA4
+ * - Uses centralized useCVData hook for consistent data management
  */
-export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
-  // Store hooks (these remain the same)
+export const CVLivePreviewA4MultiPage = ({
+  cvId,
+}: CVLivePreviewA4MultiPageProps) => {
   const { activeCvId } = useCvStore();
   const {
     headerColor,
@@ -50,13 +48,10 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
   } = useCvStyleStore();
   const { getSectionTitle, selectedSections } = useCVSectionStore();
 
-  // SINGLE centralized data hook replaces 8 individual data hooks
   const actualCvId = cvId || activeCvId;
   const safeActiveCvId = actualCvId || 0;
-
   const cvData = useCVData(safeActiveCvId);
 
-  // Destructure data for better DX
   const {
     data: {
       contacts,
@@ -72,11 +67,12 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
     hasError,
   } = cvData;
 
-  // Early return after all hooks are called (same pattern as before)
+  // Early return after all hooks are called
   if (!actualCvId) {
     return (
-      <CvA4Preview>
-        <CvPaper>
+      <CVStackedPagesPreview
+        selectedSections={[]}
+        renderSectionCallback={() => (
           <Stack
             gap="lg"
             align="center"
@@ -85,16 +81,18 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
           >
             <Text c="dimmed">No CV selected</Text>
           </Stack>
-        </CvPaper>
-      </CvA4Preview>
+        )}
+      >
+        <div />
+      </CVStackedPagesPreview>
     );
   }
 
-  // Enhanced error handling
   if (hasError) {
     return (
-      <CvA4Preview>
-        <CvPaper>
+      <CVStackedPagesPreview
+        selectedSections={[]}
+        renderSectionCallback={() => (
           <Alert
             icon={<IconExclamationCircle size="1rem" />}
             title="Error loading CV data"
@@ -103,16 +101,18 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
             There was an error loading your CV data. Please try refreshing the
             page.
           </Alert>
-        </CvPaper>
-      </CvA4Preview>
+        )}
+      >
+        <div />
+      </CVStackedPagesPreview>
     );
   }
 
-  // Enhanced loading state
   if (isLoading) {
     return (
-      <CvA4Preview>
-        <CvPaper>
+      <CVStackedPagesPreview
+        selectedSections={[]}
+        renderSectionCallback={() => (
           <Box style={{ position: "relative", minHeight: "400px" }}>
             <LoadingOverlay visible={true} />
             <Stack
@@ -128,15 +128,15 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
               </Text>
             </Stack>
           </Box>
-        </CvPaper>
-      </CvA4Preview>
+        )}
+      >
+        <div />
+      </CVStackedPagesPreview>
     );
   }
 
-  // Get contact data (single item)
   const contact = contacts.length > 0 ? contacts[0] : null;
 
-  // Transform contact data for display
   const contactDisplay = contact
     ? {
         fullName:
@@ -152,7 +152,6 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
       }
     : null;
 
-  // Helper function to format dates
   const formatDate = (date: string | Date | undefined): string => {
     if (!date) return "Present";
     const d = typeof date === "string" ? new Date(date) : date;
@@ -160,18 +159,20 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
     return d.toLocaleString("en-US", { month: "short", year: "numeric" });
   };
 
-  // Get section titles using the store, fallback to defaults if no active CV
+  // Get section titles using the store
   const getTitle = (sectionType: string) => {
-    if (!actualCvId) return sectionType; // fallback
+    if (!actualCvId) return sectionType;
     return getSectionTitle(actualCvId, sectionType as any);
   };
 
-  // Create section components mapping
-  const renderSection = (sectionType: string) => {
+  // Enhanced section renderer with page awareness
+  const renderSectionForPage = (sectionType: string, pageNumber: number) => {
+    const sectionKey = `${sectionType}-page-${pageNumber}`;
+
     switch (sectionType) {
       case "contact":
         return contactDisplay ? (
-          <Box key="contact" style={{ textAlign: contactAlignment }}>
+          <Box key={sectionKey} style={{ textAlign: contactAlignment }}>
             <Title order={1} size="h2" style={{ color: headerColor }}>
               {contactDisplay.fullName}
             </Title>
@@ -197,7 +198,6 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
                   {contact.phone} •
                 </Text>
               )}
-
               {contactDisplay.linkedin && (
                 <Anchor c="blue">
                   {contactDisplay.linkedin.replace(
@@ -223,7 +223,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
 
       case "work":
         return works && works.length > 0 ? (
-          <Box key="work">
+          <Box key={sectionKey}>
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("work")}
             </Title>
@@ -233,7 +233,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
                 <Box key={index}>
                   <Group justify="space-between">
                     <Text fw={600} size="sm">
-                      {job.location && ` ${job.company} • ${job.location}`}
+                      {job.location && `${job.company} • ${job.location}`}
                     </Text>
                     <Text size="xs" c="dimmed">
                       {formatDate(job.startDate)} -{" "}
@@ -241,11 +241,9 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
                         (job.isCurrent ? "Present" : "N/A")}
                     </Text>
                   </Group>
-
                   <Text fw={600} size="sm">
                     {job.position}
                   </Text>
-
                   {Array.isArray(job.descriptions) &&
                   job.descriptions.length > 0 ? (
                     <List withPadding spacing={1} size="sm">
@@ -264,7 +262,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
 
       case "education":
         return educations && educations.length > 0 ? (
-          <Box key="education">
+          <Box key={sectionKey}>
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("education")}
             </Title>
@@ -286,7 +284,6 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
                       edu.gpa &&
                       ` • ${edu.location} • GPA: ${edu.gpa}`}
                   </Text>
-
                   {edu.description && (
                     <Text size="sm" style={{ lineHeight: 1.4 }} mt="xs">
                       {edu.description}
@@ -300,7 +297,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
 
       case "skill":
         return skills && skills.length > 0 ? (
-          <Box key="skill">
+          <Box key={sectionKey}>
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("skill")}
             </Title>
@@ -327,7 +324,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
 
       case "project":
         return projects && projects.length > 0 ? (
-          <Box key="project">
+          <Box key={sectionKey}>
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("project")}
             </Title>
@@ -351,13 +348,11 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
                       {formatDate(project.endDate) || "Present"}
                     </Text>
                   </Group>
-
                   {project.technologies && project.technologies.length > 0 && (
                     <Text fw={500} size="sm" c="dimmed">
                       Technologies: {project.technologies.join(", ")}
                     </Text>
                   )}
-
                   {Array.isArray(project.descriptions) &&
                   project.descriptions.length > 0 ? (
                     <List withPadding spacing={1} size="sm">
@@ -378,7 +373,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
 
       case "language":
         return languages && languages.length > 0 ? (
-          <Box key="language">
+          <Box key={sectionKey}>
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("language")}
             </Title>
@@ -403,7 +398,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
 
       case "organization":
         return organizations && organizations.length > 0 ? (
-          <Box key="organization">
+          <Box key={sectionKey}>
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("organization")}
             </Title>
@@ -426,11 +421,9 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
                       {formatDate(org.endDate) || "Present"}
                     </Text>
                   </Group>
-
                   <Text fw={600} size="sm">
                     {org.role}
                   </Text>
-
                   {Array.isArray(org.descriptions) &&
                   org.descriptions.length > 0 ? (
                     <List withPadding spacing={1} size="sm">
@@ -449,7 +442,7 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
 
       case "course":
         return courses && courses.length > 0 ? (
-          <Box key="course">
+          <Box key={sectionKey}>
             <Title order={3} size="h4" style={{ color: headerColor }}>
               {getTitle("course")}
             </Title>
@@ -466,11 +459,9 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
                       {formatDate(course.endDate)}
                     </Text>
                   </Group>
-
                   <Text fw={600} size="sm">
                     {course.courseName}
                   </Text>
-
                   {Array.isArray(course.descriptions) &&
                   course.descriptions.length > 0 ? (
                     <List withPadding spacing={1} size="sm">
@@ -494,28 +485,36 @@ export const CVLivePreviewA4 = ({ cvId }: CVLivePreviewA4Props) => {
     }
   };
 
+  // Fallback single-page content for initial measurement and when renderSectionCallback is not used
+  const fallbackContent = (
+    <Box
+      style={{
+        position: "relative",
+        fontFamily: fontFamily,
+        fontSize: `${fontSize}px`,
+        lineHeight: lineHeight,
+        margin: `${margin}in`,
+        // Ensure this container allows overflow for measurement
+        overflow: "visible",
+      }}
+    >
+      <Stack gap="xs">
+        {selectedSections
+          .map((sectionType) => renderSectionForPage(sectionType, 1))
+          .filter(Boolean)
+          .map((section, index) => (
+            <Fragment key={index}>{section}</Fragment>
+          ))}
+      </Stack>
+    </Box>
+  );
+
   return (
-    <CvA4Preview>
-      <CvPaper>
-        <Box
-          style={{
-            position: "relative",
-            fontFamily: fontFamily,
-            fontSize: `${fontSize}px`,
-            lineHeight: lineHeight,
-            margin: `${margin}in`,
-          }}
-        >
-          <Stack gap="xs">
-            {selectedSections
-              .map((sectionType) => renderSection(sectionType))
-              .filter(Boolean)
-              .map((section, index) => (
-                <Fragment key={index}>{section}</Fragment>
-              ))}
-          </Stack>
-        </Box>
-      </CvPaper>
-    </CvA4Preview>
+    <CVStackedPagesPreview
+      selectedSections={selectedSections}
+      renderSectionCallback={renderSectionForPage}
+    >
+      {fallbackContent}
+    </CVStackedPagesPreview>
   );
 };

@@ -22,7 +22,7 @@ import { useCVSectionStore } from "@features/dashboard/cv/store/cvSectionStore";
 import { useQuery } from "@tanstack/react-query";
 import { cvQuery } from "@features/dashboard/cv/hooks/query";
 import { CVDesignEditor } from "@features/dashboard/cv/sections/builder/components/CVDesignEditor";
-import { CVLivePreviewA4 } from "@features/dashboard/cv/components/CVLivePreviewA4";
+import { CVLivePreviewA4MultiPage } from "@features/dashboard/cv/components/CVLivePreviewA4MultiPage";
 import { CvSectionManager } from "@features/dashboard/cv/sections/builder/components/CvSectionManager";
 import { CVContentEditor } from "@features/dashboard/cv/sections/builder/components/CVContentEditor";
 import { useParams } from "@tanstack/react-router";
@@ -114,9 +114,12 @@ export const CvBuilderPage = () => {
             span={6}
             style={{
               borderLeft: "1px solid var(--mantine-color-gray-3)",
+              height: "100vh", // Set explicit height for scrolling
+              overflow: "auto", // Handle scrolling at this level
             }}
           >
-            {cvIdNumber && <CVLivePreviewA4 cvId={cvIdNumber} />}
+            {/* Preview Component */}
+            {cvIdNumber && <CVLivePreviewA4MultiPage cvId={cvIdNumber} />}
           </Grid.Col>
         </Grid>
       </Tabs>

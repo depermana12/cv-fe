@@ -24,7 +24,7 @@ import { useQuery } from "@tanstack/react-query";
 import { cvQuery } from "../../../hooks/query";
 import { CVContentEditor } from "./CVContentEditor";
 import { CVDesignEditor } from "./CVDesignEditor";
-import { CVLivePreviewA4 } from "../../../components/CVLivePreviewA4";
+import { CVLivePreviewA4MultiPage } from "../../../components/CVLivePreviewA4MultiPage";
 import { CvSectionManager } from "./CvSectionManager";
 
 type CVBuilderWrapperProps = {
@@ -114,7 +114,7 @@ export const CVBuilderWrapper = ({ onBack }: CVBuilderWrapperProps) => {
               </Tabs.Panel>
               <Tabs.Panel value="design" p="md">
                 {/* Design Editor */}
-                <CVDesignEditor cvId={cv.id} />
+                <CVDesignEditor />
               </Tabs.Panel>
             </Box>
           </Grid.Col>
@@ -123,6 +123,8 @@ export const CVBuilderWrapper = ({ onBack }: CVBuilderWrapperProps) => {
             span={6}
             style={{
               borderLeft: "1px solid var(--mantine-color-gray-3)",
+              height: "calc(100vh - 200px)", // Set explicit height for scrolling
+              overflow: "auto", // Handle scrolling at this level
             }}
           >
             <Stack gap="xs">
@@ -131,7 +133,7 @@ export const CVBuilderWrapper = ({ onBack }: CVBuilderWrapperProps) => {
               </Title>
 
               <Box>
-                <CVLivePreviewA4 />
+                <CVLivePreviewA4MultiPage cvId={activeCvId!} />
               </Box>
             </Stack>
           </Grid.Col>
