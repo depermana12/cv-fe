@@ -8,17 +8,7 @@ interface PublicCvPreviewProps {
 
 export const PublicCvPreview: React.FC<PublicCvPreviewProps> = ({ cv }) => {
   return (
-    <Paper
-      p="xl"
-      radius="md"
-      withBorder
-      style={{
-        minHeight: "842px", // A4 height ratio
-        maxWidth: "595px", // A4 width ratio
-        margin: "0 auto",
-        backgroundColor: "white",
-      }}
-    >
+    <Paper p="lg" shadow="sm" withBorder radius="md">
       <Stack gap="lg">
         {/* Contact Section */}
         {cv.contacts && cv.contacts.length > 0 && (

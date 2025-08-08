@@ -115,7 +115,7 @@ export const PublicCvViewer = ({
               <div>
                 <Title order={2}>{cv.title}</Title>
                 <Text c="dimmed" size="sm">
-                  by @{searchParams.username}
+                  by {searchParams.username}
                 </Text>
               </div>
               <Group gap="xs">

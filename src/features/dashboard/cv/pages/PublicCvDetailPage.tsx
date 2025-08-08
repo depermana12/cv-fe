@@ -11,7 +11,7 @@ import {
   Loader,
   Center,
   Divider,
-  Box,
+  Grid,
 } from "@mantine/core";
 import {
   IconEye,
@@ -19,7 +19,7 @@ import {
   IconUser,
   IconCalendar,
   IconAlertCircle,
-  IconGlobe,
+  IconLanguage,
 } from "@tabler/icons-react";
 import { useCvByUsernameSlug } from "../hooks/useCvByUsernameSlug";
 import { PublicCvPreview } from "../components/PublicCvPreview";
@@ -72,22 +72,57 @@ export const PublicCvDetailPage = () => {
   }
 
   return (
-    <Container size="xl" py="xl">
-      <Stack gap="xl">
-        {/* CV Header Information */}
-        <Paper p="xl" withBorder radius="md">
-          <Stack gap="md">
-            <Group justify="space-between" align="flex-start">
-              <Stack gap="xs">
-                <Group gap="xs" align="center">
-                  <IconGlobe size={20} />
-                  <Title order={1}>{cv.title}</Title>
-                </Group>
-                <Text c="dimmed" size="lg">
-                  by @{username}
+    <Container size="lg" py="xl">
+      <Title order={2} mb="lg">
+        {cv.title}
+      </Title>
+
+      <Grid>
+        <Grid.Col span={{ base: 12, md: 8 }}>
+          <PublicCvPreview cv={cv} />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <Paper withBorder p="lg" radius="md">
+            <Stack gap="xs">
+              <Group gap={4}>
+                <IconUser size={16} />
+                <Text size="sm">
+                  Author: {(username || "Unknown").toUpperCase()}
                 </Text>
+              </Group>
+              <Group gap={4}>
+                <IconLanguage size={16} />
+                <Text size="sm">
+                  Language: {(cv.language || "en").toUpperCase()}
+                </Text>
+              </Group>
+              <Group gap={4}>
+                <IconCalendar size={16} />
+                <Text size="sm">
+                  Created:{" "}
+                  {new Date(cv.createdAt).toLocaleDateString("en-ID", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </Text>
+              </Group>
+              <Group gap={4}>
+                <IconCalendar size={16} />
+                <Text size="sm">
+                  Updated:{" "}
+                  {new Date(cv.updatedAt).toLocaleDateString("en-ID", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </Text>
+              </Group>
+              <Divider />
+              <Text size="sm">
+                {/* This should be for meta description, but okay for */}
                 {cv.description && <Text>{cv.description}</Text>}
-              </Stack>
+              </Text>
 
               <Group gap="md">
                 <Badge
@@ -105,40 +140,10 @@ export const PublicCvDetailPage = () => {
                   {(cv.downloads || 0).toLocaleString()} downloads
                 </Badge>
               </Group>
-            </Group>
-
-            <Divider />
-
-            <Group gap="lg">
-              <Group gap={4}>
-                <IconUser size={16} />
-                <Text size="sm">
-                  Language: {(cv.language || "en").toUpperCase()}
-                </Text>
-              </Group>
-              <Group gap={4}>
-                <IconCalendar size={16} />
-                <Text size="sm">
-                  Updated: {new Date(cv.updatedAt).toLocaleDateString()}
-                </Text>
-              </Group>
-              {cv.theme && (
-                <Text size="sm" c="dimmed">
-                  Theme: {cv.theme}
-                </Text>
-              )}
-            </Group>
-          </Stack>
-        </Paper>
-
-        {/* CV Preview */}
-        <Box>
-          <Title order={2} mb="md">
-            CV Preview
-          </Title>
-          <PublicCvPreview cv={cv} />
-        </Box>
-      </Stack>
+            </Stack>
+          </Paper>
+        </Grid.Col>
+      </Grid>
     </Container>
   );
 };
