@@ -16,9 +16,9 @@ import { useApplicationTrends } from "../hooks/useApplicationTrends";
 import { useAuthStore } from "@app/store/authStore";
 
 const TIME_PERIODS = [
-  { value: "7", label: "Last 7 days" },
-  { value: "30", label: "Last 30 days" },
-  { value: "90", label: "Last 3 months" },
+  { value: "7", label: "7 days" },
+  { value: "30", label: "30 days" },
+  { value: "90", label: "90 days" },
 ];
 
 export const ApplicationTrendsChart = () => {
@@ -98,7 +98,7 @@ export const ApplicationTrendsChart = () => {
             value={selectedPeriod}
             onChange={setSelectedPeriod}
             data={TIME_PERIODS}
-            size="sm"
+            size="xs"
             radius="sm"
           />
         </Group>

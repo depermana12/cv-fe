@@ -47,3 +47,12 @@ export const applicationsMonthlyInterviewQuery = (userId: number) => {
     enabled: !!userId,
   });
 };
+
+export const portalPerformanceQuery = (userId: number) => {
+  return queryOptions({
+    queryKey: ["portalPerformance", userId],
+    queryFn: () => analyticService.portalPerformance(userId),
+    staleTime: 1000 * 60 * 10,
+    enabled: !!userId,
+  });
+};

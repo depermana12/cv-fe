@@ -5,6 +5,7 @@ import type {
   ApplicationTrends,
   MonthlyApplicationRate,
   StatusDistribution,
+  PortalPerformance,
 } from "../types/analytic.type";
 
 export class AnalyticApi {
@@ -51,6 +52,16 @@ export class AnalyticApi {
   async applicationsMonthlyInterview(userId: number) {
     const response = await axiosClient.get<ApiResponse<MonthlyApplicationRate>>(
       `${this.resource}/monthly-interview-metrics`,
+      {
+        params: { userId },
+      },
+    );
+    return response.data;
+  }
+
+  async portalPerformance(userId: number) {
+    const response = await axiosClient.get<ApiResponse<PortalPerformance[]>>(
+      `${this.resource}/portal-performance`,
       {
         params: { userId },
       },

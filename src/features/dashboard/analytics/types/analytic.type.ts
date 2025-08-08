@@ -21,3 +21,12 @@ export type ApplicationMonthlyGoal = {
   remainingItem: number;
   remainingDays: number;
 };
+
+export type PortalPerformance = {
+  portal: string;
+  totalApplications: number;
+  interviews: number;
+  offers: number;
+  interviewRate: number; // percentage 0-100
+  offerRate: number; // percentage 0-100
+};
