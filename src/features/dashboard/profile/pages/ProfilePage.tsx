@@ -11,7 +11,6 @@ import {
   Button,
   Progress,
   Box,
-  Container,
   Anchor,
   Modal,
 } from "@mantine/core";
@@ -23,6 +22,7 @@ import { useCvsPaginated } from "@features/dashboard/cv/hooks/useCvs";
 import { ProfileCard } from "../components/ProfileCard";
 import { ProfileForm } from "../components/ProfileForm";
 import { AccountDelete } from "../components/AccountDelete";
+import { AccountInformation } from "../components/AccountInformation";
 
 export const ProfilePage = () => {
   const { data: user, isLoading: userLoading, error: userError } = useUser();
@@ -96,7 +96,7 @@ export const ProfilePage = () => {
       <Tabs defaultValue="profile" variant="outline">
         <Tabs.List mb="lg">
           <Tabs.Tab value="profile">Profile</Tabs.Tab>
-          <Tabs.Tab value="settings">Settings</Tabs.Tab>
+          <Tabs.Tab value="account">Account</Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="profile">
@@ -235,13 +235,16 @@ export const ProfilePage = () => {
           </Grid>
         </Tabs.Panel>
 
-        <Tabs.Panel value="settings">
-          <Container size="sm">
-            <Stack gap="lg">
+        <Tabs.Panel value="account">
+          <Grid>
+            <Grid.Col span={{ base: 12, sm: 10, md: 8, lg: 6, xl: 5 }}>
               <Title order={4}>Account</Title>
-              <AccountDelete user={user} />
-            </Stack>
-          </Container>
+              <Stack gap="lg">
+                <AccountInformation user={user} />
+                <AccountDelete user={user} />
+              </Stack>
+            </Grid.Col>
+          </Grid>
         </Tabs.Panel>
       </Tabs>
 
