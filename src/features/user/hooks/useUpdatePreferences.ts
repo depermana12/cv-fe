@@ -12,20 +12,12 @@ export const useUpdatePreferences = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user", "me"] });
-      notifications.show({
-        position: "top-right",
-        withCloseButton: true,
-        autoClose: 3000,
-        title: "Preferences updated",
-        message: `Your preferences have been updated successfully.`,
-        color: "green",
-      });
     },
     onError: (err: any) => {
       notifications.show({
         position: "top-right",
         withCloseButton: true,
-        autoClose: 3000,
+        autoClose: 5000,
         title: "Failed to update preferences",
         message:
           err?.response?.data?.message ||
